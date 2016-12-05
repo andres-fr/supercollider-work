@@ -1,0 +1,281 @@
+############################################################################
+######################## CORRELATOR ########################################
+######################### AndresFR #########################################
+############################################################################
+
+
+############################################################################
+### DESCRIPTION:
+############################################################################
+the first phase of the project consists on an algorithm that
+intends to achieve a close reconstruction of an original audio signal
+by transforming and combining different audio samples, the "materials".
+The second phase, once achieved a satisfying result, consists on changing
+tweaking and changing the environment, in order to force the algorithm
+to compromise a solution for non-existing or non-solvable problems.
+
+In this reconstruction, the original signal must be audible, but also
+the materials that lead to it. This degree of compromise may be adjusted.
+
+With transforming and combiningit is meant the following:
+   - Time delay of a material (phase shifting)
+   - Transposition of a material (spectrum shifting, NOT tape-transposing)
+   - Multiplication by a constant (normalization)
+   - Addition of different materials (superposition)
+In notation, this "linear" operation: k*S[t+a] + l*Z[t+b] involves every 
+transformation except transposition. In it, k and l are real-numbered 
+constants, a and b are time delays, S and Z signals.
+
+
+***QUESTION: CAN THIS BE FORMULED AS A LINEAR PROBLEM ALSO WITH TRANSPOSITION??
+   FOURIER TRANSFORM?
+   probably the best approach is to regard transpositions as "new materials",
+   that is, a pool of 5 materials with 10 transpositions each is equivalent
+   as a pool with 50 materials. But this can be very inefficient(see further).
+
+
+
+############################################################################
+### OPTIMIZATION OBJECTIVE
+############################################################################
+3) In order to measure the similarity between two signals, the
+   CROSS-CORRELATION is chosen. This operation is defined on the time
+   domain, but has a more efficient implementation on the frequency domain.
+   ... math (definition, properties, asymptotic)...
+   The CC is the "ideal way to find the position of a certain signal mixed
+   with white noise". Of course, in our setup there is no "noise", and the
+   original signal is very unlikely to contain the materials. BUT the maximum
+   of the CC between the original signal and a material returns anyway the
+   timepoint where the sample could fit "best". In its mathematical
+   formulation, the problem looks like this:
+
+given:
+  -> an original signal S[t]
+  -> a set of material signals M := {m1[t], ...}
+  -> the signal transformation f(t, mat_id, del, trans, norm)
+
+find the (f1, ...f_k) tuple with the corresponding parameters
+that maximize the the following cross-correlation:
+  -> CC(S[t], (f1+f2+ ...))
+
+
+
+############################################################################
+### HOW DOES THE OPTIMIZATION OBJECTIVE FULFILL THE GOALS
+############################################################################
+4) As seen, taking the maximum of the CC over every material leads
+to a solution for the {del, norm} parameters. But, there are
+still three free parameters {mat_id, k, trans}:
+  -> mat_id: which material to take from M?
+  -> k: how many material instances should be used in total?
+  -> trans: how to choose the transposition?
+This three parameters depend heavily on each other, and also on how do
+the signals look like. For constrainted types of signals, some assumptions
+can be done (for example, if there is a delta in the materials every signal
+can be perfectly reconstructed). But since this setup doesn't make assumptions
+on the data, this is a NON-CONVEX OPTIMIZATION PROBLEM. What does this mean?
+   a) Convex functions have a single, global, minimum (or maximum). And
+      Therefore a CLEAR solution, which can be analitically found (usually
+      in an efficient way). Non-convex functions have many ups and downs,
+      which generate local minima and maxima, and there is no general 
+      analytical solution to find the global ones.
+   b) This makes the quest for a solution an expensive problem, and on the
+      top of that the "solution" is going to be most likely suboptimal (keep
+      in mind that "best" fitting doesn't necessarily mean "good" fitting).
+   c) But on the other side,this can lead to interesting behaviours:
+      the thesis is, that some solutions for the optimization of non-convex
+      problems can be regarded as creative, depending on the circumstances.
+      The goal of this project is to explore the possibilities of such a
+      problematic and gain some experience and knowledge about those
+      circumstances and our perception on creativity.
+
+
+
+############################################################################
+### A FIRST APPROACH TO THE ALGORITHM:
+############################################################################
+
+1) Non-convex optimization problems can be solved inefficiently, with some
+   brute-force search for instance. This doesn't make much sense when the
+   search space is real-numbered, but for small, discrete spaces this is very
+   feasable. This is the expected case with the {mat_id} variable: M is
+   expected to contain a few number of materials, and therefore a bruteforce
+   approach seems feasible:
+              next_f = max([CC(S, f(material, ...)) for material in M])
+   This list comprehension calculates f for all samples and takes the one
+   that returns the biggest CC. Further optimizations, like early termination
+   are possible and can be regarded later on.
+
+2) In the case of the {transposition}, the search space for each instance
+   is SAMPLE_FREQ/2, wich for a sample rate of 44100 means a total of 22050
+   possibilities. In this context, a bruteforce approach would make very little
+   sense (for performance reasons), and different optimizations have to be
+   undertaken. Some heuristics to try out, from more promising to less:
+     -> limit the search space to the regions with most spectral density
+     -> limit the global frequency resolution for the transposition
+     -> add randomization + early termination
+
+3) Number of instances, {k}: This is de facto the only variable that is
+   unlimited. In this case, the strategy is to add materials until some global
+   criterium is met, and then stop. Depending on the approach this criterium
+   can take two forms:
+     -> Stop when the ratio CC(S, (f1+f2+ ...)) / CC(S,S) is higher than a
+        certain amount
+     -> Stop when the CC(S, (f...)) doesn't get better or gets worse (preferred)
+
+
+4) So this leaves the following rapid-sketched algorithm, in pseudo-python:
+
+#---------------------------------------------------------------------------
+S = ... # original_signal
+MATERIALS = [...]  # a list with the "material" signals
+EPSILON # a small, real number
+
+while not (TERMINATE_CONDITION): # in this case it is the second approach
+    # empty at beginning, this list will hold the "best" values for each material
+    f_list = [] 
+    current_global_cc = CC(S, sum(f_list))
+    for mat in MATERIALS:
+        # returns a list of desired freqs
+        freq_list = heuristic(S, mat)
+        for trans in freq_list:
+            tmp_sig = f(mat, 0, trans, 1)
+            tmp_cc = CC(S, tmp_sig)
+            cc_peak = max(tmp_cc)
+            cc_peak_index = idx(cc_peak, tmp_cc) # returns the position of the max
+            if (cc_peak > TOLERANCE_FACTOR): 
+                tmp_norm = normalize(mat, S[cc_peak_index : cc_peak_index+len(mat)])
+                f_list.append( f(mat, cc_peak_index, trans, tmp_norm))
+    TERMINATE_CONDITION = abs(current_global_cc - CC(S, sum(f_list))) < EPSILON
+        
+#----------------------------
+As already stated, this algorithm repeats until the global CC doesn't progress
+anymore. In each iteration, the whole CC is done freq_list*MATERIALS times.
+Ignoring the rest of the operations, we have that:
+
+Correlator = O(k*M*freqs)
+
+Which means a cubic amount of cross-correlations. But one caveat: if
+"freqs" rises, k is expected to decrease (because a bigger search
+space hopefully leads to a faster/better convergence). This shows the
+importance and goal of the heuristic(S, mat) function: provide a
+"freqs" space as small as possible whilst ensuring a quick and sound
+convergence.
+
+
+
+
+############################################################################
+### A CLOSER REGARD TO THE PARTS OF THE ALGORITHM:
+############################################################################
+
+
+### CROSS-CORRELATION
+The CC itself can be an expensive operation, if not handled with care.
+Luckily, it can be very efficiently computated in the frequency domain.
+And even more luckily, the transformation between time and frequency domain
+can be also efficiently calculated with the help of the FFT algorithm family.
+The problem is that FFT constraints the buffer size to a power of 2...
+...(further math, see DSP guide)...
+
+### TRANSPOSITION
+Once done the FFT of all materials, at the beginning, this is a trivial
+task, consisting in shifting on the x-axis and then IFFTing
+
+### NORMALIZATION
+Probably taking the standard deviations and dividing is a good way?
+check that. Is it efficient??
+stddev(S[cc_peak_index : cc_peak_index+len(mat)]) / stddev(mat)
+
+
+### FREQ. HEURISTIC
+As said, the goal of the heuristic(S, mat) function is to provide a "freqs"
+space as small as possible whilst ensuring a quick and sound convergence.
+Problem: how can heur know that a freq. space will suffice, before
+calculating the corresponding f(...) and CC?
+
+see SpecPcile, and such!!
+
+a)
+Probably the way to go is the first strategy already mentioned, limit the
+search space to the regions with most spectral density IN THE DIFFERENCE
+BETWEEN BOTH SPECTRA (S, sum(f...)). But there are still 2 ways to tackle this:
+  -> parametric model: there is a fixed set of inputs, outputs and parameters.
+     This means the heuristic looks at the same things, outputs the same
+     num of infos (could be exact frequencies, or freq-boundaries...) and
+     has a fixed set of parameters (which can be hard-coded, learned...)
+  -> non-parametric model: fix a threshold, and take all freqs above,
+     or fix a "surface size" and take freqs with a high mean... 
+It is also important the fact that natural spectra propagate from low to high
+and are therefore not symmetrical.
+
+b)
+Something that maybe works is to take the difference of both spectra as a PDF,
+and spawn a fixed number of values from it.
+
+
+
+############################################################################
+### BUILDING/TESTING:
+############################################################################
+
+### ENVIRONMENT/TOOLS:
+For a first approach, the SuperCollider sound server is going to be used.
+It has already many built-in tools, and support for real-time processing.
+Firstly, the SCLanguage is going to be used, although a switch to ScalaCollider
+is considered and could help enhance the performance in case multithreading
+is needed. Everything is also open-source and GPLv3 (which is by the way good).
+
+### TESTING:
+The phase 1 is succesful if the algorithm consistently makes a synthesized
+signal that closely resembles the original one, while keeping the original
+materials noticeable. At first, this can be judged by hearing the results,
+but it would be very interesting to capture this "success property" in the
+TERMINATE_CONDITION, in order to automatize the quality criteria.
+Optimization will be at first ignored, unless really needed.
+
+### ARCHITECTURE:
+The algorithm outputs a list of f-functions that can be added in order to
+resemble the original signal. This list is incremented as the algo. runs,
+following a greedy approach: first are added the materials that contribute
+most to the CC, and those are never removed. So it could be meaningful to
+have the original signal in one channel, and in the other the resembled 
+signal synchronized to it. Then loop both, each time incrementing the number
+of f-functions involved. This way can be hopefully heard how the algo. 
+behaves through its iterations, and also how does the heuristic and overall
+CC perform.
+
+The FFTs of the signal materials can be calculated at init-time, the
+CC of the "composed" signal has to be calculated once per while-iteration
+Since it is a linear system, simply add the FFTs of the newly added to the
+composed FFT.
+There is no need to store the FFTs of the transpositions, since by aving
+the transp. ratio they can be directly readen from the original
+
+
+
+############################################################################
+### SC UGENS:
+############################################################################
+
+# http://danielnouri.org/docs/SuperColliderHelp/UGens/FFT/FFT%20Overview.html
+PV_Add: complex addition
+PV_BinShift: shift and stretch bin position
+PV_CopyPhase: copy magnitudes and phases of an FFT buffer
+PV_LocalMax: pass bins which are local maxima
+PV_MagAbove: pass bins above a threshold
+PV_Max: maximum magnitude
+PV_MagMul: multiply magnitudes
+PV_MagSmear: average magnitudes across bins
+PV_Mul: complex multiply
+
+
+
+RecordBuf.ar (inputArray, bufnum: 0, offset: 0, recLevel: 1,
+              preLevel: 0, run: 1, loop: 1, trigger: 1, doneAction: 0)
+If recLevel is 1.0 and preLevel is 0.0 then the new input overwrites the old data.
+ If they are both 1.0 then the new data is added to the existing data
+
+
+
+
