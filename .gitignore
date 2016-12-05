@@ -1,1 +1,5 @@
-correlator/materials/
+correlator/materials/**
+*.wav
+*.aiff
+*.aif
+*.mp3
