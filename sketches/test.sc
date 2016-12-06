@@ -68,8 +68,62 @@ freqs.do({arg item, count; {SinOsc.ar(item, 0, 1/r)*EnvGen.kr(env, doneAction:2)
 
 
 
+// working with dictionaries
+
+d = Dictionary.new.putPairs([a:5, b:7, c:1, d:0])
+d.add(\monkey-> 0);
+d.put("abc", 1)
+if(d.at("asdffff")==nil,{1.postln},{2.postln})
+d.at("abc")
+d.atFail("fdsa", {postln("callback!!")})
+d.keys
+d.values
+d.atAll([\monkey, "abc", \b])
+d.getPairs
 
 
 
 
+/*(// plays a given buffer with delay, normalization and FFT transp.
+SynthDef("f_function",{ |audio_name, delay=0, mul=1, transp=0, out=0|
+	var buf, bufdur, sig;
+	buf = Select.kr(audio_name, ~materials); // this could be outside of the synth for optimization
+	bufdur =Select.kr(material_idx, ~material_durations);// this is needed to free the synth correctly, but not optimal: a whole kr ugen per synth just for retrieving a global float, known at Synths instantiation time...
+	sig = PlayBuf.ar(1, buf);
+	sig = sig*Line.kr(1,1, delay+bufdur, doneAction:2);
+	sig = FFT(LocalBuf(2**15), sig, wintype:1,winsize:(2**14));
+	sig = PV_BinShift(sig, 1, transp, 0);
+	sig = IFFT(sig)*2;
+	sig = DelayN.ar(sig, delay, delay, mul);
+	Out.ar(out, sig);
+}).add;*/
 
+
+
+
+(// load the server's buffers into client's signals
+ // WARNING: this is an asynchronous task, that's why such a quirky syntax.
+ // Signals live in the client, avoid playing them! use the buffers instead.
+ // Server-Client interaction can be VERY slow, so minimize it
+ // ~material_signals.at(5).play
+ // ~materials.at(5).play
+~get2powSize = {|n, padded=true| 2**(n.log2.roundUp)*if(padded,2,1)};
+~zeroPadSignal = {|sig| Signal.newClear(~get2powSize.value(sig.size)).overDub(sig)};
+~material_signals = Array.newClear(~materials.size);
+~materials.do(
+	{|buf, idx|
+		buf.loadToFloatArray(action: {|arr| var sig;
+			// *2 at the end because half of Signal is zero to avoid circular conv.
+			sig = Signal.newClear(~get2powSize.value(arr.size));
+			sig.overWrite(arr.as(Signal), 0);
+			sig.normalize;
+			~material_signals.put(idx, sig);
+			});
+});
+~original_signal = nil; // asynch. calculated in the next line
+~original.loadToFloatArray(action:{|arr| var sig;
+	sig = Signal.newClear(~get2powSize.value(arr.size));
+	sig.overWrite(arr.as(Signal), 0);
+	~original_signal = sig;
+});
+)

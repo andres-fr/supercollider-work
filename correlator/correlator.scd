@@ -23,6 +23,15 @@ basic DS: change the Array-based storage for a Dictionary based one:
   -Signals: useful for correlation only! think about the optimal storage/algor. politics
 
 
+BUG: the NRT transposer adds a delay to every audio file (probably equal to the FFT-window size).
+     a good strategy to correct that may be to use another .ar UGEN to detect the beginning of sound
+
+BUG: PlaySig casts sequences like ["anvil", 0, 1, 0] to -> "anvil[0]" which doesnt exist... decide
+     what to do with untransposed files!!
+
+BUG?? crossCorrelation outputs peak 1 sample sooner??
+
+
 // After that, it comes the normalization criterium: once known where to
 // put a sample, the right intensity has to be calculated
 
@@ -40,67 +49,82 @@ basic DS: change the Array-based storage for a Dictionary based one:
 
 
 ///////////////////////////////////////////////////////////////////////////////////
+/// GENERAL CONFIG AND DATA MODEL
+///////////////////////////////////////////////////////////////////////////////////
+( // addresses
+~working_dir = File.getcwd++"/git/supercollider-work/correlator/";
+~materials_dir = ~working_dir++"materials/";
+// this implies that everything in the "materials_dir" is an audio file to be loaded
+~material_addresses = PathName.new(~materials_dir).entries.collect({|x| x.fullPath});
+)
+
+
+(
+// THE GLOBAL DATASTRUCTURE USED TO STORE EVERYTHING
+// this section would be MUCH MORE meaningful as class definition, but hey, sclang
+~audios = Dictionary.new;
+
+// systematic function to fill the ~audios dict
+~loadAudioData = {|fullPath| var d, buf;
+	// create dictionary as d
+	d = Dictionary.new;
+	// add buffer, duration in seconds and signal (NON-PADDED TO SAVE MEMORY) to d
+	buf = Buffer.read(s, fullPath, action:{|b|
+		d.put("buf", b);
+		d.put("dur", b.duration);
+		buf.loadToFloatArray(action: {|arr| d.put("sig", arr.as(Signal))});
+	});
+	// add d to the global dict
+	~audios.put(PathName.new(fullPath).fileNameWithoutExtension, d);
+};
+
+// load everything in the "materials" folder
+~material_addresses.do({|x| ~loadAudioData.value(x)});
+
+// test everything went fine
+//~audios.at("anvil").at("buf").play
+)
+
+///////////////////////////////////////////////////////////////////////////////////
 /// BUFFERS: THE SERVER SIDE
 ///////////////////////////////////////////////////////////////////////////////////
-
-( // addresses
-~working_dir = File.getcwd++"/supercollider-work/";
-~materials_dir = ~working_dir++"materials/";
-~material_addresses = ["crotales.wav", "flexatone.wav", "recoreco.wav", "triangle.wav", "bowsuspend.wav", "anvil.wav"];
-
-)
-
-(// load the audios into buffers (test: ~materials.at(5).play)
-~material_durations = [];
-~materials = ~material_addresses.collect({|x| Buffer.read(s,~materials_dir++x,
-	action: {|b| ~material_durations = ~material_durations.add(b.duration)}).normalize});
-~original_duration = nil; // asynch. calculated in the next line
-~original = Buffer.read(s, ~working_dir++"child.wav", action: {|b| ~original_duration = b.duration});
-)
-
-(// plays a given buffer with delay, normalization and FFT transp.
-SynthDef("f_function",{ |material_idx=0, delay=0, mul=1, transp=0, out=0|
-	var buf, bufdur, sig;
-	buf = Select.kr(material_idx, ~materials); // this could be outside of the synth for optimization
-	bufdur =Select.kr(material_idx, ~material_durations);// this is needed to free the synth correctly, but not optimal: a whole kr ugen per synth just for retrieving a global float, known at Synths instantiation time...
-	sig = PlayBuf.ar(1, buf);
+(// plays a given buffer with delay and normalization
+SynthDef("f_function",{ |buf, bufdur, delay=0, mul=1, out=0|
+	var sig = PlayBuf.ar(1, buf);
 	sig = sig*Line.kr(1,1, delay+bufdur, doneAction:2);
-	sig = FFT(LocalBuf(2**15), sig, wintype:1,winsize:(2**14));
-	sig = PV_BinShift(sig, 1, transp, 0);
-	sig = IFFT(sig)*2;
 	sig = DelayN.ar(sig, delay, delay, mul);
 	Out.ar(out, sig);
 }).add;
 )
 
+(// function for playing buffers in ~audio with delay+normalization
+ // ~playBuffer.value("anvil", 0, 0.5, 0)
+~playBuffer = {|audio_name, delay, mul, transp=nil| var tmp;
+	audio_name = audio_name++if((transp==nil) || (transp==0), {""},{"["++transp++"]"});
+	tmp = ~audios.at(audio_name);
+	if (tmp!=nil,
+		{Synth("f_function", [\buf, tmp.at("buf"), \bufdur, tmp.at("dur"),
+			\delay, delay, \mul, mul])},
+		{postln("audio not found!: "++audio_name)})};
+)
 
 (// define the sequence player
-~seq_player = {|lst| lst.do({|x| Synth.new("f_function", [[\material_idx, \delay, \mul, \transp],x].flop.flat)})} // +++ , ++
+~seq_player = {|seq| seq.do({|x| ~playBuffer.value(x[0], x[1], x[2], x[3])})}
 )
 
-(// create a sequence and add 3 elements
+(// TEST: create and play a sequence
 ~f_sequence = [];
-~f_sequence = ~f_sequence.add([5, 0, 1, 0]);
+~f_sequence = ~f_sequence.add(["anvil", 0, 1, 0]);
 //upwards
-~f_sequence = ~f_sequence.add([5, 1, 1, 500]);
-~f_sequence = ~f_sequence.add([5, 2, 1, 1000]);
-~f_sequence = ~f_sequence.add([5, 3, 1, 2000]);
+~f_sequence = ~f_sequence.add(["anvil", 1, 1, 500]);
+~f_sequence = ~f_sequence.add(["anvil", 2, 1, 1000]);
+~f_sequence = ~f_sequence.add(["anvil", 3, 1, 2000]);
 //downwards
-~f_sequence = ~f_sequence.add([5, 1.3, 1, -550]);
-~f_sequence = ~f_sequence.add([5, 2.2, 1, -840]);
-~f_sequence = ~f_sequence.add([5, 3.1, 1, -1100]);
-)
-
-(// play the sequence!
+~f_sequence = ~f_sequence.add(["anvil", 1.3, 1, -550]);
+~f_sequence = ~f_sequence.add(["anvil", 2.2, 1, -840]);
+~f_sequence = ~f_sequence.add(["anvil", 3.1, 1, -1100]);
+// play!
 ~seq_player.value(~f_sequence)
-)
-
-(
-SynthDef("transpose_buffer", {|addr, transp=0| var buf, sig;
-	buf = Buffer.read(s, addr);
-	sig = PlayBuf.ar(1, buf, doneAction:2);
-	Out.ar(0,sig);
-}).add;
 )
 
 
@@ -113,25 +137,16 @@ SynthDef("transpose_buffer", {|addr, transp=0| var buf, sig;
 /// FILE MANAGEMENT: CREATE TRANSPOSED AUDIO FILES
 ///////////////////////////////////////////////////////////////////////////////////
 
-(// substitutes extension for nr in square brackets and returns whole
- // test: ~addNrToPath.value(~materials.at(0).path, 200)++".wav"
-~addNrToPath = {|path, nr| var tmp;
-	tmp = PathName.new(path);
-	tmp.pathOnly++tmp.fileNameWithoutExtension++"["++nr++"]";
-};
-)
-
-(// function for testing purposes.Warning: it doesn't free the buffer!
-~playBufFromPath = {|path| {PlayBuf.ar(1, Buffer.read(s,path), doneAction:2)}.play}
-)
-
 
 (// this function takes a path to a soundfile, transposes it with PV_Binshift and saves it
- // to a .wav file in the same folder. if a callback_fn is passed, will be executed after. Example:
- // ~transposeFileNRT.value(~materials.at(0).path, -300, {~playBufFromPath.value(~addNrToPath.value(~materials.at(0).path,-300)++".wav")})
-~transposeFileNRT = {|addr, transp, callback_fn=nil|
+ // to a .wav file in the given path. if a callback_fn is passed, will be executed after. Example:
+ // ~transposeFileNRT.value(~materials.at(0).path, -300, "home/whatever/asdf.wav", {~playBufFromPath.value(~addNrToPath.value(~materials.at(0).path,-300)++".wav")})
+// WARNING: do not use this function, use ~createTransposedAudio instead! this doesn't
+// check if the file already exists, nor adapts the resultpath, or includes the result
+// into the ~audios dictionary... in OOP this wouldn't be public
+~transposeFileNRT = {|addr, transp, resultpath, callback_fn=nil|
 	fork {
-		var sf, dur, frames, channels, samplerate, resultpath, oscpath, score, resultbuf, cond;
+		var sf, dur, frames, channels, samplerate, oscpath, score, resultbuf, cond;
 		// 1) RESOLVE FILENAMES AND SUCH
 		sf = SoundFile.openRead(addr);
 		dur = sf.duration;
@@ -139,7 +154,6 @@ SynthDef("transpose_buffer", {|addr, transp=0| var buf, sig;
 		channels = sf.numChannels;
 		samplerate = sf.sampleRate;
 		sf.close;
-		resultpath = ~addNrToPath.value(addr, transp)++".wav";
 		oscpath = PathName.tmp +/+ UniqueID.next ++ ".osc";
 		resultbuf = Buffer.new(s, frames, channels);
 		// 2) DEFINE SCORE
@@ -170,7 +184,7 @@ SynthDef("transpose_buffer", {|addr, transp=0| var buf, sig;
 		// 3) CALLBACK REGION AFTER NRT FINISHED
 		File.delete(oscpath);
 		resultbuf.free;
-		postln("saved transposition to "++resultpath);
+		//postln("saved transposition to "++resultpath);
 		callback_fn.value;
 	};
 };
@@ -183,51 +197,53 @@ var transp = -345;
 
 
 
+(// function that uses ~transposeFileNRT: checks for name consistency,
+ // and creates the transposed audio adding it ASYNCHRONOUSLY to ~audios at the end.
+// ~createTransposedAudio.value("anvil", -100);
+// ~audios.at("anvil[-100]").at("buf").play
+~createTransposedAudio = {|audio_name, transp| var bufpath, newname, newpath;
+	// check if transp is zero: in that case do nothing
+	if(transp==0,{postln("zero transposition: do nothing")},{
+		// check if audio_name exists! otherwise plot a warning (PathName will crash)
+		~audios.atFail(audio_name, {println("unexisting audio: "++audio_name)});
+		// now check if name[transp] already exists
+		bufpath = PathName.new(~audios.at(audio_name).at("buf").path);
+		newname = bufpath.fileNameWithoutExtension++"["++transp++"]";
+		if(~audios.at(newname)!=nil,
+			// if exists, do nothing
+			{postln("material "++newname++" already exists! do nothing")},
+			{// if everything went as expected:
+				newpath =bufpath.pathOnly++newname++".wav";
+				newpath.postln;
+				newname.postln;
+				bufpath.postln;
+				~transposeFileNRT.value(bufpath.asAbsolutePath, transp, newpath, {
+					("created and added "++newname++" to ~audios!").postln;
+					~loadAudioData.value(newpath)});
+		})
+	})
+};
+)
+
 
 ///////////////////////////////////////////////////////////////////////////////////
 /// SIGNALS: THE CLIENT SIDE
 ///////////////////////////////////////////////////////////////////////////////////
 
-(// load the server's buffers into client's signals
- // WARNING: this is an asynchronous task, that's why such a quirky syntax.
- // Signals live in the client, avoid playing them! use the buffers instead.
- // Server-Client interaction can be VERY slow, so minimize it
- // ~material_signals.at(5).play
- // ~materials.at(5).play
-~get2powSize = {|n, padded=true| 2**(n.log2.roundUp)*if(padded,2,1)};
+(// some basic functions
+~get2powSize = {|n, extra_padded=true| 2**(n.log2.roundUp)*if(extra_padded,2,1)};
 ~zeroPadSignal = {|sig| Signal.newClear(~get2powSize.value(sig.size)).overDub(sig)};
-~material_signals = Array.newClear(~materials.size);
-~materials.do(
-	{|buf, idx|
-		buf.loadToFloatArray(action: {|arr| var sig;
-			// *2 at the end because half of Signal is zero to avoid circular conv.
-			sig = Signal.newClear(~get2powSize.value(arr.size));
-			sig.overWrite(arr.as(Signal), 0);
-			sig.normalize;
-			~material_signals.put(idx, sig);
-			});
-});
-~original_signal = nil; // asynch. calculated in the next line
-~original.loadToFloatArray(action:{|arr| var sig;
-	sig = Signal.newClear(~get2powSize.value(arr.size));
-	sig.overWrite(arr.as(Signal), 0);
-	~original_signal = sig;
-});
-)
 
-
-
-(// "efficient" way to play a signal: ~playSig.value(~material_signals.at(5))
+// "efficient" way to play any signal: ~playSig.value(~audios.at("anvil").at("sig"))
 ~playSig ={|sig| Buffer.loadCollection(s, sig, action:{
 	|buf| {PlayBuf.ar(buf.numChannels, buf, doneAction:2)}.play})};
 )
 
-
-
 (// FFT-transpose a signal (naive, dont use!)
+// ~playSig.value(~transposeSignalFFT.value(~audios.at("anvil").at("sig"), 1024))
 ~rotateList = {|lst, n| (lst++(0!abs(n))).rotate(n)[0..lst.size-1]};
 ~transposeSignalFFT = {|sig, n| var imag, cosTable, complex, resynth;
-	n.postln;
+	sig = ~zeroPadSignal.value(sig);
 	imag = Signal.newClear(sig.size); // zeros
 	cosTable = Signal.fftCosTable(sig.size); // required
 	complex = fft(sig, imag, cosTable); // calculated complex fft
@@ -242,17 +258,30 @@ var transp = -345;
 
 
 
-(// define the sequence player for signals
-~seq_player_sig = {|sampledur, lst| var sig, tmp;
-	sig = Signal.newClear(sampledur);
-	lst.do({|x|
-		tmp = ~material_signals.at(x.at(0));
-		tmp = ~transposeSignalFFT.value(tmp, x.at(3));
-		sig.overDub(tmp, x.at(1)*s.sampleRate.asInt)});
-	~playSig.value(sig)};
+( // receives a sequence of the form [[mat_name,second,mult,transp], ...] and
+  // returns the result of combining the corresponding signals
+  // ~playSig.value(~render_sequence.value([["anvil", 0, 1, 300], ["anvil", 1, 0.05, -300]]))
+~render_sequence = {|seq| var final_sig, last_elt, total_dur, tmp_sig, sample_rate;
+	sample_rate = s.sampleRate;
+	last_elt = seq.last; // just in case last is O(n), to avoid duplicity
+	total_dur = (~audios.at(last_elt.at(0)).at("dur"))+(last_elt.at(1));
+	final_sig = Signal.newClear(total_dur*sample_rate.roundUp);
+	total_dur.postln;
+	seq.do({|x|
+		tmp_sig = x.at(0)++"["++x.at(3)++"]"; // get transp.name
+		tmp_sig = ~audios.at(tmp_sig).at("sig"); // get signal
+		tmp_sig = tmp_sig * x.at(2);  // normalize signal
+		final_sig.overDub(tmp_sig, (x.at(1)*sample_rate).asInt)
+	});
+	final_sig;
+};
 )
 
 
+
+(// ~seq_player_sig.value([["anvil", 0, 1, 300], ["anvil", 1, 0.05, -300]]);
+~seq_player_sig = {|seq| ~playSig.value(~render_sequence.value(seq))};
+)
 
 
 (// FFT-cross-correlation between 2 signals:
@@ -267,7 +296,7 @@ var transp = -345;
  // c = ~crossCorrelation.value(a,b);
  // a.plot; b.plot; c[0..1000].plot;
  // c.integral
- // c.maxIndex   // WARNING: THIS RETURNS 122, ONE SAMPLE MUST BE ADDED
+ // c.maxIndex   // WARNING: THIS RETURNS 122, ONE SAMPLE MUST BE ADDED??
 ~crossCorrelation = {|sig1, sig2, plot=false| var imag, cosTable, ff1,ff2, cc, outsize;
 	sig1 = ~zeroPadSignal.value(sig1);
 	sig2 = ~zeroPadSignal.value(sig2);
