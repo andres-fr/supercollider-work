@@ -1,6 +1,6 @@
 (//server config and start
 Server.default = s = Server.internal;
-s.options.memSize = 200*2014;// 200MB RAM allocable
+s.options.memSize = 1500*1024;// up to 1500MB RAM allocable
 s.reboot;
 //s.volume.gui;
 //s.plotTree;
@@ -13,15 +13,6 @@ s.reboot;
 /// TODO
 ///////////////////////////////////////////////////////////////////////////////////
 
-substitute every appearance of roundPow2 with zeroPadSignal
-
-basic DS: change the Array-based storage for a Dictionary based one:
-  -each material filename should be a key, and the value is another Dictionary,
-   in which the keys are transp. integers and the values are the corresponding BUFFERS
-  -the original files are with a zero, each NRT created file should be added as well to the dictionary
-  -add support to the NRT module: ignore files if they exist or if transp=0
-  -Signals: useful for correlation only! think about the optimal storage/algor. politics
-
 
 BUG: the NRT transposer adds a delay to every audio file (probably equal to the FFT-window size).
      a good strategy to correct that may be to use another .ar UGEN to detect the beginning of sound
@@ -32,7 +23,8 @@ BUG: PlaySig casts sequences like ["anvil", 0, 1, 0] to -> "anvil[0]" which does
 BUG?? crossCorrelation outputs peak 1 sample sooner??
 
 
-// After that, it comes the normalization criterium: once known where to
+
+// signal normalization criterium: once known where to
 // put a sample, the right intensity has to be calculated
 
 // once done that, build a stereophonic setup with a hard-coded loop to test
@@ -48,6 +40,12 @@ BUG?? crossCorrelation outputs peak 1 sample sooner??
 
 
 
+
+
+
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////
 /// GENERAL CONFIG AND DATA MODEL
 ///////////////////////////////////////////////////////////////////////////////////
@@ -55,7 +53,9 @@ BUG?? crossCorrelation outputs peak 1 sample sooner??
 ~working_dir = File.getcwd++"/git/supercollider-work/correlator/";
 ~materials_dir = ~working_dir++"materials/";
 // this implies that everything in the "materials_dir" is an audio file to be loaded
-~material_addresses = PathName.new(~materials_dir).entries.collect({|x| x.fullPath});
+~get_materialdir_contents = {PathName.new(~materials_dir).entries.collect({|x| x.fullPath});};
+~get_materialdir_names = {PathName.new(~materials_dir).entries.collect({|x| x.fileNameWithoutExtension});};
+~material_addresses = ~get_materialdir_contents.value;
 )
 
 
@@ -84,6 +84,15 @@ BUG?? crossCorrelation outputs peak 1 sample sooner??
 // test everything went fine
 //~audios.at("anvil").at("buf").play
 )
+
+
+
+
+
+
+
+
+
 
 ///////////////////////////////////////////////////////////////////////////////////
 /// BUFFERS: THE SERVER SIDE
@@ -116,13 +125,13 @@ SynthDef("f_function",{ |buf, bufdur, delay=0, mul=1, out=0|
 ~f_sequence = [];
 ~f_sequence = ~f_sequence.add(["anvil", 0, 1, 0]);
 //upwards
-~f_sequence = ~f_sequence.add(["anvil", 1, 1, 500]);
-~f_sequence = ~f_sequence.add(["anvil", 2, 1, 1000]);
-~f_sequence = ~f_sequence.add(["anvil", 3, 1, 2000]);
+~f_sequence = ~f_sequence.add(["anvil", 1, 1, 100]);
+~f_sequence = ~f_sequence.add(["anvil", 2, 1, 200]);
+~f_sequence = ~f_sequence.add(["anvil", 3, 1, 300]);
 //downwards
-~f_sequence = ~f_sequence.add(["anvil", 1.3, 1, -550]);
-~f_sequence = ~f_sequence.add(["anvil", 2.2, 1, -840]);
-~f_sequence = ~f_sequence.add(["anvil", 3.1, 1, -1100]);
+~f_sequence = ~f_sequence.add(["anvil", 1.3, 1, -100]);
+~f_sequence = ~f_sequence.add(["anvil", 2.2, 1, -200]);
+~f_sequence = ~f_sequence.add(["anvil", 3.1, 1, -300]);
 // play!
 ~seq_player.value(~f_sequence)
 )
@@ -189,11 +198,7 @@ SynthDef("f_function",{ |buf, bufdur, delay=0, mul=1, out=0|
 	};
 };
 )
-/*( // TEST NRT TRANSPOSITION: check the materials folder to find the generated files
-var addr = ~materials.at(5).path;
-var transp = -345;
-~transposeFileNRT.value(addr, transp, {~playBufFromPath.value(~addNrToPath.value(addr, transp)++".wav")})
-)*/
+
 
 
 
@@ -209,21 +214,38 @@ var transp = -345;
 		// now check if name[transp] already exists
 		bufpath = PathName.new(~audios.at(audio_name).at("buf").path);
 		newname = bufpath.fileNameWithoutExtension++"["++transp++"]";
-		if(~audios.at(newname)!=nil,
+		if(~get_materialdir_names.value.detect({|x| x==newname})!=nil,
 			// if exists, do nothing
 			{postln("material "++newname++" already exists! do nothing")},
 			{// if everything went as expected:
 				newpath =bufpath.pathOnly++newname++".wav";
-				newpath.postln;
-				newname.postln;
-				bufpath.postln;
 				~transposeFileNRT.value(bufpath.asAbsolutePath, transp, newpath, {
 					("created and added "++newname++" to ~audios!").postln;
-					~loadAudioData.value(newpath)});
+					~loadAudioData.value(newpath)
+				});
 		})
 	})
 };
 )
+
+
+( // TEST NRT TRANSPOSITION, BATCH TRANSPOSE SOME SAMPLES:
+
+/*var addr = ~materials.at(5).path;
+var transp = -345;
+~transposeFileNRT.value(addr, transp, {~playBufFromPath.value(~addNrToPath.value(addr, transp)++".wav")})*/
+
+var m = ["anvil", "flexatone", "triangle", "bowsuspend", "crotales", "recoreco", "child"];
+[-400, -300, -200, -100, 100, 200, 300, 400].do({|freq|
+	m.do({|name|
+		~createTransposedAudio.value(name, freq)
+	})
+});
+)
+
+
+
+
 
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -232,7 +254,8 @@ var transp = -345;
 
 (// some basic functions
 ~get2powSize = {|n, extra_padded=true| 2**(n.log2.roundUp)*if(extra_padded,2,1)};
-~zeroPadSignal = {|sig| Signal.newClear(~get2powSize.value(sig.size)).overDub(sig)};
+~zeroPadSignal = {|sig, extra_padded=true|
+	Signal.newClear(~get2powSize.value(sig.size, extra_padded)).overDub(sig)};
 
 // "efficient" way to play any signal: ~playSig.value(~audios.at("anvil").at("sig"))
 ~playSig ={|sig| Buffer.loadCollection(s, sig, action:{
@@ -287,19 +310,18 @@ var transp = -345;
 (// FFT-cross-correlation between 2 signals:
  // At each sample t, the output corresponds with sig2 bein fixed, and
  // sig1 being delayed t samples. Therefore, the position of the peak
- // value corresponds to the delay that sig2 presented against a.
+ // value corresponds to the delay that sig2 presented against sig1
  // The following example illustrates this, it should show a peak at
  // sample 123, because b is simply a with 123 samples delay:
  // a = Signal.fill(1000, { rrand(-1.0, 1.0)});
  // //a = Signal.sineFill(1000,[1],[0]); // this is another option
  // b = (0!123++a).as(Signal);
- // c = ~crossCorrelation.value(a,b);
- // a.plot; b.plot; c[0..1000].plot;
+ // c = ~crossCorrelation.value(a,b,true);
  // c.integral
  // c.maxIndex   // WARNING: THIS RETURNS 122, ONE SAMPLE MUST BE ADDED??
-~crossCorrelation = {|sig1, sig2, plot=false| var imag, cosTable, ff1,ff2, cc, outsize;
-	sig1 = ~zeroPadSignal.value(sig1);
-	sig2 = ~zeroPadSignal.value(sig2);
+~crossCorrelation = {|sig1, sig2, plot=false, extrapad=true| var imag, cosTable, ff1,ff2, cc, outsize;
+	sig1 = ~zeroPadSignal.value(sig1, extrapad);
+	sig2 = ~zeroPadSignal.value(sig2, extrapad);
 	imag = Signal.newClear(max(sig1.size, sig2.size)); // zeros
 	cosTable = Signal.fftCosTable(imag.size); // required
 	if(sig1.size!=imag.size,{sig1 = imag.as(Signal).overDub(sig1)});
@@ -318,6 +340,60 @@ var transp = -345;
 	//return value
 	cc
 })
+
+
+// another CC test
+/* ~crossCorrelation.value(~audios.at("anvil").at("sig"),
+	((~audios.at("anvil[100]").at("sig")!5).flat).as(Signal),true, extrapad:true);
+*/
+
+
+
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////
+/// THE ALGORITHM: HEURISTICS, PROTOCOLS, OPTIMIZATIONS...
+///////////////////////////////////////////////////////////////////////////////////
+
+
+
+( var original, result, materials, f_seq, terminate_condition, i;
+
+// 1) the original signal, the sequence that the algo constructs, and the allowed materials
+original = ~audios.at("child").at("sig"); // child is the signal to reconstruct
+result = Signal.newClear(original.size);
+materials = ~audios.keys.reject({|x| x.contains("child")}); // child not allowed as material
+f_seq = [];
+
+// 2) the convergence criterium: signal
+terminate_condition = {|i| i>10}; // abs(current_global_cc - CC(S, sum(f_list))) < EPSILON
+
+
+//2) the algo generate
+i = 0;
+while ({i<10},{
+
+	// interpreter crashes when calculating a long CC...
+	i = i+1;
+});
+
+
+)
+
+
+//
+// (
+// ~crossCorrelation.value(~audios.at("anvil").at("sig"),
+// 	~audios.at("child").at("sig"),
+// true, extrapad:true);
+// )
+
+
+
+
 
 
 
