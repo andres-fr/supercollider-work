@@ -1,0 +1,108 @@
+
+
+
+
+;;; load with snd-s7 -l ...
+
+
+
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; GENERAL SETTINGS
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(set! (with-background-processes) #f) ;; high-demand on CPU
+;;;(set! (with-inset-graph) #t)
+(set! (print-length) 100) ;; to see whats going on in the REPL
+;;;(set! (with-tracking-cursor) #t)
+
+
+
+
+
+
+
+;; Do not forget to take into account the energy of the signals: to
+;; obtain a useful measure of similarity between two signals, normalize
+;; (divide) the correlation by the square root of the product of the
+;; autocorrelation (max) of each signal.
+
+;; Example: Assume you want to know the correlation between cos(pi.t/2)
+;; and (1-t^2) on the range [-1;1] for t. You obtain the correlation
+;; function (32/pi^3).cos(pi.T/2) where T is the shift parameter. It
+;; follows the max (T=0) is 1.03 !!! Verifying the correlation between
+;; cos(pi.t/2) and itself, you will obtain 1. Does it mean (1-t^2) is
+;; more correlated to cos(pi.t/2) than cos(pi.t/2) itself ? Obviously,
+;; no!  If you normalize the correlation operation, the normalized
+;; correlation function between cos(pi.t/2) and (1-t^2) is as follows:
+;; ((32/pi^3)/(16/15x1)^1/2).cos(pi.T/2). The max is then 0.9992 (less
+;; than 1, ok).  Rk: 16/15 is the max of the autocorrelation of (1-t^2)
+;; and 1 is the max of the autocorrelation of cos(pi.t/2), all on the
+;; range [-1;1].
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; CORRELATE 2 AUDIO FILES AND SAVE AS .corr FILE
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define* (upper-pow2 n (extrapad #t)) (expt 2 (+ (truncate (log2 n)) (if extrapad 2 1))))
+(define (zeropad-vector vec newsize) (float-vector-add! (make-float-vector newsize) vec))
+(define (first-half-vct vec) (float-vector-subseq vec 0  (1-(floor (/ (length vec) 2)))))
+
+
+
+
+;; ;;; DECLARE ADDRESSES
+(define *child-path* "~/snd-work/child.wav")
+(define *anvil-path* "~/snd-work/anvil.wav")
+(define *s_rate* (mus-sound-srate *anvil-path*))
+;; ;;;OPEN SOUNDS
+;; (define *child-id* (sound->integer (open-sound *child-path*)))
+;; (define *anvil-id* (sound->integer (open-sound *anvil-path*)))
+;; ;;; CONVERT TO VECTORS
+;; (define *child-vct* (samples 0 (mus-sound-framples *child-path*) *child-id*))
+;; (define *anvil-vct* (samples 0 (mus-sound-framples *anvil-path*) *anvil-id*))
+
+(define *child-vct* (apply float-vector (map (lambda (x) (1- (random 2.0))) (make-float-vector 44100))))
+(define *anvil-vct* (append (make-float-vector 1000) (float-vector-copy *child-vct*)))
+
+
+
+
+;;; ZERO-PAD THE VECTORS TO THE BIGGEST AND MAKE IMAGINARY ZERO-VEC
+(define *child-padded* (zeropad-vector *child-vct* (upper-pow2 (max (length *child-vct*) (length *anvil-vct*)))))
+(define *anvil-padded* (zeropad-vector *anvil-vct* (upper-pow2 (max (length *child-vct*) (length *anvil-vct*)))))
+(define *imaginary-child* (make-float-vector (length *child-padded*)))
+(define *imaginary-anvil* (make-float-vector (length *anvil-padded*)))
+
+
+
+;;; PERFORM FFTS (IN-PLACE)
+(mus-fft *child-padded* *imaginary-child* (length *imaginary-child*) 1)
+(mus-fft *anvil-padded* *imaginary-anvil* (length *imaginary-anvil*) 1)
+
+;;; CONVERT ONE OF THE SIGNALS TO ITS COMPLEX CONJUGATE (BECAUSE THIS IS CORRELATION)
+(float-vector-scale! *imaginary-child* -1)
+
+;;; MULTIPLY SPECTRA!!
+(define *correlation-real* (float-vector-multiply! *child-padded* *anvil-padded*))
+(define *correlation-imag* (float-vector-multiply! *imaginary-child* *imaginary-anvil*))
+
+;;; PERFORM IFFT (IN-PLACE), TRUNCATE AND NORMALIZE RESULT
+(mus-fft *correlation-real* *correlation-imag* (length *correlation-real*) -1)
+(set! *correlation-real* (first-half-vct *correlation-real*))
+(float-vector-scale! *correlation-real* (/ 1.0 (length *correlation-real*)))
+
+
+;;; TEST NORMALIZE
+(float-vector-scale! *correlation-real* (/ 1.0 (float-vector-max *correlation-real*)))
+
+;;; OUTPUT CORRELATION AS FILE
+(array->file "/home/afr/snd-work/test.corr" *correlation-real*
+             (length *correlation-real*) *s_rate* 1)
+
+;;; exit snd
+(exit)
