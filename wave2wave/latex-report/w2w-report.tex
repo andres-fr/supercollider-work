@@ -95,6 +95,12 @@
 \renewcommand{\labelitemiv}{$\cdot$}
 
 
+%%% grey boxes for emphasis
+\usepackage{lmodern}
+\usepackage{amssymb,mathtools}
+\usepackage[most]{tcolorbox}
+
+
 
 %%% The "real" document content comes below...
 
@@ -153,40 +159,134 @@ Given:
     \begin{aligned}
       S{\scriptstyle (t)} \;&\hat{=} \text{ a real-valued signal of sample length } |S| \in \mathbb{N} \text{ (the {\it original})}\\
       \vec{m} := (\ m_1{\scriptstyle (t)}, ..., m_N{\scriptstyle (t)}) \;&\hat{=} \text{ a vector of \(N\in\mathbb{N}\) discrete, real-valued signals (the {\it materials})}\\
-      f(x{\scriptstyle (t)}) = \varphi(kx{\scriptstyle (t+d)}) \;&\hat{=} \text{ a signal transformation consisting of delay } d\in\mathbb{N} \text{, normali-}\\
-        &\phantom{\quad\,}\text{zation } k\in\mathbb{R} \text{ and a further non-linear transformation } \varphi \notag\\ %% _{\{\backslash 0\}}
+      f(x{\scriptstyle (t)}) = k
+      \varphi_x{\scriptstyle (t+d)} \;&\hat{=} \text{ a signal consisting of any non-linear transformation } \varphi_x \text{ and a}\\
+        &\phantom{\quad\,}\text{further delay } d\in\mathbb{N} \text{ and normalization } k\in\mathbb{R} \notag\\ %% _{\{\backslash 0\}}
     \end{aligned}
 \end{align*}
-Find the parameters for the signal \(S'\) (the {\it reconstruction}):
+Find the parameters for the signal \(S'{\scriptstyle (t)}\) (the {\it reconstruction}):
   \begin{align*}
-    S'{\scriptstyle (t)} = \sum_{n=1}^N\{f_n(m_n)\} = \sum_{n=1}^N\{\varphi_n(k_nm_n{\scriptstyle (t+d_n)})\}\qquad : \quad \forall\; m_n{\scriptstyle (t)}  \in M
+    S'{\scriptstyle (t)} = \sum_{n=1}^N\{f_n(m_n{\scriptstyle (t)})\} = \sum_{n=1}^N\{k_n\varphi_{m_n}{\scriptstyle (t+d_n)}\}
   \end{align*}
-  That minimize the energy \(E\) difference between {\it original} and {\it reconstruction}, whereas the energy of a signal is defined as:
+  That minimize the energy of the {\it residual} signal \(R{\scriptstyle (t)} := E[S{\scriptstyle (t)}-S'{\scriptstyle (t)}]\), that is, the difference between  {\it original} and {\it reconstruction}. The energy of a signal is defined as:
   \begin{align*}
     \begin{aligned}
       E[x{\scriptstyle (t)}] = \sum_{t=1}^{|x|}\{(x{\scriptstyle (t)})^2\}\\[15pt]
     \end{aligned}
   \end{align*}
-  The optimization objective remains then as follows:
+  And therefore, the optimization objective remains then as follows:
   \begin{align*}
     \begin{aligned}
-      (\vec{k}^*, \vec{d}^*) &= \underset{\vec{k}, \vec{d}}{\text{minimize}}
-      E[S{\scriptstyle (t)}-S'{\scriptstyle (t)}]\\
-      &= \underset{\vec{k}, \vec{d}}{\text{minimize}} \sum_{t=1}^{|S|}\Bigg\{\bigg(S{\scriptstyle (t)}-\sum_{n=1}^N\{\varphi_n(k_nm_n{\scriptstyle (t+d_n)})\}\bigg)^2\Bigg\}
+      (\vec{k}^*, \vec{d}^*) &= \underset{\vec{k}, \vec{d}}{\text{minimize }}\Bigg[
+      R{\scriptstyle (t)} = E[S{\scriptstyle (t)}-S'{\scriptstyle (t)}]
+      = \sum_{t=1}^{|S|}\bigg\{\Big(S{\scriptstyle (t)}-\sum_{n=1}^N\{k_n\varphi_{m_n}{\scriptstyle (t+d_n)}\}\Bigg]
     \end{aligned}
   \end{align*}
-  Whereas \(\vec{k}=(k_1, ..., k_N)\) and \(\vec{d}=(d_1, ..., d_N)\) are respectively the normalization and delay vectors that hold the values for each corresponding material with the same index, and \(\vec{k}^*, \vec{d}^*\) are the values of those vectors that minimize the expressed function. As it will be shown, the solutions have the following values:
-  \begin{align*}
-    \begin{aligned}
-      &\vec{d}_n^* = idx(max(CC[S, m_n])) \quad : \quad \forall\, m_n \in M'\\
-      &\vec{k}_n^* = 3
-    \end{aligned}
-\end{align*}
+  Which can also be written in the following equivalent algebraic expression:
   
-   \end{equation*}
+  \begin{tcolorbox}[ams align*]
+    %\label{whatever}
+    (\vec{k}^*, \vec{d}^*) &= \underset{\vec{k}, \vec{d}}{\text{minimize }}
+        \bigg\lVert \vec{S}-\Phi_{\vec{d}\;} \vec{k}\bigg\rVert_2^2
+  \end{tcolorbox}
+
+  With the Signals and parameters defined as it follows:
+  \begin{align*}
+    \vec{S}=\begin{pmatrix} S{\scriptstyle (1)} \\ \vdots\\ S{\scriptstyle (|S|)} \end{pmatrix} \quad
+    \vec{k}=\begin{pmatrix} k_1 \\ \vdots\\ k_N \end{pmatrix} \quad
+    \vec{d}=\begin{pmatrix} d_1 \\ \vdots\\ d_N \end{pmatrix} \quad
+    \Phi_{\vec{d}} = 
+    \begin{pmatrix}
+      \varphi_1(m_1{\scriptstyle (1)}) & \cdots & \varphi_N(m_N{\scriptstyle (1)}) \\
+      \varphi_1(m_1{\scriptstyle (2)}) & \cdots & \varphi_N(m_N{\scriptstyle (2)}) \\
+      \vdots  &  \ddots & \vdots  \\
+      \varphi_1(m_1{\scriptstyle (|S'|)}) & \cdots & \varphi_N(m_N{\scriptstyle (|S'|)}) \\
+    \end{pmatrix}
+  \end{align*}
+
+  Whereas the \(\varphi\) signals inside \(\Phi\) are zero-padded (filled up with zeroes) in order to be defined between \(1\) and \(|S'|\). As it can be seen  in the proof, the solutions for the minimization problem have the following values:
+  \begin{tcolorbox}[ams align*]
+    %\label{whatever}
+    \begin{aligned}
+      &\vec{d}_n^* = idx(max(CC[S{\scriptstyle (t}, m_n{\scriptstyle (t}])) \quad : \quad \forall\, n \in \{1, ...,N\}\\
+      &\vec{k}_n^* = (\Phi_{\vec{d}^*}^T\Phi_{\vec{d}^*})^{-1}\Phi_{\vec{d}^*}^T \vec{S}
+    \end{aligned}
+  \end{tcolorbox}
+
+  Whereas \(CC[S{\scriptstyle (t)}, \varphi_n{\scriptstyle (t)}]\) is the {\it cross-correlation} between signals \(S{\scriptstyle (t)}}\) and \(\varphi_n{\scriptstyle (t)}\).
+  
 
 \subsection*{Proof for the optimization objective and algorithm}
-First, it helps to reformulate the energy difference to minimize:
+The minimization of \(E[R{\scriptstyle (t)}]= \Big\lVert \vec{S}-\Phi_{\vec{d}\;} \vec{k}\Big\rVert_2^2\) for \(k\) corresponds to the well-known problem of the {\it least squares}, solvable with the {\it normal equations}. For any given \(k\), the derivative of the corresponding direction \(\delta k\) is:
+\begin{align*}
+    \begin{aligned}
+      \nabla_{\vec{k}} \Big\lVert \vec{S}-\Phi_{\vec{d}\;} \vec{k}\Big\rVert_2^2 \cdot \delta \vec{k} = 2 \langle \Phi_{\vec{d}\;}\delta \vec{k}\;,\; \vec{S}-\Phi_{\vec{d}\;} \vec{k} \rangle = 2\delta \vec{k}^T(\Phi_{\vec{d}\;}^T\vec{S} - \Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;} \vec{k})
+    \end{aligned}
+\end{align*}
+The \(k^*\) minimum occurs when this derivative is set to zero, which has a single solution at \(\Phi_{\vec{d}\;}^T\vec{S} - \Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;} \vec{k}\):
+\begin{align*}
+    \begin{aligned}
+      \vec{k}_{opt} =  (\Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;})^{-1} \Phi_{\vec{d}\;}^T\vec{S}
+    \end{aligned}
+\end{align*}
+
+But as it can be observed, the value of \(\vec{k}_{opt}\) also depends on \(\vec{d}\), and therefore, by definition, the optimal value \(\vec{d}^*\) is the one that provides the best optimization \(\vec{k}^*\):
+\begin{align*}
+    \begin{aligned}
+      \vec{k}^* =  (\Phi_{\vec{d}^*\;}^T \Phi_{\vec{d}^*\;})^{-1} \Phi_{\vec{d}^*\;}^T\vec{S}
+    \end{aligned}
+\end{align*}
+But what is that value? Recovering the original minimization problem in its algebraic form,
+\begin{align*}
+  \begin{aligned}
+    (\vec{k}^*, \vec{d}^*) &= \underset{\vec{k}, \vec{d}}{\text{minimize }}
+    \bigg\lVert \vec{S}-\Phi_{\vec{d}\;} \vec{k}\bigg\rVert_2^2
+    \end{aligned}
+\end{align*}
+It is now possible to substitute \(\vec{k}\) with the already known expression for \(\vec{k}_{opt}\) (note that this is valid for every \(\vec{d}\)), and reformulate the optimization problem:
+\begin{align*}
+  \begin{aligned}
+    \vec{S}'  &= \Phi_{\vec{d}\;} \vec{k}= \Phi_{\vec{d}\;} \Big\{(\Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;})^{-1} \Phi_{\vec{d}\;}^T\vec{S} \Big\}\\[10pt]
+    %&=  \langle \Phi_{\vec{d}\;}(\Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;})^{-1} \Phi_{\vec{d}\;}^T \quad, \quad \vec{S} \rangle\\
+    \vec{d}^* &= \underset{\vec{d}}{\text{minimize }}
+    \bigg\lVert \vec{S}-\Big\{\Phi_{\vec{d}\;} (\Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;})^{-1} \Phi_{\vec{d}\;}^T\Big\}\vec{S} \bigg\rVert_2^2 &= \underset{\vec{d}}{\text{minimize }}
+    \bigg\lVert \vec{S}- \Psi_{\vec{d}\;} \vec{S} \bigg\rVert_2^2
+    \end{aligned}
+\end{align*}
+In this last expression, note that \(\Phi_{\vec{d}\;} (\Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;})^{-1} \Phi_{\vec{d}\;}^T\vec{S} \) is equivalent to \(\vec{S}'\), expressed as \(\vec{S}\) projected onto the symmetrical {\it normalized covariance matrix} of \(\Phi_{\vec{d}\;}\), that is, \(\Psi_{\vec{d}\;} := \Phi_{\vec{d}\;} (\Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;})^{-1} \Phi_{\vec{d}\;}^T\).\\[7pt]
+This observation has very interesting implications:
+  \begin{tcolorbox}[ams text]
+    %\label{whatever}
+    If \(\Psi=I\), then \(S'=S\) and therefore \(E[R]=0\). This only can happen if \(\Phi\) has at least as many linearly independent columns as rows (a proof for that is not provided here). In other words, any original signal of \(|S|\) samples can be exactly reconstructed as a linear combination of \(|S|\)-many (linearly independent) materials. Leaving apart the utility/viability of having as much materials as samples has \(S\), this observation can turn out to be very useful, in order to further optimize or tweak the algorithm. For instance, by performing the {\it singular value decomposition} of \(\Psi\), it is possible to know how much each material contributes to the overall minimization of the residual signal).
+  \end{tcolorbox}
+
+  Regarding the optimization problem, this also means that \(\Psi_{\vec{d}\;}\) should be as close to the identity matrix as possible:
+  \begin{align*}
+    \begin{aligned}
+      \vec{d}^* &= \underset{\vec{d}}{\text{minimize }}
+    \bigg\lVert \vec{S}- \Psi_{\vec{d}\;} \vec{S} \bigg\rVert_2^2 =
+    \underset{\vec{d}}{\text{minimize }}
+    \bigg\lVert I- \Psi_{\vec{d}\;} \bigg\rVert_2^2
+    \end{aligned}
+  \end{align*}
+
+
+
+  of finding the values for \(\vec{d}^*\), recall that:
+  \begin{align*}
+  \begin{aligned}
+    \vec{S}' = \Phi_{\vec{d}\;} (\Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;})^{-1} \Phi_{\vec{d}\;}^T\vec{S}
+    \end{aligned}
+  \end{align*}
+  And therefore:
+  \begin{align*}
+  \begin{aligned}
+    \vec{S}'{\scriptstyle (t)} = \vec{S}^T \Phi_{\vec{d}\;} (\Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;})^{-1} \vec{m}_{\vec{d}\;}{\scriptstyle (t)} = \langle \vec{S} \;,\; \Phi_{\vec{d}\;} (\Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;})^{-1} \vec{m}_{\vec{d}\;}{\scriptstyle (t)} \rangle 
+    \end{aligned}
+  \end{align*}
+  And now that we defined each sample of the reconstruction as a dot product between the original and the delayed materials  asdf
+
+
   \begin{align*}
     \begin{aligned}
       E[S{\scriptstyle (t)}-S'{\scriptstyle (t)}] &= \sum_{t=1}^{|S|}\{(S{\scriptstyle (t)}-S'{\scriptstyle (t)})^2\}\\ %\sum_{t=1}^{|S|}\Bigg\{\bigg(S{\scriptstyle (t)}-\sum_{n=1}^N\{\varphi_n(k_nm_n{\scriptstyle (t+d_n)})\}\bigg)^2\Bigg\}\\
@@ -195,7 +295,7 @@ First, it helps to reformulate the energy difference to minimize:
       &= E[S{\scriptstyle (t)}] + E[S'{\scriptstyle (t)}] - 2<S{\scriptstyle (t)}, S'{\scriptstyle (t)}>
     \end{aligned}
   \end{align*}
-  Whereas \(<x{\scriptstyle (t)},y{\scriptstyle (t)}> = \sum_{t=1}^{max(|x|,|y|)}\{x{\scriptstyle (t)}y{\scriptstyle (t)}\}\) represents the dot-product of two signals \(x, y\). It would now follow a proof, substituting the energy values with the precise definition of \(S'\) and reformuling everything as a second-order polynomial of \(k\). But at this point is when it is possible to profit from the simplified problem definition, with the following observations:
+  Whereas \(<x{\scriptstyle (t)},y{\scriptstyle (t)}> = \sum_{t=1}^{max(|x|,|y|)}\{x{\scriptstyle (t)}y{\scriptstyle (t)}\}\) represents the dot-product of two signals \(x, y\). With this more convenient expression, and the following observations, it is possible to solve the optimization problem:
 
   \begin{enumerate}
   %% \item The energy of a signal is always non-negative%% Since the energy of a signal is always non-negative, the minimal value that can be achieved is zero, when both signals are identical:

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2016.10.31)  12 DEC 2016 02:39
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2016.10.31)  14 DEC 2016 07:18
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1218,36 +1218,334 @@ Class scrartcl Warning: Usage of package `fancyhdr' together
 \f@ncyO@olf=\skip107
 \f@ncyO@orf=\skip108
 )
-(./w2w-report.aux
+(/usr/share/texmf/tex/latex/lm/lmodern.sty
+Package: lmodern 2009/10/30 v1.6 Latin Modern Fonts
+LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
+(Font)                  OT1/cmr/m/n --> OT1/lmr/m/n on input line 22.
+LaTeX Font Info:    Overwriting symbol font `letters' in version `normal'
+(Font)                  OML/cmm/m/it --> OML/lmm/m/it on input line 23.
+LaTeX Font Info:    Overwriting symbol font `symbols' in version `normal'
+(Font)                  OMS/cmsy/m/n --> OMS/lmsy/m/n on input line 24.
+LaTeX Font Info:    Overwriting symbol font `largesymbols' in version `normal'
+(Font)                  OMX/cmex/m/n --> OMX/lmex/m/n on input line 25.
+LaTeX Font Info:    Overwriting symbol font `operators' in version `bold'
+(Font)                  OT1/cmr/bx/n --> OT1/lmr/bx/n on input line 26.
+LaTeX Font Info:    Overwriting symbol font `letters' in version `bold'
+(Font)                  OML/cmm/b/it --> OML/lmm/b/it on input line 27.
+LaTeX Font Info:    Overwriting symbol font `symbols' in version `bold'
+(Font)                  OMS/cmsy/b/n --> OMS/lmsy/b/n on input line 28.
+LaTeX Font Info:    Overwriting symbol font `largesymbols' in version `bold'
+(Font)                  OMX/cmex/m/n --> OMX/lmex/m/n on input line 29.
+LaTeX Font Info:    Overwriting math alphabet `\mathbf' in version `normal'
+(Font)                  OT1/cmr/bx/n --> OT1/lmr/bx/n on input line 31.
+LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `normal'
+(Font)                  OT1/cmss/m/n --> OT1/lmss/m/n on input line 32.
+LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `normal'
+(Font)                  OT1/cmr/m/it --> OT1/lmr/m/it on input line 33.
+LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `normal'
+(Font)                  OT1/cmtt/m/n --> OT1/lmtt/m/n on input line 34.
+LaTeX Font Info:    Overwriting math alphabet `\mathbf' in version `bold'
+(Font)                  OT1/cmr/bx/n --> OT1/lmr/bx/n on input line 35.
+LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `bold'
+(Font)                  OT1/cmss/bx/n --> OT1/lmss/bx/n on input line 36.
+LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `bold'
+(Font)                  OT1/cmr/bx/it --> OT1/lmr/bx/it on input line 37.
+LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `bold'
+(Font)                  OT1/cmtt/m/n --> OT1/lmtt/m/n on input line 38.
+)
+(/usr/share/texlive/texmf-dist/tex/latex/mathtools/mathtools.sty
+Package: mathtools 2015/06/17 v1.17 mathematical typesetting tools
+
+(/usr/share/texlive/texmf-dist/tex/latex/tools/calc.sty
+Package: calc 2014/10/28 v4.3 Infix arithmetic (KKT,FJ)
+\calc@Acount=\count161
+\calc@Bcount=\count162
+\calc@Adimen=\dimen196
+\calc@Bdimen=\dimen197
+\calc@Askip=\skip109
+\calc@Bskip=\skip110
+LaTeX Info: Redefining \setlength on input line 80.
+LaTeX Info: Redefining \addtolength on input line 81.
+\calc@Ccount=\count163
+\calc@Cskip=\skip111
+)
+(/usr/share/texlive/texmf-dist/tex/latex/mathtools/mhsetup.sty
+Package: mhsetup 2010/01/21 v1.2a programming setup (MH)
+)
+LaTeX Info: Thecontrolsequence`\('isalreadyrobust on input line 129.
+LaTeX Info: Thecontrolsequence`\)'isalreadyrobust on input line 129.
+LaTeX Info: Thecontrolsequence`\['isalreadyrobust on input line 129.
+LaTeX Info: Thecontrolsequence`\]'isalreadyrobust on input line 129.
+\g_MT_multlinerow_int=\count164
+\l_MT_multwidth_dim=\dimen198
+\origjot=\skip112
+\l_MT_shortvdotswithinadjustabove_dim=\dimen199
+\l_MT_shortvdotswithinadjustbelow_dim=\dimen200
+\l_MT_above_intertext_sep=\dimen201
+\l_MT_below_intertext_sep=\dimen202
+\l_MT_above_shortintertext_sep=\dimen203
+\l_MT_below_shortintertext_sep=\dimen204
+)
+(/usr/share/texlive/texmf-dist/tex/latex/tcolorbox/tcolorbox.sty
+Package: tcolorbox 2015/07/23 version 3.71 text color boxes
+
+(/usr/share/texlive/texmf-dist/tex/latex/environ/environ.sty
+Package: environ 2014/05/04 v0.3 A new way to define environments
+
+(/usr/share/texlive/texmf-dist/tex/latex/trimspaces/trimspaces.sty
+Package: trimspaces 2009/09/17 v1.1 Trim spaces around a token list
+))
+(/usr/share/texlive/texmf-dist/tex/latex/etoolbox/etoolbox.sty
+Package: etoolbox 2015/08/02 v2.2a e-TeX tools for LaTeX (JAW)
+\etb@tempcnta=\count165
+)
+\tcb@titlebox=\box41
+\tcb@upperbox=\box42
+\tcb@lowerbox=\box43
+\tcb@phantombox=\box44
+\c@tcbbreakpart=\count166
+\c@tcblayer=\count167
+\tcb@temp=\box45
+\tcb@temp=\box46
+\tcb@temp=\box47
+\tcb@temp=\box48
+\tcb@out=\write4
+\tcb@record@out=\write5
+
+(/usr/share/texlive/texmf-dist/tex/latex/tcolorbox/tcbraster.code.tex
+Library (tcolorbox): 'tcbraster.code.tex' version '3.71'
+\c@tcbrastercolumn=\count168
+\c@tcbrasterrow=\count169
+\c@tcbraster=\count170
+) (/usr/share/texlive/texmf-dist/tex/latex/tcolorbox/tcbskins.code.tex
+Library (tcolorbox): 'tcbskins.code.tex' version '3.71'
+\tcb@waterbox=\box49
+(/usr/share/texlive/texmf-dist/tex/latex/tcolorbox/tcbskinsjigsaw.code.tex
+Library (tcolorbox): 'tcbskinsjigsaw.code.tex' version '3.71'
+)) (/usr/share/texlive/texmf-dist/tex/latex/tcolorbox/tcbbreakable.code.tex
+Library (tcolorbox): 'tcbbreakable.code.tex' version '3.71'
+\tcb@testbox=\box50
+\tcb@totalupperbox=\box51
+\tcb@totallowerbox=\box52
+) (/usr/share/texlive/texmf-dist/tex/latex/tcolorbox/tcbhooks.code.tex
+Library (tcolorbox): 'tcbhooks.code.tex' version '3.71'
+) (/usr/share/texlive/texmf-dist/tex/latex/tcolorbox/tcbtheorems.code.tex
+Library (tcolorbox): 'tcbtheorems.code.tex' version '3.71'
+) (/usr/share/texlive/texmf-dist/tex/latex/tcolorbox/tcbfitting.code.tex
+Library (tcolorbox): 'tcbfitting.code.tex' version '3.71'
+\tcbfitdim=\dimen205
+\tcb@lowerfitdim=\dimen206
+\tcb@upperfitdim=\dimen207
+\tcb@cur@hbadness=\count171
+) (/usr/share/texlive/texmf-dist/tex/latex/tcolorbox/tcbxparse.code.tex
+Library (tcolorbox): 'tcbxparse.code.tex' version '3.71'
+(/usr/share/texlive/texmf-dist/tex/latex/l3packages/xparse/xparse.sty
+(/usr/share/texlive/texmf-dist/tex/latex/l3kernel/expl3.sty
+Package: expl3 2015/06/15 v5630 L3 programming layer (loader) 
+
+(/usr/share/texlive/texmf-dist/tex/latex/l3kernel/expl3-code.tex
+Package: expl3 2015/06/15 v5630 L3 programming layer (code) 
+L3 Module: l3bootstrap 2015/05/20 v5608 L3 Bootstrap code
+L3 Module: l3names 2015/02/24 v5535 L3 Namespace for primitives
+L3 Module: l3basics 2015/01/27 v5500 L3 Basic definitions
+L3 Module: l3expan 2014/11/27 v5472 L3 Argument expansion
+L3 Module: l3tl 2015/01/27 v5500 L3 Token lists
+L3 Module: l3str 2015/03/01 v5545 L3 Strings
+L3 Module: l3seq 2014/08/23 v5354 L3 Sequences and stacks
+L3 Module: l3int 2015/02/21 v5529 L3 Integers
+\c_max_int=\count172
+\l_tmpa_int=\count173
+\l_tmpb_int=\count174
+\g_tmpa_int=\count175
+\g_tmpb_int=\count176
+L3 Module: l3quark 2014/08/23 v5354 L3 Quarks
+L3 Module: l3prg 2015/04/13 v5566 L3 Control structures
+\g__prg_map_int=\count177
+L3 Module: l3clist 2014/08/23 v5354 L3 Comma separated lists
+L3 Module: l3token 2014/09/15 v5422 L3 Experimental token manipulation
+L3 Module: l3prop 2014/08/23 v5354 L3 Property lists
+L3 Module: l3msg 2015/02/26 v5537 L3 Messages
+L3 Module: l3file 2015/06/07 v5627 L3 File and I/O operations
+\l_iow_line_count_int=\count178
+\l__iow_target_count_int=\count179
+\l__iow_current_line_int=\count180
+\l__iow_current_word_int=\count181
+\l__iow_current_indentation_int=\count182
+L3 Module: l3skip 2015/05/18 v5607 L3 Dimensions and skips
+\c_zero_dim=\dimen208
+\c_max_dim=\dimen209
+\l_tmpa_dim=\dimen210
+\l_tmpb_dim=\dimen211
+\g_tmpa_dim=\dimen212
+\g_tmpb_dim=\dimen213
+\c_zero_skip=\skip113
+\c_max_skip=\skip114
+\l_tmpa_skip=\skip115
+\l_tmpb_skip=\skip116
+\g_tmpa_skip=\skip117
+\g_tmpb_skip=\skip118
+\c_zero_muskip=\muskip12
+\c_max_muskip=\muskip13
+\l_tmpa_muskip=\muskip14
+\l_tmpb_muskip=\muskip15
+\g_tmpa_muskip=\muskip16
+\g_tmpb_muskip=\muskip17
+L3 Module: l3keys 2015/06/14 v5629 L3 Key-value interfaces
+\g__keyval_level_int=\count183
+\l_keys_choice_int=\count184
+L3 Module: l3fp 2014/08/22 v5336 L3 Floating points
+\c__fp_leading_shift_int=\count185
+\c__fp_middle_shift_int=\count186
+\c__fp_trailing_shift_int=\count187
+\c__fp_big_leading_shift_int=\count188
+\c__fp_big_middle_shift_int=\count189
+\c__fp_big_trailing_shift_int=\count190
+\c__fp_Bigg_leading_shift_int=\count191
+\c__fp_Bigg_middle_shift_int=\count192
+\c__fp_Bigg_trailing_shift_int=\count193
+L3 Module: l3box 2014/08/23 v5354 L3 Experimental boxes
+\c_empty_box=\box53
+\l_tmpa_box=\box54
+\l_tmpb_box=\box55
+\g_tmpa_box=\box56
+\g_tmpb_box=\box57
+L3 Module: l3coffins 2014/08/23 v5354 L3 Coffin code layer
+\l__coffin_internal_box=\box58
+\l__coffin_internal_dim=\dimen214
+\l__coffin_offset_x_dim=\dimen215
+\l__coffin_offset_y_dim=\dimen216
+\l__coffin_x_dim=\dimen217
+\l__coffin_y_dim=\dimen218
+\l__coffin_x_prime_dim=\dimen219
+\l__coffin_y_prime_dim=\dimen220
+\c_empty_coffin=\box59
+\l__coffin_aligned_coffin=\box60
+\l__coffin_aligned_internal_coffin=\box61
+\l_tmpa_coffin=\box62
+\l_tmpb_coffin=\box63
+\l__coffin_display_coffin=\box64
+\l__coffin_display_coord_coffin=\box65
+\l__coffin_display_pole_coffin=\box66
+\l__coffin_display_offset_dim=\dimen221
+\l__coffin_display_x_dim=\dimen222
+\l__coffin_display_y_dim=\dimen223
+L3 Module: l3color 2014/08/23 v5354 L3 Experimental color support
+L3 Module: l3candidates 2015/05/21 v5613 L3 Experimental additions to l3kernel
+\l__box_top_dim=\dimen224
+\l__box_bottom_dim=\dimen225
+\l__box_left_dim=\dimen226
+\l__box_right_dim=\dimen227
+\l__box_top_new_dim=\dimen228
+\l__box_bottom_new_dim=\dimen229
+\l__box_left_new_dim=\dimen230
+\l__box_right_new_dim=\dimen231
+\l__box_internal_box=\box67
+\l__coffin_bounding_shift_dim=\dimen232
+\l__coffin_left_corner_dim=\dimen233
+\l__coffin_right_corner_dim=\dimen256
+\l__coffin_bottom_corner_dim=\dimen257
+\l__coffin_top_corner_dim=\dimen258
+\l__coffin_scaled_total_height_dim=\dimen259
+\l__coffin_scaled_width_dim=\dimen260
+)
+(/usr/share/texlive/texmf-dist/tex/latex/l3kernel/l3unicode-data.def
+File: l3unicode-data.def 2015/03/01 v5544 L3 Unicode data
+)
+(/usr/share/texlive/texmf-dist/tex/latex/l3kernel/l3pdfmode.def
+File: l3pdfmode.def 2015/05/21 v5613 L3 Experimental driver: PDF mode
+\l__driver_color_stack_int=\count194
+))
+Package: xparse 2015/06/15 v5630 L3 Experimental document command parser
+\l__xparse_current_arg_int=\count195
+\l__xparse_m_args_int=\count196
+\l__xparse_mandatory_args_int=\count197
+\l__xparse_processor_int=\count198
+\l__xparse_v_nesting_int=\count199
+)
+.................................................
+. LaTeX info: "xparse/define-command"
+. 
+. Defining command \tcboxverb with sig. ' O{} v ' on line 128.
+.................................................
+)
+(/usr/share/texlive/texmf-dist/tex/latex/tcolorbox/tcblistingsutf8.code.tex
+Library (tcolorbox): 'tcblistingsutf8.code.tex' version '3.71'
+(/usr/share/texlive/texmf-dist/tex/latex/oberdiek/listingsutf8.sty
+Package: listingsutf8 2011/11/10 v1.2 Allow UTF-8 in listings input (HO)
+
+(/usr/share/texlive/texmf-dist/tex/latex/listings/listings.sty
+\lst@mode=\count200
+\lst@gtempboxa=\box68
+\lst@token=\toks40
+\lst@length=\count201
+\lst@currlwidth=\dimen261
+\lst@column=\count202
+\lst@pos=\count203
+\lst@lostspace=\dimen262
+\lst@width=\dimen263
+\lst@newlines=\count204
+\lst@lineno=\count205
+\lst@maxwidth=\dimen264
+
+(/usr/share/texlive/texmf-dist/tex/latex/listings/lstmisc.sty
+File: lstmisc.sty 2015/06/04 1.6 (Carsten Heinz)
+\c@lstnumber=\count206
+\lst@skipnumbers=\count207
+\lst@framebox=\box69
+)
+(/usr/share/texlive/texmf-dist/tex/latex/listings/listings.cfg
+File: listings.cfg 2015/06/04 1.6 listings configuration
+))
+Package: listings 2015/06/04 1.6 (Carsten Heinz)
+
+(/usr/share/texlive/texmf-dist/tex/generic/oberdiek/stringenc.sty
+Package: stringenc 2011/12/02 v1.10 Convert strings between diff. encodings (HO
+)
+))
+(/usr/share/texlive/texmf-dist/tex/latex/tcolorbox/tcblistings.code.tex
+Library (tcolorbox): 'tcblistings.code.tex' version '3.71'
+(/usr/share/texlive/texmf-dist/tex/latex/tcolorbox/tcblistingscore.code.tex
+Library (tcolorbox): 'tcblistingscore.code.tex' version '3.71'
+\c@tcblisting=\count208
+))) (/usr/share/texlive/texmf-dist/tex/latex/tcolorbox/tcbexternal.code.tex
+Library (tcolorbox): 'tcbexternal.code.tex' version '3.71'
+) (/usr/share/texlive/texmf-dist/tex/latex/tcolorbox/tcbmagazine.code.tex
+Library (tcolorbox): 'tcbmagazine.code.tex' version '3.71'
+)) (./w2w-report.aux
 
 LaTeX Warning: Label `fig2' multiply defined.
 
-\c@pagesLTS.arabic.1.local.cnt=\count161
+\c@pagesLTS.arabic.1.local.cnt=\count209
 )
 \openout1 = `w2w-report.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 102.
-LaTeX Font Info:    ... okay on input line 102.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 102.
-LaTeX Font Info:    ... okay on input line 102.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 102.
-LaTeX Font Info:    ... okay on input line 102.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 102.
-LaTeX Font Info:    ... okay on input line 102.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 102.
-LaTeX Font Info:    ... okay on input line 102.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 102.
-LaTeX Font Info:    ... okay on input line 102.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 102.
-LaTeX Font Info:    ... okay on input line 102.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 102.
-LaTeX Font Info:    Try loading font information for TS1+cmr on input line 102.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 108.
+LaTeX Font Info:    ... okay on input line 108.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 108.
+LaTeX Font Info:    ... okay on input line 108.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 108.
+LaTeX Font Info:    ... okay on input line 108.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 108.
+LaTeX Font Info:    ... okay on input line 108.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 108.
+LaTeX Font Info:    ... okay on input line 108.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 108.
+LaTeX Font Info:    ... okay on input line 108.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 108.
+LaTeX Font Info:    ... okay on input line 108.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 108.
+LaTeX Font Info:    Try loading font information for TS1+cmr on input line 108.
 
  (/usr/share/texlive/texmf-dist/tex/latex/base/ts1cmr.fd
 File: ts1cmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
-LaTeX Font Info:    ... okay on input line 102.
+LaTeX Font Info:    ... okay on input line 108.
+LaTeX Font Info:    Try loading font information for OT1+lmr on input line 108.
 
+
+(/usr/share/texmf/tex/latex/lm/ot1lmr.fd
+File: ot1lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
+)
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
 *geometry* verbose mode - [ preamble ] result:
@@ -1284,17 +1582,17 @@ LaTeX Font Info:    ... okay on input line 102.
 
 (/usr/share/texlive/texmf-dist/tex/context/base/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count162
-\scratchdimen=\dimen196
-\scratchbox=\box41
-\nofMPsegments=\count163
-\nofMParguments=\count164
-\everyMPshowfont=\toks40
-\MPscratchCnt=\count165
-\MPscratchDim=\dimen197
-\MPnumerator=\count166
-\makeMPintoPDFobject=\count167
-\everyMPtoPDFconversion=\toks41
+\scratchcounter=\count210
+\scratchdimen=\dimen265
+\scratchbox=\box70
+\nofMPsegments=\count211
+\nofMParguments=\count212
+\everyMPshowfont=\toks41
+\MPscratchCnt=\count213
+\MPscratchDim=\dimen266
+\MPnumerator=\count214
+\makeMPintoPDFobject=\count215
+\everyMPtoPDFconversion=\toks42
 ) (/usr/share/texlive/texmf-dist/tex/latex/oberdiek/epstopdf-base.sty
 Package: epstopdf-base 2010/02/09 v2.5 Base part for package epstopdf
 
@@ -1313,9 +1611,10 @@ e
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: subfig package v1.3 is loaded.
 Package caption Info: hyperref package is loaded.
+Package caption Info: listings package is loaded.
 Package caption Info: End \AtBeginDocument code.
-\AtBeginShipoutBox=\box42
-Package hyperref Info: Link coloring OFF on input line 102.
+\AtBeginShipoutBox=\box71
+Package hyperref Info: Link coloring OFF on input line 108.
 
 (/usr/share/texlive/texmf-dist/tex/latex/hyperref/nameref.sty
 Package: nameref 2012/10/27 v2.43 Cross-referencing by name of section
@@ -1323,31 +1622,34 @@ Package: nameref 2012/10/27 v2.43 Cross-referencing by name of section
 (/usr/share/texlive/texmf-dist/tex/generic/oberdiek/gettitlestring.sty
 Package: gettitlestring 2010/12/03 v1.4 Cleanup title references (HO)
 )
-\c@section@level=\count168
+\c@section@level=\count216
 )
-LaTeX Info: Redefining \ref on input line 102.
-LaTeX Info: Redefining \pageref on input line 102.
-LaTeX Info: Redefining \nameref on input line 102.
+LaTeX Info: Redefining \ref on input line 108.
+LaTeX Info: Redefining \pageref on input line 108.
+LaTeX Info: Redefining \nameref on input line 108.
 
 (./w2w-report.out) (./w2w-report.out)
-\@outlinefile=\write4
-\openout4 = `w2w-report.out'.
+\@outlinefile=\write6
+\openout6 = `w2w-report.out'.
 
  ABD: EveryShipout initializing macros
+! Undefined control sequence.
+\@currname ->\@nil 
+                   
+l.108 \begin{document}
+                      
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
 
-Class scrartcl Warning: Usage of deprecated font command `\it'!
-(scrartcl)              You should note, that in 1994 font command `\it' has
-(scrartcl)              been defined for compatiblitiy to Script 2.0 only.
-(scrartcl)              Now, after two decades of LaTeX2e and NFSS2, you
-(scrartcl)              shouldn't use such commands any longer and within
-(scrartcl)              KOMA-Script usage of `\it' is definitely deprecated.
-(scrartcl)              See `fntguide.pdf' for more information about
-(scrartcl)              recommended font commands.
-(scrartcl)              Note also, that KOMA-Script will remove the definition
-(scrartcl)              of `\it' anytime until release of about version 3.20.
-(scrartcl)              But for now, KOMA-Script will replace deprecated `\it'
-(scrartcl)              by `\normalfont \itshape ' on input line 106.
-
+\c@lstlisting=\count217
+LaTeX Font Info:    Try loading font information for OT1+lmss on input line 110
+.
+(/usr/share/texmf/tex/latex/lm/ot1lmss.fd
+File: ot1lmss.fd 2009/10/30 v1.6 Font defs for Latin Modern
+)
 
 Class scrartcl Warning: Usage of deprecated font command `\it'!
 (scrartcl)              You should note, that in 1994 font command `\it' has
@@ -1374,7 +1676,7 @@ Class scrartcl Warning: Usage of deprecated font command `\it'!
 (scrartcl)              Note also, that KOMA-Script will remove the definition
 (scrartcl)              of `\it' anytime until release of about version 3.20.
 (scrartcl)              But for now, KOMA-Script will replace deprecated `\it'
-(scrartcl)              by `\normalfont \itshape ' on input line 112.
+(scrartcl)              by `\normalfont \itshape ' on input line 118.
 
 
 Class scrartcl Warning: Usage of deprecated font command `\it'!
@@ -1388,17 +1690,31 @@ Class scrartcl Warning: Usage of deprecated font command `\it'!
 (scrartcl)              Note also, that KOMA-Script will remove the definition
 (scrartcl)              of `\it' anytime until release of about version 3.20.
 (scrartcl)              But for now, KOMA-Script will replace deprecated `\it'
-(scrartcl)              by `\normalfont \itshape ' on input line 113.
+(scrartcl)              by `\normalfont \itshape ' on input line 118.
+
+
+Class scrartcl Warning: Usage of deprecated font command `\it'!
+(scrartcl)              You should note, that in 1994 font command `\it' has
+(scrartcl)              been defined for compatiblitiy to Script 2.0 only.
+(scrartcl)              Now, after two decades of LaTeX2e and NFSS2, you
+(scrartcl)              shouldn't use such commands any longer and within
+(scrartcl)              KOMA-Script usage of `\it' is definitely deprecated.
+(scrartcl)              See `fntguide.pdf' for more information about
+(scrartcl)              recommended font commands.
+(scrartcl)              Note also, that KOMA-Script will remove the definition
+(scrartcl)              of `\it' anytime until release of about version 3.20.
+(scrartcl)              But for now, KOMA-Script will replace deprecated `\it'
+(scrartcl)              by `\normalfont \itshape ' on input line 119.
 
 
 Package Fancyhdr Warning: \headheight is too small (17.0pt): 
- Make it at least 25.16252pt.
+ Make it at least 25.2232pt.
  We now make it that large for the rest of the document.
  This may cause the page layout to be inconsistent, however.
 
-\c@pagesLTS.pnc.arabic=\count169
-\c@pagesLTS.double.arabic=\count170
-\c@pagesLTS.current.local.arabic=\count171
+\c@pagesLTS.pnc.arabic=\count218
+\c@pagesLTS.double.arabic=\count219
+\c@pagesLTS.current.local.arabic=\count220
 [1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}
 
 ]
@@ -1414,7 +1730,7 @@ Class scrartcl Warning: Usage of deprecated font command `\it'!
 (scrartcl)              Note also, that KOMA-Script will remove the definition
 (scrartcl)              of `\it' anytime until release of about version 3.20.
 (scrartcl)              But for now, KOMA-Script will replace deprecated `\it'
-(scrartcl)              by `\normalfont \itshape ' on input line 126.
+(scrartcl)              by `\normalfont \itshape ' on input line 132.
 
 
 Class scrartcl Warning: Usage of deprecated font command `\it'!
@@ -1428,7 +1744,7 @@ Class scrartcl Warning: Usage of deprecated font command `\it'!
 (scrartcl)              Note also, that KOMA-Script will remove the definition
 (scrartcl)              of `\it' anytime until release of about version 3.20.
 (scrartcl)              But for now, KOMA-Script will replace deprecated `\it'
-(scrartcl)              by `\normalfont \itshape ' on input line 126.
+(scrartcl)              by `\normalfont \itshape ' on input line 132.
 
 
 Class scrartcl Warning: Usage of deprecated font command `\it'!
@@ -1442,7 +1758,7 @@ Class scrartcl Warning: Usage of deprecated font command `\it'!
 (scrartcl)              Note also, that KOMA-Script will remove the definition
 (scrartcl)              of `\it' anytime until release of about version 3.20.
 (scrartcl)              But for now, KOMA-Script will replace deprecated `\it'
-(scrartcl)              by `\normalfont \itshape ' on input line 126.
+(scrartcl)              by `\normalfont \itshape ' on input line 132.
 
 
 Class scrartcl Warning: Usage of deprecated font command `\it'!
@@ -1456,17 +1772,48 @@ Class scrartcl Warning: Usage of deprecated font command `\it'!
 (scrartcl)              Note also, that KOMA-Script will remove the definition
 (scrartcl)              of `\it' anytime until release of about version 3.20.
 (scrartcl)              But for now, KOMA-Script will replace deprecated `\it'
-(scrartcl)              by `\normalfont \itshape ' on input line 134.
+(scrartcl)              by `\normalfont \itshape ' on input line 140.
 
-LaTeX Font Info:    Try loading font information for U+msa on input line 134.
+LaTeX Font Info:    Try loading font information for OML+lmm on input line 140.
+
+(/usr/share/texmf/tex/latex/lm/omllmm.fd
+File: omllmm.fd 2009/10/30 v1.6 Font defs for Latin Modern
+)
+LaTeX Font Info:    Try loading font information for OMS+lmsy on input line 140
+.
+
+(/usr/share/texmf/tex/latex/lm/omslmsy.fd
+File: omslmsy.fd 2009/10/30 v1.6 Font defs for Latin Modern
+)
+LaTeX Font Info:    Try loading font information for OMX+lmex on input line 140
+.
+
+(/usr/share/texmf/tex/latex/lm/omxlmex.fd
+File: omxlmex.fd 2009/10/30 v1.6 Font defs for Latin Modern
+)
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <10.95> on input line 140.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <8> on input line 140.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <6> on input line 140.
+LaTeX Font Info:    Try loading font information for U+msa on input line 140.
+
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 134.
+LaTeX Font Info:    Try loading font information for U+msb on input line 140.
 
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
-) [2]
+)
+
+Package Fancyhdr Warning: \headheight is too small (17.0pt): 
+ Make it at least 25.2232pt.
+ We now make it that large for the rest of the document.
+ This may cause the page layout to be inconsistent, however.
+
+[2]
 
 Class scrartcl Warning: Usage of deprecated font command `\it'!
 (scrartcl)              You should note, that in 1994 font command `\it' has
@@ -1479,7 +1826,13 @@ Class scrartcl Warning: Usage of deprecated font command `\it'!
 (scrartcl)              Note also, that KOMA-Script will remove the definition
 (scrartcl)              of `\it' anytime until release of about version 3.20.
 (scrartcl)              But for now, KOMA-Script will replace deprecated `\it'
-(scrartcl)              by `\normalfont \itshape ' on input line 144.
+(scrartcl)              by `\normalfont \itshape ' on input line 150.
+
+
+Package Fancyhdr Warning: \headheight is too small (17.0pt): 
+ Make it at least 25.2232pt.
+ We now make it that large for the rest of the document.
+ This may cause the page layout to be inconsistent, however.
 
 [3]
 
@@ -1494,7 +1847,7 @@ Class scrartcl Warning: Usage of deprecated font command `\it'!
 (scrartcl)              Note also, that KOMA-Script will remove the definition
 (scrartcl)              of `\it' anytime until release of about version 3.20.
 (scrartcl)              But for now, KOMA-Script will replace deprecated `\it'
-(scrartcl)              by `\normalfont \itshape ' on input line 159.
+(scrartcl)              by `\normalfont \itshape ' on input line 166.
 
 
 Class scrartcl Warning: Usage of deprecated font command `\it'!
@@ -1508,7 +1861,7 @@ Class scrartcl Warning: Usage of deprecated font command `\it'!
 (scrartcl)              Note also, that KOMA-Script will remove the definition
 (scrartcl)              of `\it' anytime until release of about version 3.20.
 (scrartcl)              But for now, KOMA-Script will replace deprecated `\it'
-(scrartcl)              by `\normalfont \itshape ' on input line 159.
+(scrartcl)              by `\normalfont \itshape ' on input line 166.
 
 
 Class scrartcl Warning: Usage of deprecated font command `\it'!
@@ -1522,7 +1875,7 @@ Class scrartcl Warning: Usage of deprecated font command `\it'!
 (scrartcl)              Note also, that KOMA-Script will remove the definition
 (scrartcl)              of `\it' anytime until release of about version 3.20.
 (scrartcl)              But for now, KOMA-Script will replace deprecated `\it'
-(scrartcl)              by `\normalfont \itshape ' on input line 159.
+(scrartcl)              by `\normalfont \itshape ' on input line 166.
 
 
 Class scrartcl Warning: Usage of deprecated font command `\it'!
@@ -1536,10 +1889,10 @@ Class scrartcl Warning: Usage of deprecated font command `\it'!
 (scrartcl)              Note also, that KOMA-Script will remove the definition
 (scrartcl)              of `\it' anytime until release of about version 3.20.
 (scrartcl)              But for now, KOMA-Script will replace deprecated `\it'
-(scrartcl)              by `\normalfont \itshape ' on input line 159.
+(scrartcl)              by `\normalfont \itshape ' on input line 166.
 
 
-Overfull \hbox (3.7382pt too wide) in paragraph at lines 159--159
+Overfull \hbox (3.73996pt too wide) in paragraph at lines 166--166
 [] 
  []
 
@@ -1555,7 +1908,7 @@ Class scrartcl Warning: Usage of deprecated font command `\it'!
 (scrartcl)              Note also, that KOMA-Script will remove the definition
 (scrartcl)              of `\it' anytime until release of about version 3.20.
 (scrartcl)              But for now, KOMA-Script will replace deprecated `\it'
-(scrartcl)              by `\normalfont \itshape ' on input line 160.
+(scrartcl)              by `\normalfont \itshape ' on input line 167.
 
 
 Class scrartcl Warning: Usage of deprecated font command `\it'!
@@ -1569,7 +1922,7 @@ Class scrartcl Warning: Usage of deprecated font command `\it'!
 (scrartcl)              Note also, that KOMA-Script will remove the definition
 (scrartcl)              of `\it' anytime until release of about version 3.20.
 (scrartcl)              But for now, KOMA-Script will replace deprecated `\it'
-(scrartcl)              by `\normalfont \itshape ' on input line 164.
+(scrartcl)              by `\normalfont \itshape ' on input line 171.
 
 
 Class scrartcl Warning: Usage of deprecated font command `\it'!
@@ -1583,97 +1936,108 @@ Class scrartcl Warning: Usage of deprecated font command `\it'!
 (scrartcl)              Note also, that KOMA-Script will remove the definition
 (scrartcl)              of `\it' anytime until release of about version 3.20.
 (scrartcl)              But for now, KOMA-Script will replace deprecated `\it'
-(scrartcl)              by `\normalfont \itshape ' on input line 164.
+(scrartcl)              by `\normalfont \itshape ' on input line 171.
 
 
-! LaTeX Error: Bad math environment delimiter.
+Class scrartcl Warning: Usage of deprecated font command `\it'!
+(scrartcl)              You should note, that in 1994 font command `\it' has
+(scrartcl)              been defined for compatiblitiy to Script 2.0 only.
+(scrartcl)              Now, after two decades of LaTeX2e and NFSS2, you
+(scrartcl)              shouldn't use such commands any longer and within
+(scrartcl)              KOMA-Script usage of `\it' is definitely deprecated.
+(scrartcl)              See `fntguide.pdf' for more information about
+(scrartcl)              recommended font commands.
+(scrartcl)              Note also, that KOMA-Script will remove the definition
+(scrartcl)              of `\it' anytime until release of about version 3.20.
+(scrartcl)              But for now, KOMA-Script will replace deprecated `\it'
+(scrartcl)              by `\normalfont \itshape ' on input line 171.
 
-See the LaTeX manual or LaTeX Companion for explanation.
+
+Package Fancyhdr Warning: \headheight is too small (17.0pt): 
+ Make it at least 25.2232pt.
+ We now make it that large for the rest of the document.
+ This may cause the page layout to be inconsistent, however.
+
+[4]
+
+Class scrartcl Warning: Usage of deprecated font command `\it'!
+(scrartcl)              You should note, that in 1994 font command `\it' has
+(scrartcl)              been defined for compatiblitiy to Script 2.0 only.
+(scrartcl)              Now, after two decades of LaTeX2e and NFSS2, you
+(scrartcl)              shouldn't use such commands any longer and within
+(scrartcl)              KOMA-Script usage of `\it' is definitely deprecated.
+(scrartcl)              See `fntguide.pdf' for more information about
+(scrartcl)              recommended font commands.
+(scrartcl)              Note also, that KOMA-Script will remove the definition
+(scrartcl)              of `\it' anytime until release of about version 3.20.
+(scrartcl)              But for now, KOMA-Script will replace deprecated `\it'
+(scrartcl)              by `\normalfont \itshape ' on input line 216.
+
+! Extra }, or forgotten $.
+l.216 ...n} between signals \(S{\scriptstyle (t)}}
+                                                  \) and \(\varphi_n{\script...
+I've deleted a group-closing symbol because it seems to be
+spurious, as in `$x}$'. But perhaps the } is legitimate and
+you forgot something else, as in `\hbox{$x}'. In such cases
+the way to recover is to insert both the forgotten and the
+deleted material, e.g., by typing `I$}'.
+
+
+Class scrartcl Warning: Usage of deprecated font command `\it'!
+(scrartcl)              You should note, that in 1994 font command `\it' has
+(scrartcl)              been defined for compatiblitiy to Script 2.0 only.
+(scrartcl)              Now, after two decades of LaTeX2e and NFSS2, you
+(scrartcl)              shouldn't use such commands any longer and within
+(scrartcl)              KOMA-Script usage of `\it' is definitely deprecated.
+(scrartcl)              See `fntguide.pdf' for more information about
+(scrartcl)              recommended font commands.
+(scrartcl)              Note also, that KOMA-Script will remove the definition
+(scrartcl)              of `\it' anytime until release of about version 3.20.
+(scrartcl)              But for now, KOMA-Script will replace deprecated `\it'
+(scrartcl)              by `\normalfont \itshape ' on input line 220.
+
+
+Class scrartcl Warning: Usage of deprecated font command `\it'!
+(scrartcl)              You should note, that in 1994 font command `\it' has
+(scrartcl)              been defined for compatiblitiy to Script 2.0 only.
+(scrartcl)              Now, after two decades of LaTeX2e and NFSS2, you
+(scrartcl)              shouldn't use such commands any longer and within
+(scrartcl)              KOMA-Script usage of `\it' is definitely deprecated.
+(scrartcl)              See `fntguide.pdf' for more information about
+(scrartcl)              recommended font commands.
+(scrartcl)              Note also, that KOMA-Script will remove the definition
+(scrartcl)              of `\it' anytime until release of about version 3.20.
+(scrartcl)              But for now, KOMA-Script will replace deprecated `\it'
+(scrartcl)              by `\normalfont \itshape ' on input line 220.
+
+
+Class scrartcl Warning: Usage of deprecated font command `\it'!
+(scrartcl)              You should note, that in 1994 font command `\it' has
+(scrartcl)              been defined for compatiblitiy to Script 2.0 only.
+(scrartcl)              Now, after two decades of LaTeX2e and NFSS2, you
+(scrartcl)              shouldn't use such commands any longer and within
+(scrartcl)              KOMA-Script usage of `\it' is definitely deprecated.
+(scrartcl)              See `fntguide.pdf' for more information about
+(scrartcl)              recommended font commands.
+(scrartcl)              Note also, that KOMA-Script will remove the definition
+(scrartcl)              of `\it' anytime until release of about version 3.20.
+(scrartcl)              But for now, KOMA-Script will replace deprecated `\it'
+(scrartcl)              by `\normalfont \itshape ' on input line 256.
+
+
+! Package pgfkeys Error: I do not know the key '/tcb/ams text' and I am going t
+o ignore it. Perhaps you misspelled it.
+
+See the pgfkeys package documentation for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.186    \end{equation*}
-                        
-Your command was ignored.
-Type  I <command> <return>  to replace it with another command,
-or  <return>  to continue without it.
-
-
-! LaTeX Error: \begin{document} ended by \end{equation*}.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.186    \end{equation*}
-                        
-Your command was ignored.
-Type  I <command> <return>  to replace it with another command,
-or  <return>  to continue without it.
-
-! Missing $ inserted.
-<inserted text> 
-                $
-l.186    \end{equation*}
-                        
-I've inserted something that you may have forgotten.
-(See the <inserted text> above.)
-With luck, this will get me unwedged. But if you
-really didn't forget anything, try typing `2' now; then
-my insertion and my current dilemma will both disappear.
-
-! Display math should end with $$.
-<to be read again> 
-                   \endgroup 
-l.186    \end{equation*}
-                        
-The `$' that I just saw supposedly matches a previous `$$'.
-So I shall assume that you typed `$$' both times.
-
-! Extra \endgroup.
-<recently read> \endgroup 
-                          
-l.186    \end{equation*}
-                        
-Things are pretty mixed up, but I think the worst is over.
-
-[4] [5] [6]
-
-Class scrartcl Warning: Usage of deprecated font command `\it'!
-(scrartcl)              You should note, that in 1994 font command `\it' has
-(scrartcl)              been defined for compatiblitiy to Script 2.0 only.
-(scrartcl)              Now, after two decades of LaTeX2e and NFSS2, you
-(scrartcl)              shouldn't use such commands any longer and within
-(scrartcl)              KOMA-Script usage of `\it' is definitely deprecated.
-(scrartcl)              See `fntguide.pdf' for more information about
-(scrartcl)              recommended font commands.
-(scrartcl)              Note also, that KOMA-Script will remove the definition
-(scrartcl)              of `\it' anytime until release of about version 3.20.
-(scrartcl)              But for now, KOMA-Script will replace deprecated `\it'
-(scrartcl)              by `\normalfont \itshape ' on input line 281.
-
-! Missing $ inserted.
-<inserted text> 
-                $
-l.285 ...al (show CC, distribut. property). The k_
-                                                  s are a little more tricky...
-I've inserted a begin-math/end-math symbol since I think
-you left one out. Proceed, with fingers crossed.
-
-! Missing $ inserted.
-<inserted text> 
-                $
-l.286 
-      
-I've inserted a begin-math/end-math symbol since I think
-you left one out. Proceed, with fingers crossed.
-
-
-Overfull \hbox (17.56567pt too wide) in paragraph at lines 284--286
-\OT1/cmr/m/n/10.95 The k$[]\OML/cmm/m/it/10.95 arealittlemoretricky\OT1/cmr/m/n
-/10.95 (\OML/cmm/m/it/10.95 showthatdisindependentfromk\OT1/cmr/m/n/10.95 )\OML
-/cmm/m/it/10.95 :Showminimizationofenergy$ 
- []
+l.258   \begin{tcolorbox}[ams text]
+                                   
+This error message was generated by an \errmessage
+command, so I can't give any explicit help.
+Pretend that you're Hercule Poirot: Examine all clues,
+and deduce the truth by order and method.
 
 
 Class scrartcl Warning: Usage of deprecated font command `\it'!
@@ -1687,22 +2051,34 @@ Class scrartcl Warning: Usage of deprecated font command `\it'!
 (scrartcl)              Note also, that KOMA-Script will remove the definition
 (scrartcl)              of `\it' anytime until release of about version 3.20.
 (scrartcl)              But for now, KOMA-Script will replace deprecated `\it'
-(scrartcl)              by `\normalfont \itshape ' on input line 288.
+(scrartcl)              by `\normalfont \itshape ' on input line 260.
+
+
+Package Fancyhdr Warning: \headheight is too small (17.0pt): 
+ Make it at least 25.2232pt.
+ We now make it that large for the rest of the document.
+ This may cause the page layout to be inconsistent, however.
+
+[5]
+
+Package Fancyhdr Warning: \headheight is too small (17.0pt): 
+ Make it at least 25.2232pt.
+ We now make it that large for the rest of the document.
+ This may cause the page layout to be inconsistent, however.
+
+[6]
+
+Package Fancyhdr Warning: \headheight is too small (17.0pt): 
+ Make it at least 25.2232pt.
+ We now make it that large for the rest of the document.
+ This may cause the page layout to be inconsistent, however.
 
 [7]
 
-Class scrartcl Warning: Usage of deprecated font command `\it'!
-(scrartcl)              You should note, that in 1994 font command `\it' has
-(scrartcl)              been defined for compatiblitiy to Script 2.0 only.
-(scrartcl)              Now, after two decades of LaTeX2e and NFSS2, you
-(scrartcl)              shouldn't use such commands any longer and within
-(scrartcl)              KOMA-Script usage of `\it' is definitely deprecated.
-(scrartcl)              See `fntguide.pdf' for more information about
-(scrartcl)              recommended font commands.
-(scrartcl)              Note also, that KOMA-Script will remove the definition
-(scrartcl)              of `\it' anytime until release of about version 3.20.
-(scrartcl)              But for now, KOMA-Script will replace deprecated `\it'
-(scrartcl)              by `\normalfont \itshape ' on input line 315.
+Package Fancyhdr Warning: \headheight is too small (17.0pt): 
+ Make it at least 25.2232pt.
+ We now make it that large for the rest of the document.
+ This may cause the page layout to be inconsistent, however.
 
 [8]
 
@@ -1717,13 +2093,64 @@ Class scrartcl Warning: Usage of deprecated font command `\it'!
 (scrartcl)              Note also, that KOMA-Script will remove the definition
 (scrartcl)              of `\it' anytime until release of about version 3.20.
 (scrartcl)              But for now, KOMA-Script will replace deprecated `\it'
-(scrartcl)              by `\normalfont \itshape ' on input line 352.
+(scrartcl)              by `\normalfont \itshape ' on input line 381.
 
-! Too many }'s.
-l.374          \end{align*}}
-                            
-You've closed more groups than you opened.
-Such booboos are generally harmless, so keep going.
+! Missing $ inserted.
+<inserted text> 
+                $
+l.385 ...al (show CC, distribut. property). The k_
+                                                  s are a little more tricky...
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+! Missing $ inserted.
+<inserted text> 
+                $
+l.386 
+      
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+
+Overfull \hbox (17.56581pt too wide) in paragraph at lines 384--386
+\OT1/lmr/m/n/10.95 The k$[]\OML/lmm/m/it/10.95 arealittlemoretricky\OT1/lmr/m/n
+/10.95 (\OML/lmm/m/it/10.95 showthatdisindependentfromk\OT1/lmr/m/n/10.95 )\OML
+/lmm/m/it/10.95 :Showminimizationofenergy$ 
+ []
+
+
+Class scrartcl Warning: Usage of deprecated font command `\it'!
+(scrartcl)              You should note, that in 1994 font command `\it' has
+(scrartcl)              been defined for compatiblitiy to Script 2.0 only.
+(scrartcl)              Now, after two decades of LaTeX2e and NFSS2, you
+(scrartcl)              shouldn't use such commands any longer and within
+(scrartcl)              KOMA-Script usage of `\it' is definitely deprecated.
+(scrartcl)              See `fntguide.pdf' for more information about
+(scrartcl)              recommended font commands.
+(scrartcl)              Note also, that KOMA-Script will remove the definition
+(scrartcl)              of `\it' anytime until release of about version 3.20.
+(scrartcl)              But for now, KOMA-Script will replace deprecated `\it'
+(scrartcl)              by `\normalfont \itshape ' on input line 388.
+
+
+Class scrartcl Warning: Usage of deprecated font command `\it'!
+(scrartcl)              You should note, that in 1994 font command `\it' has
+(scrartcl)              been defined for compatiblitiy to Script 2.0 only.
+(scrartcl)              Now, after two decades of LaTeX2e and NFSS2, you
+(scrartcl)              shouldn't use such commands any longer and within
+(scrartcl)              KOMA-Script usage of `\it' is definitely deprecated.
+(scrartcl)              See `fntguide.pdf' for more information about
+(scrartcl)              recommended font commands.
+(scrartcl)              Note also, that KOMA-Script will remove the definition
+(scrartcl)              of `\it' anytime until release of about version 3.20.
+(scrartcl)              But for now, KOMA-Script will replace deprecated `\it'
+(scrartcl)              by `\normalfont \itshape ' on input line 415.
+
+
+Package Fancyhdr Warning: \headheight is too small (17.0pt): 
+ Make it at least 25.2232pt.
+ We now make it that large for the rest of the document.
+ This may cause the page layout to be inconsistent, however.
 
 [9]
 
@@ -1738,7 +2165,34 @@ Class scrartcl Warning: Usage of deprecated font command `\it'!
 (scrartcl)              Note also, that KOMA-Script will remove the definition
 (scrartcl)              of `\it' anytime until release of about version 3.20.
 (scrartcl)              But for now, KOMA-Script will replace deprecated `\it'
-(scrartcl)              by `\normalfont \itshape ' on input line 385.
+(scrartcl)              by `\normalfont \itshape ' on input line 452.
+
+
+Package Fancyhdr Warning: \headheight is too small (17.0pt): 
+ Make it at least 25.2232pt.
+ We now make it that large for the rest of the document.
+ This may cause the page layout to be inconsistent, however.
+
+[10]
+! Too many }'s.
+l.474          \end{align*}}
+                            
+You've closed more groups than you opened.
+Such booboos are generally harmless, so keep going.
+
+
+Class scrartcl Warning: Usage of deprecated font command `\it'!
+(scrartcl)              You should note, that in 1994 font command `\it' has
+(scrartcl)              been defined for compatiblitiy to Script 2.0 only.
+(scrartcl)              Now, after two decades of LaTeX2e and NFSS2, you
+(scrartcl)              shouldn't use such commands any longer and within
+(scrartcl)              KOMA-Script usage of `\it' is definitely deprecated.
+(scrartcl)              See `fntguide.pdf' for more information about
+(scrartcl)              recommended font commands.
+(scrartcl)              Note also, that KOMA-Script will remove the definition
+(scrartcl)              of `\it' anytime until release of about version 3.20.
+(scrartcl)              But for now, KOMA-Script will replace deprecated `\it'
+(scrartcl)              by `\normalfont \itshape ' on input line 485.
 
 
 ! Package inputenc Error: Unicode char \u8:∗ not set up for use with LaTeX.
@@ -1747,7 +2201,7 @@ See the inputenc package documentation for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.386            Let \(w∗
+l.486            Let \(w∗
                            ^D\) denote the parameters minimizing the mean sq...
 
 Your command was ignored.
@@ -1755,7 +2209,7 @@ Type  I <command> <return>  to replace it with another command,
 or  <return>  to continue without it.
 
 ! Too many }'s.
-l.392          }
+l.492          }
                 
 You've closed more groups than you opened.
 Such booboos are generally harmless, so keep going.
@@ -1772,7 +2226,7 @@ Class scrartcl Warning: Usage of deprecated font command `\it'!
 (scrartcl)              Note also, that KOMA-Script will remove the definition
 (scrartcl)              of `\it' anytime until release of about version 3.20.
 (scrartcl)              But for now, KOMA-Script will replace deprecated `\it'
-(scrartcl)              by `\normalfont \itshape ' on input line 396.
+(scrartcl)              by `\normalfont \itshape ' on input line 496.
 
 
 Class scrartcl Warning: Usage of deprecated font command `\it'!
@@ -1786,10 +2240,10 @@ Class scrartcl Warning: Usage of deprecated font command `\it'!
 (scrartcl)              Note also, that KOMA-Script will remove the definition
 (scrartcl)              of `\it' anytime until release of about version 3.20.
 (scrartcl)              But for now, KOMA-Script will replace deprecated `\it'
-(scrartcl)              by `\normalfont \itshape ' on input line 396.
+(scrartcl)              by `\normalfont \itshape ' on input line 496.
 
 
-LaTeX Warning: File `cv_reg.png' not found on input line 400.
+LaTeX Warning: File `cv_reg.png' not found on input line 500.
 
 
 ! Package pdftex.def Error: File `cv_reg.png' not found.
@@ -1798,14 +2252,26 @@ See the pdftex.def package documentation for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.400 ...width=0.8\textwidth, angle=0]{cv_reg.png}
+l.500 ...width=0.8\textwidth, angle=0]{cv_reg.png}
                                                   
 Using draft setting for this image.
 Try typing  <return>  to proceed.
 If that doesn't work, type  X <return>  to quit.
 
+LaTeX Font Info:    Try loading font information for OT1+lmtt on input line 500
+.
+(/usr/share/texmf/tex/latex/lm/ot1lmtt.fd
+File: ot1lmtt.fd 2009/10/30 v1.6 Font defs for Latin Modern
+)
 
-LaTeX Warning: File `var_bias.png' not found on input line 408.
+Package Fancyhdr Warning: \headheight is too small (17.0pt): 
+ Make it at least 25.2232pt.
+ We now make it that large for the rest of the document.
+ This may cause the page layout to be inconsistent, however.
+
+[11]
+
+LaTeX Warning: File `var_bias.png' not found on input line 508.
 
 
 ! Package pdftex.def Error: File `var_bias.png' not found.
@@ -1814,14 +2280,14 @@ See the pdftex.def package documentation for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.408 ...dth=1.1\textwidth, angle=0]{var_bias.png}
+l.508 ...dth=1.1\textwidth, angle=0]{var_bias.png}
                                                   
 Using draft setting for this image.
 Try typing  <return>  to proceed.
 If that doesn't work, type  X <return>  to quit.
 
 
-Overfull \hbox (41.82791pt too wide) in paragraph at lines 408--409
+Overfull \hbox (41.82791pt too wide) in paragraph at lines 508--509
  [][] 
  []
 
@@ -1832,7 +2298,7 @@ See the pageslts package documentation for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.415 \end{document}
+l.515 \end{document}
                     
 The pageslts package was used, but
 \pagenumbering
@@ -1850,10 +2316,30 @@ right.
 
 
 AED: pageslts setting LastPage 
-[10] [11] [12]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 415.
-Package atveryend Info: Executing hook `AfterLastShipout' on input line 415.
-\c@pagesLTS.arabic.1.local.count=\count172
+
+Package Fancyhdr Warning: \headheight is too small (17.0pt): 
+ Make it at least 25.2232pt.
+ We now make it that large for the rest of the document.
+ This may cause the page layout to be inconsistent, however.
+
+[12]
+
+Package Fancyhdr Warning: \headheight is too small (17.0pt): 
+ Make it at least 25.2232pt.
+ We now make it that large for the rest of the document.
+ This may cause the page layout to be inconsistent, however.
+
+[13]
+
+Package Fancyhdr Warning: \headheight is too small (17.0pt): 
+ Make it at least 25.2232pt.
+ We now make it that large for the rest of the document.
+ This may cause the page layout to be inconsistent, however.
+
+[14]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 515.
+Package atveryend Info: Executing hook `AfterLastShipout' on input line 515.
+\c@pagesLTS.arabic.1.local.count=\count221
  
 AED: pageslts setting VeryLastPage via AfterLastShipout 
 
@@ -1864,7 +2350,7 @@ Package pageslts Info: Total number of pages is even.
 
 
 (./w2w-report.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 415.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 515.
 
 
  *File List*
@@ -1972,7 +2458,26 @@ pageslts.sty    2015/08/02 v1.2d Refers to special pages' numbers/names (HMM)
 undolabl.sty    2015/03/29 v1.0l Overriding labels (HMM)
 alphalph.sty    2011/05/13 v2.4 Convert numbers to letters (HO)
 fancyhdr.sty    
+ lmodern.sty    2009/10/30 v1.6 Latin Modern Fonts
+mathtools.sty    2015/06/17 v1.17 mathematical typesetting tools
+    calc.sty    2014/10/28 v4.3 Infix arithmetic (KKT,FJ)
+ mhsetup.sty    2010/01/21 v1.2a programming setup (MH)
+tcolorbox.sty    2015/07/23 version 3.71 text color boxes
+ environ.sty    2014/05/04 v0.3 A new way to define environments
+trimspaces.sty    2009/09/17 v1.1 Trim spaces around a token list
+etoolbox.sty    2015/08/02 v2.2a e-TeX tools for LaTeX (JAW)
+  xparse.sty    2015/06/15 v5630 L3 Experimental document command parser
+   expl3.sty    2015/06/15 v5630 L3 programming layer (loader) 
+expl3-code.tex    2015/06/15 v5630 L3 programming layer 
+l3unicode-data.def    2015/03/01 v5544 L3 Unicode data
+l3pdfmode.def    2015/05/21 v5613 L3 Experimental driver: PDF mode
+listingsutf8.sty    2011/11/10 v1.2 Allow UTF-8 in listings input (HO)
+listings.sty    2015/06/04 1.6 (Carsten Heinz)
+ lstmisc.sty    2015/06/04 1.6 (Carsten Heinz)
+listings.cfg    2015/06/04 1.6 listings configuration
+stringenc.sty    2011/12/02 v1.10 Convert strings between diff. encodings (HO)
   ts1cmr.fd    2014/09/29 v2.5h Standard LaTeX font definitions
+  ot1lmr.fd    2009/10/30 v1.6 Font defs for Latin Modern
 supp-pdf.mkii
 epstopdf-base.sty    2010/02/09 v2.5 Base part for package epstopdf
   grfext.sty    2010/08/19 v1.1 Manage graphics extensions (HO)
@@ -1981,45 +2486,50 @@ epstopdf-sys.cfg    2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
 gettitlestring.sty    2010/12/03 v1.4 Cleanup title references (HO)
 w2w-report.out
 w2w-report.out
+ ot1lmss.fd    2009/10/30 v1.6 Font defs for Latin Modern
+  omllmm.fd    2009/10/30 v1.6 Font defs for Latin Modern
+ omslmsy.fd    2009/10/30 v1.6 Font defs for Latin Modern
+ omxlmex.fd    2009/10/30 v1.6 Font defs for Latin Modern
     umsa.fd    2013/01/14 v3.01 AMS symbols A
     umsb.fd    2013/01/14 v3.01 AMS symbols B
+ ot1lmtt.fd    2009/10/30 v1.6 Font defs for Latin Modern
  ***********
 
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 415.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 515.
 Package rerunfilecheck Info: File `w2w-report.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
 
 LaTeX Warning: There were multiply-defined labels.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 415.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 515.
  ) 
 Here is how much of TeX's memory you used:
- 21045 strings out of 495000
- 384242 string characters out of 6181168
- 528711 words of memory out of 5000000
- 23839 multiletter control sequences out of 15000+600000
- 13611 words of font info for 50 fonts, out of 8000000 for 9000
+ 33190 strings out of 495000
+ 650095 string characters out of 6181168
+ 797527 words of memory out of 5000000
+ 35855 multiletter control sequences out of 15000+600000
+ 54259 words of font info for 51 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 64i,19n,61p,1042b,436s stack positions out of 5000i,500n,10000p,200000b,80000s
-</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></us
-r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/shar
-e/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texl
-ive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></usr/share/texlive/tex
-mf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/share/texlive/texmf-dist
-/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/
-type1/public/amsfonts/cm/cmr6.pfb></usr/share/texlive/texmf-dist/fonts/type1/pu
-blic/amsfonts/cm/cmr8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/ams
-fonts/cm/cmss12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/
-cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cms
-y6.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb>
-</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/
-share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/share/
-texlive/texmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb></usr/share/t
-exlive/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on w2w-report.pdf (12 pages, 209772 bytes).
+ 69i,19n,105p,10426b,471s stack positions out of 5000i,500n,10000p,200000b,80000s
+{/usr/share/texmf/fonts/enc/dvips/lm/lm-rmtt.enc}{/usr/share/texmf/fonts/enc/
+dvips/lm/lm-rm.enc}{/usr/share/texmf/fonts/enc/dvips/lm/lm-mathsy.enc}{/usr/sha
+re/texmf/fonts/enc/dvips/lm/lm-mathit.enc}{/usr/share/texmf/fonts/enc/dvips/lm/
+lm-mathex.enc}</usr/share/texmf/fonts/type1/public/lm/lmbx10.pfb></usr/share/te
+xmf/fonts/type1/public/lm/lmex10.pfb></usr/share/texmf/fonts/type1/public/lm/lm
+mi10.pfb></usr/share/texmf/fonts/type1/public/lm/lmmi6.pfb></usr/share/texmf/fo
+nts/type1/public/lm/lmmi8.pfb></usr/share/texmf/fonts/type1/public/lm/lmr10.pfb
+></usr/share/texmf/fonts/type1/public/lm/lmr6.pfb></usr/share/texmf/fonts/type1
+/public/lm/lmr8.pfb></usr/share/texmf/fonts/type1/public/lm/lmri10.pfb></usr/sh
+are/texmf/fonts/type1/public/lm/lmss12.pfb></usr/share/texmf/fonts/type1/public
+/lm/lmsy10.pfb></usr/share/texmf/fonts/type1/public/lm/lmsy6.pfb></usr/share/te
+xmf/fonts/type1/public/lm/lmsy8.pfb></usr/share/texmf/fonts/type1/public/lm/lmt
+t10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/symbols/msam
+10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm1
+0.pfb>
+Output written on w2w-report.pdf (14 pages, 243119 bytes).
 PDF statistics:
- 188 PDF objects out of 1000 (max. 8388607)
- 156 compressed objects within 2 object streams
- 47 named destinations out of 1000 (max. 500000)
+ 205 PDF objects out of 1000 (max. 8388607)
+ 171 compressed objects within 2 object streams
+ 49 named destinations out of 1000 (max. 500000)
  13 words of extra memory for PDF output out of 10000 (max. 10000000)
 
