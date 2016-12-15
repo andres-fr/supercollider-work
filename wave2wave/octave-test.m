@@ -1,21 +1,172 @@
+################################################################################
 ## M-x run-octave    start repl
 
-
-## C-c TAB a       octave-send-buffer
-## C-c TAB b       octave-send-block
-## C-c TAB f       octave-send-defun
-## C-c TAB k       octave-kill-process
-## C-c TAB l       octave-send-line
-## C-c TAB q       octave-hide-process-buffer
-## C-c TAB r       octave-send-region
-## C-c TAB s       octave-show-process-buffer
-
-## C-c C-M-h       octave-mark-block
-## C-c M-l         my-octave-clear-repl
-
-
+## C-M-RET send line
+## C-, C-RET send paragraph
+## C-c C-l send buffer
 ## C-c M-l clear repl
-## C-c C-l send whole buffer to repl
+################################################################################
 
 
-help eye
+
+
+
+################################################################################
+### CONFIGURE FFTW
+################################################################################
+
+
+
+################################################################################
+### GLOBALS
+################################################################################
+MATERIALS_DIR =  strcat(pwd(),"/materials/");
+
+
+
+
+################################################################################
+### LOADING AND PREPROCESSING AUDIO FILES
+################################################################################
+function outsig = remove_dc(sig)
+  m = sum(sig)/length(sig);
+  outsig = sig-m;
+endfunction
+
+function outsig = normalize_sig(sig)
+  outsig = sig/max(abs(sig));
+endfunction
+
+function outsig = preprocess_sig(sig)
+  outsig = normalize_sig(remove_dc(sig));
+endfunction
+
+function [sig, fs] = load_and_preprocess(filepath)
+  [sig, fs] = audioread(filepath);
+  sig = preprocess_sig(sig);
+endfunction
+
+
+
+[anvil, fs] = load_and_preprocess(strcat(MATERIALS_DIR, "anvil.wav"));
+[triangle, fs] = load_and_preprocess(strcat(MATERIALS_DIR, "triangle.wav"));
+[flexatone, fs] = load_and_preprocess(strcat(MATERIALS_DIR, "flexatone.wav"));
+[recoreco, fs] = load_and_preprocess(strcat(MATERIALS_DIR, "recoreco.wav"));
+[child, fs] = load_and_preprocess(strcat(MATERIALS_DIR, "child.wav"));
+
+
+################################################################################
+### LOADING AND PREPROCESSING AUDIO FILES
+################################################################################
+
+
+
+
+
+########################
+## cual es el plan para hoy??
+## acabas de demostrar que no es secuencial CC->k.
+## Pero al menos esta muy pulido! para el prototipo,
+## seria ideal que pasaras de K y te centraras en la CC:
+
+## 1) importar, normalizar (0 mean, 1 max) plotear y exportar archivos de audio
+
+## 2) hacer FFT y cross-correlation, comprobar que funciona
+
+## 3) un test sencillo:
+##    mezclar 3 materiales A, B, C con delays distintos
+##    proponer 10 materiales entre los que estan A,B,C
+##    coger los 3 que mas CC dan, y reconstruir
+##    escuchar la reconstruccion
+
+
+
+
+function newsize = padsize(sig)
+  newsize = ceil(log2(length(sig)));
+  newsize = 2**newsize;
+endfunction
+
+function newsize = maxpadsize(sig1, sig2)
+  newsize = max(padsize(sig1), padsize(sig2))
+endfunction
+
+function outsig = fftcc(sig1, sig2)
+  if length(sig1)<length(sig2)
+    sig1 = flip(sig1);
+  else
+    sig2=flip(sig2);
+  endif
+  outsig = fftconv(sig1, sig2);#, maxpadsize(sig1, sig2));
+endfunction
+
+
+
+
+################################################################################
+### TESTS
+################################################################################
+
+
+#########  TESTING CROSS-CORRELATION WITH SOME NOISE
+range = 1:1:2000;
+noise = 2*rand(1, 1000)-1;
+noise_delayed = [zeros(1, 500), noise];
+clf;subplot(3,1,1); plot(noise_delayed); xlim([0, 3000]);
+subplot(3,1,2); plot(noise);xlim([0, 3000]);
+subplot(3,1,3); plot(fftcc(noise_delayed, noise));xlim([0, 3000]);
+
+#######  TEST CONVOLUTION WITH ANVIL AS REVERB FILTER
+## sound(anvil,fs);
+## sound(child,fs);
+test_conv = normalize_sig(fftconv(child,anvil));
+wavwrite(test_conv, fs, "test.wav");
+
+
+
+### TEST FFT
+x=child;
+clf;
+subplot(2,1,1);
+plot(x);
+grid;
+xlabel("time domain in samples");
+ylabel("Signal amplitude");
+subplot(2,1,2);
+y=fft(x, 2*padsize(x));
+plot(abs(y));
+xlabel("frequency domain bins");
+ylabel("spectral amplitude");
+
+
+pre_post_pad([1;2;3],19, 20)
+
+function outsig = pre_post_pad(sig, init, totalsize)
+  outsig = postpad([zeros(init-1,1);sig], totalsize);
+endfunction
+
+function outsig = add_a_to_b(sig_a, sig_b, initpos)
+  outsig =  sig_b+pre_post_pad(sig_a, initpos, length(sig_b));
+endfunction
+
+add_a_to_b([1;2;3], ones(10,1),3)
+
+### TEST APP
+test = child;
+test = add_a_to_b(anvil, test, 44100);
+test = add_a_to_b(flexatone, test, 2*44100);
+test = add_a_to_b(recoreco, test, 3*44100);
+wavwrite(test, fs, "test_app.wav");
+
+
+## calculate respective correlations
+cc_anvil = fftcc(test, anvil);
+cc_flexatone = fftcc(test, flexatone);
+cc_recoreco = fftcc(test, recoreco);
+
+clf;subplot(3,1,1); plot(cc_anvil); xlim([0, length(test)]);
+subplot(3,1,2); plot(cc_flexatone);xlim([0, length(test)]);
+subplot(3,1,3); plot(cc_recoreco);xlim([0, length(test)]);
+
+
+[val, ii ] = max(cc_recoreco);

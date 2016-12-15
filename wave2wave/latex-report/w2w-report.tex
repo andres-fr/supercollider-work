@@ -253,97 +253,124 @@ It is now possible to substitute \(\vec{k}\) with the already known expression f
     \bigg\lVert \vec{S}- \Psi_{\vec{d}\;} \vec{S} \bigg\rVert_2^2
     \end{aligned}
 \end{align*}
-In this last expression, note that \(\Phi_{\vec{d}\;} (\Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;})^{-1} \Phi_{\vec{d}\;}^T\vec{S} \) is equivalent to \(\vec{S}'\), expressed as \(\vec{S}\) projected onto the symmetrical {\it normalized covariance matrix} of \(\Phi_{\vec{d}\;}\), that is, \(\Psi_{\vec{d}\;} := \Phi_{\vec{d}\;} (\Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;})^{-1} \Phi_{\vec{d}\;}^T\).\\[7pt]
+In this last expression, note that \(\Phi_{\vec{d}\;} (\Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;})^{-1} \Phi_{\vec{d}\;}^T\vec{S} \) is equivalent to \(\vec{S}'\), expressed as \(\vec{S}\) projected onto the symmetrical matrix \(\Psi_{\vec{d}\;} := \Phi_{\vec{d}\;} (\Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;})^{-1} \Phi_{\vec{d}\;}^T\).\\[7pt]
 This observation has very interesting implications:
   \begin{tcolorbox}[ams text]
     %\label{whatever}
-    If \(\Psi=I\), then \(S'=S\) and therefore \(E[R]=0\). This only can happen if \(\Phi\) has at least as many linearly independent columns as rows (a proof for that is not provided here). In other words, any original signal of \(|S|\) samples can be exactly reconstructed as a linear combination of \(|S|\)-many (linearly independent) materials. Leaving apart the utility/viability of having as much materials as samples has \(S\), this observation can turn out to be very useful, in order to further optimize or tweak the algorithm. For instance, by performing the {\it singular value decomposition} of \(\Psi\), it is possible to know how much each material contributes to the overall minimization of the residual signal).
+    If \(\Psi=I\), then \(S'=S\) and therefore \(E[R]=0\). This only can happen if \(\Phi\) has at least as many linearly independent columns as rows (a proof for that is not provided here). In other words, \textbf{any original signal of size \(K\) can be exactly reconstructed as a linear combination if \(K\)-many linearly independent materials are provided}.\\
+    Furthermore, by performing the {\it singular value decomposition} of \(\Psi\), \textbf{it is possible to know how much each material contributes to the overall minimization of the residual signal}. This can be very useful for further optimization/tweaking of the algorithm.
   \end{tcolorbox}
 
-  Regarding the optimization problem, this also means that \(\Psi_{\vec{d}\;}\) should be as close to the identity matrix as possible:
+  %% The properties of \(\Psi_{\vec{d}\;}\) also allow to go on with the optimization objective:
+  %% \begin{align*}
+  %%   \begin{aligned}
+  %%     \vec{d}^* &= \underset{\vec{d}}{\text{minimize }}
+  %%     \bigg\lVert \vec{S}- \Psi_{\vec{d}\;} \vec{S} \bigg\rVert_2^2
+  %%     %= \underset{\vec{d}}{\text{minimize }} \bigg\lVert I- \Psi_{\vec{d}\;} \bigg\rVert_2^2
+  %%   \end{aligned}
+  %% \end{align*}
+
+  
+
+  Retaking the optimization objective:
   \begin{align*}
     \begin{aligned}
       \vec{d}^* &= \underset{\vec{d}}{\text{minimize }}
-    \bigg\lVert \vec{S}- \Psi_{\vec{d}\;} \vec{S} \bigg\rVert_2^2 =
-    \underset{\vec{d}}{\text{minimize }}
-    \bigg\lVert I- \Psi_{\vec{d}\;} \bigg\rVert_2^2
+      E[S{\scriptstyle (t)}-S'{\scriptstyle (t)}]\\
+      &= \underset{\vec{d}}{\text{minimize }} E[S{\scriptstyle (t)}]+E[S'{\scriptstyle (t)}]-2\langle S{\scriptstyle (t)},S'{\scriptstyle (t)}\rangle\\
+      &= \underset{\vec{d}}{\text{minimize }} \langle \vec{S}, \vec{S} \rangle + \langle \vec{S}', \vec{S}' \rangle - 2 \langle \vec{S},  \vec{S}' \rangle\\
+      &= \underset{\vec{d}}{\text{minimize }} \langle \vec{S}', \vec{S}' \rangle - 2 \langle \vec{S},  \vec{S}' \rangle\\
+      &= \underset{\vec{d}}{\text{maximize }} 2 \langle \vec{S},  \vec{S}' \rangle - \langle \vec{S}', \vec{S}' \rangle\\
+      &= \underset{\vec{d}}{\text{maximize }} \langle \vec{S}' \;\;,\; 2\vec{S}-\vec{S}'  \rangle\\
+      &= \underset{\vec{d}}{\text{maximize }} \langle \Phi_{\vec{d}\;} k \;\;,\; 2\vec{S}-\Phi_{\vec{d}\;} k  \rangle\\
+      %\bigg\lVert \vec{S}- \vec{S'} \bigg\rVert_2^2
+      %= \underset{\vec{d}}{\text{minimize }} \bigg\lVert I- \Psi_{\vec{d}\;} \bigg\rVert_2^2
     \end{aligned}
   \end{align*}
-
-
-
-  of finding the values for \(\vec{d}^*\), recall that:
+  This yields, for each d, the following optimizations:
   \begin{align*}
   \begin{aligned}
-    \vec{S}' = \Phi_{\vec{d}\;} (\Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;})^{-1} \Phi_{\vec{d}\;}^T\vec{S}
+    &d_1^* = \underset{\delta}{\text{maximize }} \Big\langle m_1{\scriptstyle (t+\delta)}\quad ,\quad 2\vec{S}- (m_1{\scriptstyle (t+\delta)}+m_2{\scriptstyle (t+d_2^*)}+...+m_N{\scriptstyle (t+d_N^*)})\Big\rangle\\
+    &d_2^* = \underset{\delta}{\text{maximize }} \Big\langle m_2{\scriptstyle (t+\delta)}\quad ,\quad 2\vec{S}- (m_1{\scriptstyle (t+d_1^*)} + m_2{\scriptstyle (t+\delta)}+...+m_N{\scriptstyle (t+d_N^*)})\Big\rangle\\
+    &...\\
+    &d_N^* = \underset{\delta}{\text{maximize }} \Big\langle m_N{\scriptstyle (t+\delta)}\quad ,\quad 2\vec{S}- (m_1{\scriptstyle (t+d_1^*)} + m_2{\scriptstyle (t+d_2^*)}+...+m_N{\scriptstyle (t+\delta)})\Big\rangle\\
     \end{aligned}
   \end{align*}
-  And therefore:
-  \begin{align*}
-  \begin{aligned}
-    \vec{S}'{\scriptstyle (t)} = \vec{S}^T \Phi_{\vec{d}\;} (\Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;})^{-1} \vec{m}_{\vec{d}\;}{\scriptstyle (t)} = \langle \vec{S} \;,\; \Phi_{\vec{d}\;} (\Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;})^{-1} \vec{m}_{\vec{d}\;}{\scriptstyle (t)} \rangle 
-    \end{aligned}
-  \end{align*}
-  And now that we defined each sample of the reconstruction as a dot product between the original and the delayed materials  asdf
+  Which form an equation system of \(N\) equations with \(N\) variables each (note that \(\langle m_i{\scriptstyle (t+\delta)}, m_i{\scriptstyle (t+\delta)}\rangle \) is the energy of the signal \(m_i{\scriptstyle (t)}\) and doesn't depend on \(\delta\), therefore is not a variable).\\
+  STRATEGIES TO CONTINUE: EITHER SOLVE THE SYSTEM IF POSSIBLE, OR MAYBE SHOW THAT MAXIMIZING <S, S'> IS ALREADY THE BEST SOLUTION BY ANALYZING THE WORST-CASE CEILINGS (IF POSSIBLE), OR MAYBE SHOWING THAT OPTIMIZATION OF K CAN TAKE CARE OF E[S'] AND THEREFORE MAXIMIZING <S,S'> IS THE WAY TO GO...
 
-
-  \begin{align*}
-    \begin{aligned}
-      E[S{\scriptstyle (t)}-S'{\scriptstyle (t)}] &= \sum_{t=1}^{|S|}\{(S{\scriptstyle (t)}-S'{\scriptstyle (t)})^2\}\\ %\sum_{t=1}^{|S|}\Bigg\{\bigg(S{\scriptstyle (t)}-\sum_{n=1}^N\{\varphi_n(k_nm_n{\scriptstyle (t+d_n)})\}\bigg)^2\Bigg\}\\
-      &= \sum_{t=1}^{|S|}\{S{\scriptstyle (t)}^2+S'{\scriptstyle (t)}^2-2S{\scriptstyle (t)}S'{\scriptstyle (t)}\}\\
-      &= \sum_{t=1}^{|S|}\{S{\scriptstyle (t)}^2\}+\sum_{t=1}^{|S|}\{S'{\scriptstyle (t)}^2\}-\sum_{t=1}^{|S|}\{2S{\scriptstyle (t)}S'{\scriptstyle (t)}\}\\
-      &= E[S{\scriptstyle (t)}] + E[S'{\scriptstyle (t)}] - 2<S{\scriptstyle (t)}, S'{\scriptstyle (t)}>
-    \end{aligned}
-  \end{align*}
-  Whereas \(<x{\scriptstyle (t)},y{\scriptstyle (t)}> = \sum_{t=1}^{max(|x|,|y|)}\{x{\scriptstyle (t)}y{\scriptstyle (t)}\}\) represents the dot-product of two signals \(x, y\). With this more convenient expression, and the following observations, it is possible to solve the optimization problem:
-
-  \begin{enumerate}
-  %% \item The energy of a signal is always non-negative%% Since the energy of a signal is always non-negative, the minimal value that can be achieved is zero, when both signals are identical:
+  %% of finding the values for \(\vec{d}^*\), recall that:
   %% \begin{align*}
-  %%   \begin{aligned}
-  %%     E[x{\scriptstyle (t)}]+E[x{\scriptstyle (t)}]-2<x{\scriptstyle (t)},x{\scriptstyle (t)}>= 2\sum_{t=1}^{|x|}\{x{\scriptstyle (t)}^2\}-2\sum_{t=1}^{|x|}\{x{\scriptstyle (t)}x{\scriptstyle (t)}\} = 0
+  %% \begin{aligned}
+  %%   \vec{S}' = \Phi_{\vec{d}\;} (\Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;})^{-1} \Phi_{\vec{d}\;}^T\vec{S}
   %%   \end{aligned}
   %% \end{align*}
-  %% \item Fo
-  \item The value of \(E[S{\scriptstyle (t)}]\) is not affected by changes on \(\vec{k}\) and \(\vec{d}\)
-  \item The value of \(E[S'{\scriptstyle (t)}]\) is not affected by changes on \(\vec{d}\)
-  \item The maximum of a sum is the sum of the maxima
-  \item The maximum dot product between two signals \(x{\scriptstyle (t)},y{\scriptstyle (t)}\) is located at\\
-    \(d^* = idx(max(CC[x{\scriptstyle (t)},y{\scriptstyle (t)}])\)% or, what is the same \(max(<x{\scriptstyle (t)},y{\scriptstyle (t+d)>}) = CC[x{\scriptstyle (t)},y{\scriptstyle (t+d)}]{\scriptstyle (d^*)}\)
-  \item The cross-correlation follows the distributive property. In other words, the \(CC\) of a sum is the sum of the \(CC\)s: \(CC[x, (y_1+...+y_N)] = CC[x,y_1]+...+CC[x,y_N]\)
-  \item The cross-correlation is also associative with multiplication by a constant \(k\in\mathbb{R}\): \(CC[x, k\cdot y] = k \cdot CC[x, y]\)
-  \end{enumerate}
+  %% And therefore:
+  %% \begin{align*}
+  %% \begin{aligned}
+  %%   \vec{S}'{\scriptstyle (t)} = \vec{S}^T \Phi_{\vec{d}\;} (\Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;})^{-1} \vec{m}_{\vec{d}\;}{\scriptstyle (t)} = \langle \vec{S} \;,\; \Phi_{\vec{d}\;} (\Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;})^{-1} \vec{m}_{\vec{d}\;}{\scriptstyle (t)} \rangle 
+  %%   \end{aligned}
+  %% \end{align*}
+  %% And now that we defined each sample of the reconstruction as a dot product between the original and the delayed materials  asdf
 
-  With this in mind it is possible to minimize \(E[S{\scriptstyle (t)}-S'{\scriptstyle (t)}]\) in a much simpler way:
-  \begin{align*}
-    \begin{aligned}
-      (\vec{k}^*, \vec{d}^*) &= \underset{\vec{k}, \vec{d}}{\text{minimize }} E[S{\scriptstyle (t)}] + E[S'{\scriptstyle (t)}] - 2<S{\scriptstyle (t)}, S'{\scriptstyle (t)}>\\
-      ^{1.}&= \underset{\vec{k}, \vec{d}}{\text{minimize }} E[S'{\scriptstyle (t)}] - 2<S{\scriptstyle (t)}, S'{\scriptstyle (t)}>\\
-      %^{4.}&= \underset{\vec{k}, \vec{d}}{\text{minimize }} E[S'{\scriptstyle (t)}] - 2\cdot CC[S{\scriptstyle (t)}, S'{\scriptstyle (t)}]{\scriptstyle (d_n^*)}\\
-      %^{def.\,S'}&= \underset{\vec{k}, \vec{d}}{\text{minimize }} E[S'{\scriptstyle (t)}] - 2\cdot max\bigg(CC\Big[S{\scriptstyle (t)},\sum_{n=1}^N\{k_nm'_n{\scriptstyle (t+d_n)}\}\Big]\bigg)\\
-      ^{def.\,S'}&= \underset{\vec{k}, \vec{d}}{\text{minimize }} E[S'{\scriptstyle (t)}] - 2\cdot <S{\scriptstyle (t)},\sum_{n=1}^N\{k_nm'_n{\scriptstyle (t+d_n)}\}>\\
-      \end{aligned}
-  \end{align*}
-  At this point it is already possible to extract the solution for \(\vec{d}\):
-  \begin{align*}
-    \begin{aligned}
-      \vec{d}^* &=  \underset{\vec{d}}{\text{minimize }} E[S'{\scriptstyle (t)}] - 2\cdot <S{\scriptstyle (t)},\sum_{n=1}^N\{k_nm'_n{\scriptstyle (t+d_n)}\}>\\
-      ^{2.}&=  \underset{\vec{d}}{\text{minimize }} - 2\cdot <S{\scriptstyle (t)},\sum_{n=1}^N\{k_nm'_n{\scriptstyle (t+d_n)}\}>\\
-      &=  \underset{\vec{d}}{\text{maximize }}  <S{\scriptstyle (t)},\sum_{n=1}^N\{k_nm'_n{\scriptstyle (t+d_n)}\}>\\
-      ^{distrib.}&=  \underset{\vec{d}}{\text{maximize }}  \sum_{n=1}^N<S{\scriptstyle (t)},\{k_nm'_n{\scriptstyle (t+d_n)}\}>\\
-      ^{3.}&=  \underset{d_n}{\text{maximize}}<S{\scriptstyle (t)},\{k_nm'_n{\scriptstyle (t+d_n)}\}> \quad \forall d_n \in \vec{d}\\
-      ^{4.}\iff &d_n^* = idx(max(CC[S{\scriptstyle (t)}, k_nm'_n{\scriptstyle (t+d_n)}]) \quad \forall d_n \in \vec{d}\\
-      \end{aligned}
-  \end{align*}
 
-  It remains to find the solution for \(\vec{k}\). Rearranging the optimization problem with the already known values for \(\vec{d}\) yields the following expression:
-  \begin{align*}
-    \begin{aligned}
-      \vec{k}^* &= \underset{\vec{k}}{\text{minimize }} E[S{\scriptstyle (t)}] + E[S'{\scriptstyle (t)}] - 2<S{\scriptstyle (t)}, S'{\scriptstyle (t)}>\\
-      ^{1.}&= \underset{\vec{k}}{\text{minimize }} E[S'{\scriptstyle (t)}] - 2<S{\scriptstyle (t)}, S'{\scriptstyle (t)}>\\
-      ^{def.\,S'}&= \underset{\vec{k}}{\text{minimize }} E[S'{\scriptstyle (t)}] - 2\cdot <S{\scriptstyle (t)},\sum_{n=1}^N\{k_nm'_n{\scriptstyle (t+d_n)}\}>\\
-      \end{aligned}
-  \end{align*}
+  %% \begin{align*}
+  %%   \begin{aligned}
+  %%     E[S{\scriptstyle (t)}-S'{\scriptstyle (t)}] &= \sum_{t=1}^{|S|}\{(S{\scriptstyle (t)}-S'{\scriptstyle (t)})^2\}\\ %\sum_{t=1}^{|S|}\Bigg\{\bigg(S{\scriptstyle (t)}-\sum_{n=1}^N\{\varphi_n(k_nm_n{\scriptstyle (t+d_n)})\}\bigg)^2\Bigg\}\\
+  %%     &= \sum_{t=1}^{|S|}\{S{\scriptstyle (t)}^2+S'{\scriptstyle (t)}^2-2S{\scriptstyle (t)}S'{\scriptstyle (t)}\}\\
+  %%     &= \sum_{t=1}^{|S|}\{S{\scriptstyle (t)}^2\}+\sum_{t=1}^{|S|}\{S'{\scriptstyle (t)}^2\}-\sum_{t=1}^{|S|}\{2S{\scriptstyle (t)}S'{\scriptstyle (t)}\}\\
+  %%     &= E[S{\scriptstyle (t)}] + E[S'{\scriptstyle (t)}] - 2<S{\scriptstyle (t)}, S'{\scriptstyle (t)}>
+  %%   \end{aligned}
+  %% \end{align*}
+  %% Whereas \(<x{\scriptstyle (t)},y{\scriptstyle (t)}> = \sum_{t=1}^{max(|x|,|y|)}\{x{\scriptstyle (t)}y{\scriptstyle (t)}\}\) represents the dot-product of two signals \(x, y\). With this more convenient expression, and the following observations, it is possible to solve the optimization problem:
+
+  %% \begin{enumerate}
+  %% %% \item The energy of a signal is always non-negative%% Since the energy of a signal is always non-negative, the minimal value that can be achieved is zero, when both signals are identical:
+  %% %% \begin{align*}
+  %% %%   \begin{aligned}
+  %% %%     E[x{\scriptstyle (t)}]+E[x{\scriptstyle (t)}]-2<x{\scriptstyle (t)},x{\scriptstyle (t)}>= 2\sum_{t=1}^{|x|}\{x{\scriptstyle (t)}^2\}-2\sum_{t=1}^{|x|}\{x{\scriptstyle (t)}x{\scriptstyle (t)}\} = 0
+  %% %%   \end{aligned}
+  %% %% \end{align*}
+  %% %% \item Fo
+  %% \item The value of \(E[S{\scriptstyle (t)}]\) is not affected by changes on \(\vec{k}\) and \(\vec{d}\)
+  %% \item The value of \(E[S'{\scriptstyle (t)}]\) is not affected by changes on \(\vec{d}\)
+  %% \item The maximum of a sum is the sum of the maxima
+  %% \item The maximum dot product between two signals \(x{\scriptstyle (t)},y{\scriptstyle (t)}\) is located at\\
+  %%   \(d^* = idx(max(CC[x{\scriptstyle (t)},y{\scriptstyle (t)}])\)% or, what is the same \(max(<x{\scriptstyle (t)},y{\scriptstyle (t+d)>}) = CC[x{\scriptstyle (t)},y{\scriptstyle (t+d)}]{\scriptstyle (d^*)}\)
+  %% \item The cross-correlation follows the distributive property. In other words, the \(CC\) of a sum is the sum of the \(CC\)s: \(CC[x, (y_1+...+y_N)] = CC[x,y_1]+...+CC[x,y_N]\)
+  %% \item The cross-correlation is also associative with multiplication by a constant \(k\in\mathbb{R}\): \(CC[x, k\cdot y] = k \cdot CC[x, y]\)
+  %% \end{enumerate}
+
+  %% With this in mind it is possible to minimize \(E[S{\scriptstyle (t)}-S'{\scriptstyle (t)}]\) in a much simpler way:
+  %% \begin{align*}
+  %%   \begin{aligned}
+  %%     (\vec{k}^*, \vec{d}^*) &= \underset{\vec{k}, \vec{d}}{\text{minimize }} E[S{\scriptstyle (t)}] + E[S'{\scriptstyle (t)}] - 2<S{\scriptstyle (t)}, S'{\scriptstyle (t)}>\\
+  %%     ^{1.}&= \underset{\vec{k}, \vec{d}}{\text{minimize }} E[S'{\scriptstyle (t)}] - 2<S{\scriptstyle (t)}, S'{\scriptstyle (t)}>\\
+  %%     %^{4.}&= \underset{\vec{k}, \vec{d}}{\text{minimize }} E[S'{\scriptstyle (t)}] - 2\cdot CC[S{\scriptstyle (t)}, S'{\scriptstyle (t)}]{\scriptstyle (d_n^*)}\\
+  %%     %^{def.\,S'}&= \underset{\vec{k}, \vec{d}}{\text{minimize }} E[S'{\scriptstyle (t)}] - 2\cdot max\bigg(CC\Big[S{\scriptstyle (t)},\sum_{n=1}^N\{k_nm'_n{\scriptstyle (t+d_n)}\}\Big]\bigg)\\
+  %%     ^{def.\,S'}&= \underset{\vec{k}, \vec{d}}{\text{minimize }} E[S'{\scriptstyle (t)}] - 2\cdot <S{\scriptstyle (t)},\sum_{n=1}^N\{k_nm'_n{\scriptstyle (t+d_n)}\}>\\
+  %%     \end{aligned}
+  %% \end{align*}
+  %% At this point it is already possible to extract the solution for \(\vec{d}\):
+  %% \begin{align*}
+  %%   \begin{aligned}
+  %%     \vec{d}^* &=  \underset{\vec{d}}{\text{minimize }} E[S'{\scriptstyle (t)}] - 2\cdot <S{\scriptstyle (t)},\sum_{n=1}^N\{k_nm'_n{\scriptstyle (t+d_n)}\}>\\
+  %%     ^{2.}&=  \underset{\vec{d}}{\text{minimize }} - 2\cdot <S{\scriptstyle (t)},\sum_{n=1}^N\{k_nm'_n{\scriptstyle (t+d_n)}\}>\\
+  %%     &=  \underset{\vec{d}}{\text{maximize }}  <S{\scriptstyle (t)},\sum_{n=1}^N\{k_nm'_n{\scriptstyle (t+d_n)}\}>\\
+  %%     ^{distrib.}&=  \underset{\vec{d}}{\text{maximize }}  \sum_{n=1}^N<S{\scriptstyle (t)},\{k_nm'_n{\scriptstyle (t+d_n)}\}>\\
+  %%     ^{3.}&=  \underset{d_n}{\text{maximize}}<S{\scriptstyle (t)},\{k_nm'_n{\scriptstyle (t+d_n)}\}> \quad \forall d_n \in \vec{d}\\
+  %%     ^{4.}\iff &d_n^* = idx(max(CC[S{\scriptstyle (t)}, k_nm'_n{\scriptstyle (t+d_n)}]) \quad \forall d_n \in \vec{d}\\
+  %%     \end{aligned}
+  %% \end{align*}
+
+  %% It remains to find the solution for \(\vec{k}\). Rearranging the optimization problem with the already known values for \(\vec{d}\) yields the following expression:
+  %% \begin{align*}
+  %%   \begin{aligned}
+  %%     \vec{k}^* &= \underset{\vec{k}}{\text{minimize }} E[S{\scriptstyle (t)}] + E[S'{\scriptstyle (t)}] - 2<S{\scriptstyle (t)}, S'{\scriptstyle (t)}>\\
+  %%     ^{1.}&= \underset{\vec{k}}{\text{minimize }} E[S'{\scriptstyle (t)}] - 2<S{\scriptstyle (t)}, S'{\scriptstyle (t)}>\\
+  %%     ^{def.\,S'}&= \underset{\vec{k}}{\text{minimize }} E[S'{\scriptstyle (t)}] - 2\cdot <S{\scriptstyle (t)},\sum_{n=1}^N\{k_nm'_n{\scriptstyle (t+d_n)}\}>\\
+  %%     \end{aligned}
+  %% \end{align*}
 
   
   

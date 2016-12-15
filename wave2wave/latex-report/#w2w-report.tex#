@@ -1,0 +1,549 @@
+% !TEX TS-program = pdflatex
+% !TEX encoding = UTF-8 Unicode
+
+% This is a simple template for a LaTeX document using the "article" class.
+% See "book", "report", "letter" for other types of document.
+
+\documentclass[11pt]{scrartcl} % use larger type; default would be 10pt
+
+\usepackage[utf8]{inputenc} % set input encoding (not needed with XeLaTeX)
+
+%%% Examples of Article customizations
+% These packages are optional, depending whether you want the features they provide.
+% See the LaTeX Companion or other references for full information.
+
+%%% PAGE DIMENSIONS
+\usepackage{geometry} % to change the page dimensions
+\geometry{a4paper} % or letterpaper (US) or a5paper or....
+% \geometry{margin=2in} % for example, change the margins to 2 inches all round
+% \geometry{landscape} % set up the page for landscape
+%   read geometry.pdf for detailed page layout information
+
+\usepackage{graphicx} % support the \includegraphics command and options
+
+% \usepackage[parfill]{parskip} % Activate to begin paragraphs with an empty line rather than an indent
+
+%%% PACKAGES
+\usepackage{booktabs} % for much better looking tables 
+\usepackage{array} % for better arrays (eg matrices) in maths
+\usepackage{paralist} % very flexible & customisable lists (eg. enumerate/itemize, etc.)
+\usepackage{verbatim} % adds environment for commenting out blocks of text & for better verbatim
+\usepackage{subfig} % make it possible to include more than one captioned figure/table in a single float
+\usepackage{graphicx}
+% These packages are all incorporated in the memoir class to one degree or another...
+\usepackage{hyperref}
+
+%%% SECTION TITLE APPEARANCE
+\usepackage{sectsty}
+\allsectionsfont{\sffamily\mdseries\upshape} % (See the fntguide.pdf for font help)
+% (This matches ConTeXt defaults)
+
+%%% ToC (table of contents) APPEARANCE
+\usepackage[nottoc,notlof,notlot]{tocbibind} % Put the bibliography in the ToC
+\usepackage[titles,subfigure]{tocloft} % Alter the style of the Table of Contents
+\renewcommand{\cftsecfont}{\rmfamily\mdseries\upshape}
+\renewcommand{\cftsecpagefont}{\rmfamily\mdseries\upshape} % No bold!
+
+
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{mathcomp}
+%\usepackage{colortbl}
+\usepackage{dsfont}
+\usepackage{amsfonts}
+\usepackage{cancel}
+
+%%% KV-Diagramme
+%\usepackage[ngerman]{babel}
+\input kvmacros
+
+%%% Graphen
+\usepackage{tikz}
+\usetikzlibrary{intersections}
+\usetikzlibrary{calc}
+
+% last page
+\usepackage{pageslts}
+
+%%% END Article customizations
+
+%%% HEADERS & FOOTERS
+\usepackage{fancyhdr} % This should be set AFTER setting up the page geometry
+%\usepackage{scrpage2} % Another package (only use fancyhdr or scrpage2)
+\pagestyle{fancy} % options: empty , plain , fancy
+\renewcommand{\headrulewidth}{1.2pt} % customise the layout...
+\renewcommand{\footrulewidth}{0.1pt} % customise the layout...
+\lhead{WAVE-TO-WAVE\\Andres Fernandez -- HfMDK Frankfurt}\chead{}\rhead{Report\\Stand: December 2016}
+\lfoot{}\cfoot{\thepage/\lastpageref{LastPages}}\rfoot{}
+
+
+
+%%% THE SYMBOLS FOR ``DEPENDENT'' AND ``INDEPENDENT''
+\newcommand{\CI}{\mathrel{\text{\scalebox{1.07}{$\perp\mkern-10mu\perp$}}}} % independent
+\newcommand{\nCI}{\cancel{\mathrel{\text{\scalebox{1.07}{$\perp\mkern-10mu\perp$}}}}} % dep
+%% THE SYMBOL FOR DOESN'T IMPLY
+\newcommand{\notimplies}{%
+  \mathrel{{\ooalign{\hidewidth$\not\phantom{=}$\hidewidth\cr$\implies$}}}}
+
+
+
+%%% CHANGE BULLETS FOR LISTING
+%%% original ones: $\bullet$, $\cdot$, $\diamond$, $\ast$
+\renewcommand{\labelitemi}{---}
+\renewcommand{\labelitemii}{$\circ$}
+\renewcommand{\labelitemiii}{$\ast$}
+\renewcommand{\labelitemiv}{$\cdot$}
+
+
+%%% grey boxes for emphasis
+\usepackage{lmodern}
+\usepackage{amssymb,mathtools}
+\usepackage[most]{tcolorbox}
+
+
+
+%%% The "real" document content comes below...
+
+
+\begin{document}
+
+\section*{\\[3mm]Background}
+\subsection*{General motivations and goals}
+As a composer, my motivation is the {\it automation of creative processes} (AoCP). Here, I mean automation in the sense of ``letting a machine perform the task''. I consider it to be very relevant not only for obvious economic/social reasons, which apply to every kind of automation: it can also help to bring some new knowledge about ourselves, since automating a task requires being able to describe it in a precise way, and creativity is a predominantly human skill. Furthermore, the connection between organic and mechanic processes has inspired many different aesthetical positions, which I also find interesting and attractive.\\[7pt]
+In this context, the goal would be to achieve a precise definition of creativity, or, conversely, to define algorithms whose output could be regarded as creative.
+\subsection*{Defining creativity}
+Of this two tasks, the former seems very unfeasable, not only because creativity is seen as a very complex cognitive task, and requires a lot of knowledge on cognition that we still don't have: it would also require a general consensus on its purely idiomatic usage/meaning, which would be very difficult to achieve due to the many social factors involved.\\[7pt]
+From my personal experience and discussions, the consensus gets as far as to say that something is regarded as creative if and only if it represents or produces some qualitative gain of knowledge on the receptor, that is: motivates the perception and comprehension of a new concept or category. And even this has some caveats:
+\begin{itemize}
+\item I believe that {\it qualitative} and {\it quantitative} differences are related, for example: overdriving the quantities of an existing setup can lead to the perception of new qualities. In any case, this is bound to the way of how do humans categorize, which is a very complex topic, and a matter of investigation itself.
+\item It suffices if the communicated concepts are {\it new} just to the receptor. Of course, the more global the audience, the safer is to say that something is totally new, but it can't be safely assumed that objective originality exists without going into deep metaphysical discussion.
+\end{itemize}
+
+\subsection*{An empirical approach}
+In this terms, the task of achieving a precise definition of creativity seems unattractive to me. In comparation, defining algorithms whose output could be regarded as creative seems much more feasable: it is much more localized, which can help to reach such a consensus, and technically plausible: first develop the algorithms, guided by some heuristic (e.g. intuition or educated guess), and then speculate on how the results could fit/disregard the premises. But this empirical approach presents two major drawbacks:
+\begin{itemize}
+\item If it is too localized, won't be regarded as creative at all: a delay guitar pedal, for example, produces new sounds every time it is used, but a receptor would very unlikely become some categorical new knowledge as a result of the work of the device, since they are a mere reproduction of its input.
+\item As every other empirical approach, it relies heavily on some kind of belief, if there aren't empirical results to show, or at best convenience, if the results are good.
+\end{itemize}
+So the bottom-up, empirical strategy is to try to get a broad and sound technical basis, in order to be able to conceive models that generalize well, and search for convenient/hopeful results. This sounds very harsh: in the case of AoCP, even the criterium for measuring the results as good or bad is very weak. Still, it may work well, and there are aspects that haven't been discussed yet: here is where the aesthetical dimension comes to play.
+
+
+\subsection*{My idea of art (incomplete section)}
+I regard my activity as an artistic one, because art is, for me, {\it any form of discourse that represents or communicates an idea in a way that involves an aesthetical positioning}. In my case, the {\it idea} is the AoCP, and the {\it positioning} is, for each case, the one that achieves an optimal representation and/or communication of the idea. This doesn't mean the aesthetical dimension is irrelevant, rather the opposite: the aesthetical position of each project must be such that the corresponding idea is ``optimally'' represented and/or transmitted. Optimal, for me, means:
+\begin{itemize}
+\item Free as in freedom: share of data, reproducibility but not necessarily decentralisation. machines are very advanced and there seems to be little awareness about that. Whatever we go for, better done with awareness.
+\item Complex but Global: popular contents to spread elitist means. Make elite grow ``igualar por arriba'': does this mean educational/pedagogic?
+\item Generalizability: I make music just bc i know more about that than other things. Unless we have a special soul or something, everything is a stream of patterns
+\end{itemize}
+In this sense, it has many common points with the hacker, pop, scientific discourses, and I anticipate many of their aesthetical components, but also many differences: popularity not only through simplicity! ``autotune'' involves heavy math but its very popular... TODO.
+There are also many common points with science... elaborate. Also religion, i talk about faith \\
+For example, a common {\it topos} for artworks that tackle the AoCP is the convergence between human and machine: since there is no record of such a thing, many details are open: the artist does have to specify how could it happen: do machines become a copy of the 19\textsuperscript{th} century western adult, or do humans also get closer to machines by, for instance, abandoning the idea of subject and freedom?\\[7pt]
+In this context, my discourse doesn't only intend to be a pure empirical investigation on the sources of creativity, or a way to open up new ways for the industry: art can be a very effective way to transmite the belief that the AoCP is possible, and to create a starting point for discussion about our present and future among machines: and this not only as a mean, but also a goal itself.
+
+\vspace{5mm}
+\section*{The Wave-To-Wave Algorithm}
+
+\subsection*{Approach}
+Following the program explained in the background section, the basic thesis behind this project is that \textbf{the task of optimizing could be regarded as creative}. In Mathematics, optimization problems try to find the maximum (or minimum) of a function. If the function to optimize is convex, this means it has a single global maximum, which can be efficiently found most of the times following an analytical approach.\\
+Non-convex functions, on the other side, present many local maxima, and the optimization problem is also non-convex if there is no general way to know where the global maximum is. The general solution would be here to search through the whole input space, which usually takes too long to be plausible. In that case it is necessary to define some \textbf{heuristics}, that is, criteria that help to reduce the search space but still reach a satisfying solution.\\[7pt]
+There are many kinds of optimization problems, and many of them can take place in a creative context. The problem corresponding to this algorithm is the following: given an audio file on one side, and a finite set of audio files on the other (the materials), \textbf{approximate the original file by transforming and superimposing the materials}. This approximation has to be so good that the original is clearly noticeable (in ideal cases, even speech should be understood), but the building blocks are perceived too.\\[7pt]
+There are some precedents in performing such a task, most notably IRCAM's \href{http://imtr.ircam.fr/imtr/CataRT}{{\it CataRT}}, which usually rely on already granular materials, and process the result sequentially through time. The approach of the algorithm presented here is substantially different, since it is divided in two phases:
+\begin{enumerate}
+\item Provide the closest result between the original signal and the reconstruction, by minimizing their ``energy difference''. The energy difference between to signals is a convex function and its global minimum can be efficiently calculated, as it wil be shown. Keep in mind that finding the closest reconstruction possible, doesn't mean that it has to be good: unlike other models, this makes no assumptions on the inputs (apart from them bein discrete, real-valued signals).
+\item Alter the setup to force suboptimalities in diverse ways.
+\end{enumerate}
+In other words, instead of defining the approximating algorithm with implicit heuristics already from scratch, an optimum is calculated, and the heuristics are defined in comparison to it. The hope is that this helps to make them more explicit and therefore improve not only the quality of the compositional process, but also its results and their interpretation. With this approach, the first stage implies more or less the development of a ``compositional tool'': it is in the second stage where the above mentioned non-convexity is expected to happen.
+\subsection*{Optimization objective}
+Given:
+\begin{align*}
+    \begin{aligned}
+      S{\scriptstyle (t)} \;&\hat{=} \text{ a real-valued signal of sample length } |S| \in \mathbb{N} \text{ (the {\it original})}\\
+      \vec{m} := (\ m_1{\scriptstyle (t)}, ..., m_N{\scriptstyle (t)}) \;&\hat{=} \text{ a vector of \(N\in\mathbb{N}\) discrete, real-valued signals (the {\it materials})}\\
+      f(x{\scriptstyle (t)}) = k
+      \varphi_x{\scriptstyle (t+d)} \;&\hat{=} \text{ a signal consisting of any non-linear transformation } \varphi_x \text{ and a}\\
+        &\phantom{\quad\,}\text{further delay } d\in\mathbb{N} \text{ and normalization } k\in\mathbb{R} \notag\\ %% _{\{\backslash 0\}}
+    \end{aligned}
+\end{align*}
+Find the parameters for the signal \(S'{\scriptstyle (t)}\) (the {\it reconstruction}):
+  \begin{align*}
+    S'{\scriptstyle (t)} = \sum_{n=1}^N\{f_n(m_n{\scriptstyle (t)})\} = \sum_{n=1}^N\{k_n\varphi_{m_n}{\scriptstyle (t+d_n)}\}
+  \end{align*}
+  That minimize the energy of the {\it residual} signal \(R{\scriptstyle (t)} := E[S{\scriptstyle (t)}-S'{\scriptstyle (t)}]\), that is, the difference between  {\it original} and {\it reconstruction}. The energy of a signal is defined as:
+  \begin{align*}
+    \begin{aligned}
+      E[x{\scriptstyle (t)}] = \sum_{t=1}^{|x|}\{(x{\scriptstyle (t)})^2\}\\[15pt]
+    \end{aligned}
+  \end{align*}
+  And therefore, the optimization objective remains then as follows:
+  \begin{align*}
+    \begin{aligned}
+      (\vec{k}^*, \vec{d}^*) &= \underset{\vec{k}, \vec{d}}{\text{minimize }}\Bigg[
+      R{\scriptstyle (t)} = E[S{\scriptstyle (t)}-S'{\scriptstyle (t)}]
+      = \sum_{t=1}^{|S|}\bigg\{\Big(S{\scriptstyle (t)}-\sum_{n=1}^N\{k_n\varphi_{m_n}{\scriptstyle (t+d_n)}\}\Bigg]
+    \end{aligned}
+  \end{align*}
+  Which can also be written in the following equivalent algebraic expression:
+  
+  \begin{tcolorbox}[ams align*]
+    %\label{whatever}
+    (\vec{k}^*, \vec{d}^*) &= \underset{\vec{k}, \vec{d}}{\text{minimize }}
+        \bigg\lVert \vec{S}-\Phi_{\vec{d}\;} \vec{k}\bigg\rVert_2^2
+  \end{tcolorbox}
+
+  With the Signals and parameters defined as it follows:
+  \begin{align*}
+    \vec{S}=\begin{pmatrix} S{\scriptstyle (1)} \\ \vdots\\ S{\scriptstyle (|S|)} \end{pmatrix} \quad
+    \vec{k}=\begin{pmatrix} k_1 \\ \vdots\\ k_N \end{pmatrix} \quad
+    \vec{d}=\begin{pmatrix} d_1 \\ \vdots\\ d_N \end{pmatrix} \quad
+    \Phi_{\vec{d}} = 
+    \begin{pmatrix}
+      \varphi_1(m_1{\scriptstyle (1)}) & \cdots & \varphi_N(m_N{\scriptstyle (1)}) \\
+      \varphi_1(m_1{\scriptstyle (2)}) & \cdots & \varphi_N(m_N{\scriptstyle (2)}) \\
+      \vdots  &  \ddots & \vdots  \\
+      \varphi_1(m_1{\scriptstyle (|S'|)}) & \cdots & \varphi_N(m_N{\scriptstyle (|S'|)}) \\
+    \end{pmatrix}
+  \end{align*}
+
+  Whereas the \(\varphi\) signals inside \(\Phi\) are zero-padded (filled up with zeroes) in order to be defined between \(1\) and \(|S'|\). As it can be seen  in the proof, the solutions for the minimization problem have the following values:
+  \begin{tcolorbox}[ams align*]
+    %\label{whatever}
+    \begin{aligned}
+      &\vec{d}_n^* = idx(max(CC[S{\scriptstyle (t}, m_n{\scriptstyle (t}])) \quad : \quad \forall\, n \in \{1, ...,N\}\\
+      &\vec{k}_n^* = (\Phi_{\vec{d}^*}^T\Phi_{\vec{d}^*})^{-1}\Phi_{\vec{d}^*}^T \vec{S}
+    \end{aligned}
+  \end{tcolorbox}
+
+  Whereas \(CC[S{\scriptstyle (t)}, \varphi_n{\scriptstyle (t)}]\) is the {\it cross-correlation} between signals \(S{\scriptstyle (t)}}\) and \(\varphi_n{\scriptstyle (t)}\).
+  
+
+\subsection*{Proof for the optimization objective and algorithm}
+The minimization of \(E[R{\scriptstyle (t)}]= \Big\lVert \vec{S}-\Phi_{\vec{d}\;} \vec{k}\Big\rVert_2^2\) for \(k\) corresponds to the well-known problem of the {\it least squares}, solvable with the {\it normal equations}. For any given \(k\), the derivative of the corresponding direction \(\delta k\) is:
+\begin{align*}
+    \begin{aligned}
+      \nabla_{\vec{k}} \Big\lVert \vec{S}-\Phi_{\vec{d}\;} \vec{k}\Big\rVert_2^2 \cdot \delta \vec{k} = 2 \langle \Phi_{\vec{d}\;}\delta \vec{k}\;,\; \vec{S}-\Phi_{\vec{d}\;} \vec{k} \rangle = 2\delta \vec{k}^T(\Phi_{\vec{d}\;}^T\vec{S} - \Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;} \vec{k})
+    \end{aligned}
+\end{align*}
+The \(k^*\) minimum occurs when this derivative is set to zero, which has a single solution at \(\Phi_{\vec{d}\;}^T\vec{S} - \Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;} \vec{k}\):
+\begin{align*}
+    \begin{aligned}
+      \vec{k}_{opt} =  (\Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;})^{-1} \Phi_{\vec{d}\;}^T\vec{S}
+    \end{aligned}
+\end{align*}
+
+But as it can be observed, the value of \(\vec{k}_{opt}\) also depends on \(\vec{d}\), and therefore, by definition, the optimal value \(\vec{d}^*\) is the one that provides the best optimization \(\vec{k}^*\):
+\begin{align*}
+    \begin{aligned}
+      \vec{k}^* =  (\Phi_{\vec{d}^*\;}^T \Phi_{\vec{d}^*\;})^{-1} \Phi_{\vec{d}^*\;}^T\vec{S}
+    \end{aligned}
+\end{align*}
+But what is that value? Recovering the original minimization problem in its algebraic form,
+\begin{align*}
+  \begin{aligned}
+    (\vec{k}^*, \vec{d}^*) &= \underset{\vec{k}, \vec{d}}{\text{minimize }}
+    \bigg\lVert \vec{S}-\Phi_{\vec{d}\;} \vec{k}\bigg\rVert_2^2
+    \end{aligned}
+\end{align*}
+It is now possible to substitute \(\vec{k}\) with the already known expression for \(\vec{k}_{opt}\) (note that this is valid for every \(\vec{d}\)), and reformulate the optimization problem:
+\begin{align*}
+  \begin{aligned}
+    \vec{S}'  &= \Phi_{\vec{d}\;} \vec{k}= \Phi_{\vec{d}\;} \Big\{(\Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;})^{-1} \Phi_{\vec{d}\;}^T\vec{S} \Big\}\\[10pt]
+    %&=  \langle \Phi_{\vec{d}\;}(\Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;})^{-1} \Phi_{\vec{d}\;}^T \quad, \quad \vec{S} \rangle\\
+    \vec{d}^* &= \underset{\vec{d}}{\text{minimize }}
+    \bigg\lVert \vec{S}-\Big\{\Phi_{\vec{d}\;} (\Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;})^{-1} \Phi_{\vec{d}\;}^T\Big\}\vec{S} \bigg\rVert_2^2 &= \underset{\vec{d}}{\text{minimize }}
+    \bigg\lVert \vec{S}- \Psi_{\vec{d}\;} \vec{S} \bigg\rVert_2^2
+    \end{aligned}
+\end{align*}
+In this last expression, note that \(\Phi_{\vec{d}\;} (\Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;})^{-1} \Phi_{\vec{d}\;}^T\vec{S} \) is equivalent to \(\vec{S}'\), expressed as \(\vec{S}\) projected onto the symmetrical matrix \(\Psi_{\vec{d}\;} := \Phi_{\vec{d}\;} (\Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;})^{-1} \Phi_{\vec{d}\;}^T\).\\[7pt]
+This observation has very interesting implications:
+  \begin{tcolorbox}[ams text]
+    %\label{whatever}
+    If \(\Psi=I\), then \(S'=S\) and therefore \(E[R]=0\). This only can happen if \(\Phi\) has at least as many linearly independent columns as rows (a proof for that is not provided here). In other words, \textbf{any original signal of size \(K\) can be exactly reconstructed as a linear combination if \(K\)-many linearly independent materials are provided}.\\
+    Furthermore, by performing the {\it singular value decomposition} of \(\Psi\), \textbf{it is possible to know how much each material contributes to the overall minimization of the residual signal}. This can be very useful for further optimization/tweaking of the algorithm.
+  \end{tcolorbox}
+
+  %% The properties of \(\Psi_{\vec{d}\;}\) also allow to go on with the optimization objective:
+  %% \begin{align*}
+  %%   \begin{aligned}
+  %%     \vec{d}^* &= \underset{\vec{d}}{\text{minimize }}
+  %%     \bigg\lVert \vec{S}- \Psi_{\vec{d}\;} \vec{S} \bigg\rVert_2^2
+  %%     %= \underset{\vec{d}}{\text{minimize }} \bigg\lVert I- \Psi_{\vec{d}\;} \bigg\rVert_2^2
+  %%   \end{aligned}
+  %% \end{align*}
+
+  
+
+  Retaking the optimization objective:
+  \begin{align*}
+    \begin{aligned}
+      \vec{d}^* &= \underset{\vec{d}}{\text{minimize }}
+      E[S{\scriptstyle (t)}-S'{\scriptstyle (t)}]\\
+      &= \underset{\vec{d}}{\text{minimize }} E[S{\scriptstyle (t)}]+E[S'{\scriptstyle (t)}]-2\langle S{\scriptstyle (t)},S'{\scriptstyle (t)}\rangle\\
+      &= \underset{\vec{d}}{\text{minimize }} \langle \vec{S}, \vec{S} \rangle + \langle \vec{S}', \vec{S}' \rangle - 2 \langle \vec{S},  \vec{S}' \rangle\\
+      &= \underset{\vec{d}}{\text{minimize }} \langle \vec{S}', \vec{S}' \rangle - 2 \langle \vec{S},  \vec{S}' \rangle\\
+      &= \underset{\vec{d}}{\text{maximize }} 2 \langle \vec{S},  \vec{S}' \rangle - \langle \vec{S}', \vec{S}' \rangle\\
+      &= \underset{\vec{d}}{\text{maximize }} \langle \vec{S}' \;\;,\; 2\vec{S}-\vec{S}'  \rangle\\
+      &= \underset{\vec{d}}{\text{maximize }} \langle \Phi_{\vec{d}\;} k \;\;,\; 2\vec{S}-\Phi_{\vec{d}\;} k  \rangle\\
+      %\bigg\lVert \vec{S}- \vec{S'} \bigg\rVert_2^2
+      %= \underset{\vec{d}}{\text{minimize }} \bigg\lVert I- \Psi_{\vec{d}\;} \bigg\rVert_2^2
+    \end{aligned}
+  \end{align*}
+  This yields, for each d, the following optimizations:
+  \begin{align*}
+  \begin{aligned}
+    &d_1^* = \underset{\delta}{\text{maximize }} \Big\langle m_1{\scriptstyle (t+\delta)}\quad ,\quad 2\vec{S}- (m_1{\scriptstyle (t+\delta)}+m_2{\scriptstyle (t+d_2^*)}+...+m_N{\scriptstyle (t+d_N^*)})\Big\rangle\\
+    &d_2^* = \underset{\delta}{\text{maximize }} \Big\langle m_2{\scriptstyle (t+\delta)}\quad ,\quad 2\vec{S}- (m_1{\scriptstyle (t+d_1^*)} + m_2{\scriptstyle (t+\delta)}+...+m_N{\scriptstyle (t+d_N^*)})\Big\rangle\\
+    &...\\
+    &d_N^* = \underset{\delta}{\text{maximize }} \Big\langle m_N{\scriptstyle (t+\delta)}\quad ,\quad 2\vec{S}- (m_1{\scriptstyle (t+d_1^*)} + m_2{\scriptstyle (t+d_2^*)}+...+m_N{\scriptstyle (t+\delta)})\Big\rangle\\
+    \end{aligned}
+  \end{align*}
+  Which form an equation system of \(N\) equations with \(N\) variables each (note that \(\langle m_i{\scriptstyle (t+\delta)}, m_i{\scriptstyle (t+\delta)}\rangle \) is the energy of the signal \(m_i{\scriptstyle (t)}\) and doesn't depend on \(\delta\), therefore is not a variable).\\
+  STRATEGIES TO CONTINUE: EITHER SOLVE THE SYSTEM IF POSSIBLE, OR MAYBE SHOW THAT MAXIMIZING <S, S'> IS ALREADY THE BEST SOLUTION BY ANALYZING THE WORST-CASE CEILINGS (IF POSSIBLE), OR MAYBE SHOWING THAT OPTIMIZATION OF K CAN TAKE CARE OF E[S'] AND THEREFORE MAXIMIZING <S,S'> IS THE WAY TO GO...\\
+
+  %% of finding the values for \(\vec{d}^*\), recall that:
+  %% \begin{align*}
+  %% \begin{aligned}
+  %%   \vec{S}' = \Phi_{\vec{d}\;} (\Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;})^{-1} \Phi_{\vec{d}\;}^T\vec{S}
+  %%   \end{aligned}
+  %% \end{align*}
+  %% And therefore:
+  %% \begin{align*}
+  %% \begin{aligned}
+  %%   \vec{S}'{\scriptstyle (t)} = \vec{S}^T \Phi_{\vec{d}\;} (\Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;})^{-1} \vec{m}_{\vec{d}\;}{\scriptstyle (t)} = \langle \vec{S} \;,\; \Phi_{\vec{d}\;} (\Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;})^{-1} \vec{m}_{\vec{d}\;}{\scriptstyle (t)} \rangle 
+  %%   \end{aligned}
+  %% \end{align*}
+  %% And now that we defined each sample of the reconstruction as a dot product between the original and the delayed materials  asdf
+
+
+  %% \begin{align*}
+  %%   \begin{aligned}
+  %%     E[S{\scriptstyle (t)}-S'{\scriptstyle (t)}] &= \sum_{t=1}^{|S|}\{(S{\scriptstyle (t)}-S'{\scriptstyle (t)})^2\}\\ %\sum_{t=1}^{|S|}\Bigg\{\bigg(S{\scriptstyle (t)}-\sum_{n=1}^N\{\varphi_n(k_nm_n{\scriptstyle (t+d_n)})\}\bigg)^2\Bigg\}\\
+  %%     &= \sum_{t=1}^{|S|}\{S{\scriptstyle (t)}^2+S'{\scriptstyle (t)}^2-2S{\scriptstyle (t)}S'{\scriptstyle (t)}\}\\
+  %%     &= \sum_{t=1}^{|S|}\{S{\scriptstyle (t)}^2\}+\sum_{t=1}^{|S|}\{S'{\scriptstyle (t)}^2\}-\sum_{t=1}^{|S|}\{2S{\scriptstyle (t)}S'{\scriptstyle (t)}\}\\
+  %%     &= E[S{\scriptstyle (t)}] + E[S'{\scriptstyle (t)}] - 2<S{\scriptstyle (t)}, S'{\scriptstyle (t)}>
+  %%   \end{aligned}
+  %% \end{align*}
+  %% Whereas \(<x{\scriptstyle (t)},y{\scriptstyle (t)}> = \sum_{t=1}^{max(|x|,|y|)}\{x{\scriptstyle (t)}y{\scriptstyle (t)}\}\) represents the dot-product of two signals \(x, y\). With this more convenient expression, and the following observations, it is possible to solve the optimization problem:
+
+  %% \begin{enumerate}
+  %% %% \item The energy of a signal is always non-negative%% Since the energy of a signal is always non-negative, the minimal value that can be achieved is zero, when both signals are identical:
+  %% %% \begin{align*}
+  %% %%   \begin{aligned}
+  %% %%     E[x{\scriptstyle (t)}]+E[x{\scriptstyle (t)}]-2<x{\scriptstyle (t)},x{\scriptstyle (t)}>= 2\sum_{t=1}^{|x|}\{x{\scriptstyle (t)}^2\}-2\sum_{t=1}^{|x|}\{x{\scriptstyle (t)}x{\scriptstyle (t)}\} = 0
+  %% %%   \end{aligned}
+  %% %% \end{align*}
+  %% %% \item Fo
+  %% \item The value of \(E[S{\scriptstyle (t)}]\) is not affected by changes on \(\vec{k}\) and \(\vec{d}\)
+  %% \item The value of \(E[S'{\scriptstyle (t)}]\) is not affected by changes on \(\vec{d}\)
+  %% \item The maximum of a sum is the sum of the maxima
+  %% \item The maximum dot product between two signals \(x{\scriptstyle (t)},y{\scriptstyle (t)}\) is located at\\
+  %%   \(d^* = idx(max(CC[x{\scriptstyle (t)},y{\scriptstyle (t)}])\)% or, what is the same \(max(<x{\scriptstyle (t)},y{\scriptstyle (t+d)>}) = CC[x{\scriptstyle (t)},y{\scriptstyle (t+d)}]{\scriptstyle (d^*)}\)
+  %% \item The cross-correlation follows the distributive property. In other words, the \(CC\) of a sum is the sum of the \(CC\)s: \(CC[x, (y_1+...+y_N)] = CC[x,y_1]+...+CC[x,y_N]\)
+  %% \item The cross-correlation is also associative with multiplication by a constant \(k\in\mathbb{R}\): \(CC[x, k\cdot y] = k \cdot CC[x, y]\)
+  %% \end{enumerate}
+
+  %% With this in mind it is possible to minimize \(E[S{\scriptstyle (t)}-S'{\scriptstyle (t)}]\) in a much simpler way:
+  %% \begin{align*}
+  %%   \begin{aligned}
+  %%     (\vec{k}^*, \vec{d}^*) &= \underset{\vec{k}, \vec{d}}{\text{minimize }} E[S{\scriptstyle (t)}] + E[S'{\scriptstyle (t)}] - 2<S{\scriptstyle (t)}, S'{\scriptstyle (t)}>\\
+  %%     ^{1.}&= \underset{\vec{k}, \vec{d}}{\text{minimize }} E[S'{\scriptstyle (t)}] - 2<S{\scriptstyle (t)}, S'{\scriptstyle (t)}>\\
+  %%     %^{4.}&= \underset{\vec{k}, \vec{d}}{\text{minimize }} E[S'{\scriptstyle (t)}] - 2\cdot CC[S{\scriptstyle (t)}, S'{\scriptstyle (t)}]{\scriptstyle (d_n^*)}\\
+  %%     %^{def.\,S'}&= \underset{\vec{k}, \vec{d}}{\text{minimize }} E[S'{\scriptstyle (t)}] - 2\cdot max\bigg(CC\Big[S{\scriptstyle (t)},\sum_{n=1}^N\{k_nm'_n{\scriptstyle (t+d_n)}\}\Big]\bigg)\\
+  %%     ^{def.\,S'}&= \underset{\vec{k}, \vec{d}}{\text{minimize }} E[S'{\scriptstyle (t)}] - 2\cdot <S{\scriptstyle (t)},\sum_{n=1}^N\{k_nm'_n{\scriptstyle (t+d_n)}\}>\\
+  %%     \end{aligned}
+  %% \end{align*}
+  %% At this point it is already possible to extract the solution for \(\vec{d}\):
+  %% \begin{align*}
+  %%   \begin{aligned}
+  %%     \vec{d}^* &=  \underset{\vec{d}}{\text{minimize }} E[S'{\scriptstyle (t)}] - 2\cdot <S{\scriptstyle (t)},\sum_{n=1}^N\{k_nm'_n{\scriptstyle (t+d_n)}\}>\\
+  %%     ^{2.}&=  \underset{\vec{d}}{\text{minimize }} - 2\cdot <S{\scriptstyle (t)},\sum_{n=1}^N\{k_nm'_n{\scriptstyle (t+d_n)}\}>\\
+  %%     &=  \underset{\vec{d}}{\text{maximize }}  <S{\scriptstyle (t)},\sum_{n=1}^N\{k_nm'_n{\scriptstyle (t+d_n)}\}>\\
+  %%     ^{distrib.}&=  \underset{\vec{d}}{\text{maximize }}  \sum_{n=1}^N<S{\scriptstyle (t)},\{k_nm'_n{\scriptstyle (t+d_n)}\}>\\
+  %%     ^{3.}&=  \underset{d_n}{\text{maximize}}<S{\scriptstyle (t)},\{k_nm'_n{\scriptstyle (t+d_n)}\}> \quad \forall d_n \in \vec{d}\\
+  %%     ^{4.}\iff &d_n^* = idx(max(CC[S{\scriptstyle (t)}, k_nm'_n{\scriptstyle (t+d_n)}]) \quad \forall d_n \in \vec{d}\\
+  %%     \end{aligned}
+  %% \end{align*}
+
+  %% It remains to find the solution for \(\vec{k}\). Rearranging the optimization problem with the already known values for \(\vec{d}\) yields the following expression:
+  %% \begin{align*}
+  %%   \begin{aligned}
+  %%     \vec{k}^* &= \underset{\vec{k}}{\text{minimize }} E[S{\scriptstyle (t)}] + E[S'{\scriptstyle (t)}] - 2<S{\scriptstyle (t)}, S'{\scriptstyle (t)}>\\
+  %%     ^{1.}&= \underset{\vec{k}}{\text{minimize }} E[S'{\scriptstyle (t)}] - 2<S{\scriptstyle (t)}, S'{\scriptstyle (t)}>\\
+  %%     ^{def.\,S'}&= \underset{\vec{k}}{\text{minimize }} E[S'{\scriptstyle (t)}] - 2\cdot <S{\scriptstyle (t)},\sum_{n=1}^N\{k_nm'_n{\scriptstyle (t+d_n)}\}>\\
+  %%     \end{aligned}
+  %% \end{align*}
+
+  
+  
+  \subsection*{Analysis of the model}
+  The whole problem can be divided into three smaller problems, clearly differentiated by their complexity and how they interact with each other. The thinking process leading to this division goes as follows:
+  \begin{enumerate}
+  \item This model avoids intentionally any kind of limitations on \(S\) and \(M\). Therefore, no assumptions can be done on them, further than the fact that they are real-valued, discrete signals. This is done so in order to keep the applications of this algorithm as broad as possible, but this also implies that the input space is huge, and leaves the selection of the input signal as an open problem. This is intended to be so, the algorithm will assume here that some \(S\) and \(M\) are given.
+  \item The model also avoids any kind of limitations on the \(\vec{\varphi}=\{\varphi_1, ..., \varphi_N\}\) transformations, even if they are highly non-linear or even non-deterministic. Also, this enhances a lot its generality, but increases even more its own complexity, and the complexity of its output. In order to keep the simplicity of the model, it will also be assumed that the space of possible transformations is given to the algorithm, and not calculated. To do that, it suffices to define all transformed materials as given materials, and incorporate them to the \(M\) set. We define this way the \(M'\) set:
+    \begin{align*}
+    M' := M \cup \{\varphi_i[m_i] \quad\forall\; \varphi_i[m_i]\in M\}
+    \end{align*}
+    This has two main drawbacks: the size of the input space becomes even bigger, and the transformations have to belong to the preprocessing stage. But the advantage is that model remains linear:
+    \begin{align*}
+    S'{\scriptstyle (t)} = \sum_{n=1}^N\{k_n\cdot m_n{\scriptstyle (t+d_n)}\} \qquad : \quad \forall\; m_n{\scriptstyle (t)}  \in M'
+    \end{align*}
+    Which is very convenient, since it can be highly optimized as it will be explained. The hope is that this optimization makes up for the problem of an oversized input space and preprocessing stage. Of course, further optimizations can and will be done, but they imply the reduction of the input and transformation spaces in some way, and are therefore kept outside of the model: the intention here is to formulate it as general as possible.
+  \item It remains the problem of defining the optimal \((k_1, ..., k_N)\) and \((d_1, ..., d_N)\) values, that is, the normalization factors and delays for the samples in the expanded material set \(M'\).
+      \begin{itemize}
+      \item The positions of the materials should be the ones that maximize the cross-correlation between \(S\) and \(S'\), that is: \(max \vec{d} = idx(max(CC))\)
+      \item The normalization factors should minimize the energy of the \(S-S'\)signal
+      \end{itemize}
+      As a matter of fact, the energy can be minimized for every d-vector. But the optimal d-vector remains the same for every non-zero k-vec. This means, both are independent but the cost is optimal if d is done before, because we define our criterium as (HERE COMBINE BOTH LINEARLY!!!).
+    \item So the algorithm remains as
+      \begin{enumerate}
+      \item Choose some S, and M' in a non-deterministical way (talk about heuristic)
+      \item Calculate the d by maximizing the CC
+      \item Calculate the k by minimizing E
+      \end{enumerate}
+  \end{enumerate}
+  \subsection*{Numbers}
+  Since the problem is a linear one, the opt. objective has some nice properties:\\
+  max(CC(S, lincomb(m))) = lincomb(max(CC(s,m))) because associativity\\
+  min E... big numbers!!\\
+  This proximity has been chosen for two reasons: the ideal deal
+  And the {\it proximity} between \(S\) and \(S'\) is defined as:
+  \begin{align*}
+    &J(S, S') = ???
+  \end{align*}
+  The objective is to maximize \(J\). The delays are trivial (show CC, distribut. property). The k_s are a little more tricky (show that d is independent from k). Show minimization of energy
+  
+
+         {\it Starting from the sum-of-squares error function
+           \begin{align*}
+             E_D(w) = \frac{1}{2}\sum_{n=1}^N\{t_n-w^T\phi(x_n)\}^2
+           \end{align*}
+           derive the maximum likelihood solution for the parameters
+           \begin{align*}
+             w_{ML} = (\Phi^T\Phi)^{-1}\Phi^Tt
+           \end{align*}
+           where
+           \begin{align*}
+             \Phi = \begin{pmatrix}
+               \phi_0(x_1) & \phi_1(x_1) & ... & \phi_{M-1}(x_1) \\
+               \phi_0(x_2) & \phi_1(x_2) & ... & \phi_{M-1}(x_2) \\
+               \vdots & \vdots  & \ddots & \vdots \\
+               \phi_0(x_N) & \phi_1(x_N) & ... & \phi_{M-1}(x_N) \\
+             \end{pmatrix}
+           \end{align*}
+           is the design matrix with basis functions \(\phi_j(x_i)\), \(X=\{x_1, ... x_n\}\) the vectors
+           of input training data and  \(t=\{t_1, ... t_n\}\) corresponding output training
+           values.
+           
+           
+           
+         }
+  
+
+         \subsection*{i)}
+         A very clear and brief explanation to this topic can be found in the \href{https://github.com/dkorolev/DeepLearningBook/blob/master/DeepLearningBook.pdf}{{\it Deep Learning Book}}, page 109: Since the energy function is quadratic, the optimization solution for one dimension is convex and can be anallitically found by equalling the derivative to zero. But furthermore, a linear combination of convex optimization problems is itself convex too, since multiplication by a scalar and addition of linearly independent terms doesn't affect the outcome: the multiplicating scalars can be ignored ( In fact, the usual normalization factor \(\frac{1}{M}\) was here disregarded), and the different problems optimized separately.\\
+         This is the case when performing parametric multivariate linear regression, with the \(L_2\) energy function: each weight is linearly independent from all others, and contributes to \(E\) in a convex way.
+         \subsection*{ii)}
+         In this terms the optimization objective can be fo
+         rmuled as follows:
+         \begin{align*}
+           \begin{aligned}
+             & w_{ML} = \underset{w}{\text{minimize}}
+             & & E(w, \Phi, t) = \lVert \Phi w - t \rVert_2^2 = (\Phi w - t)^T(\Phi w - t)
+           \end{aligned}
+         \end{align*}
+         And the analytical way to find it:
+         \begin{align*}
+           \begin{aligned}
+             \frac{\partial}{\partial w_{ML}}  E (w_{ML}, \Phi, t) = 0 \iff \frac{\partial}{\partial w_{ML}} \left((\Phi w_{ML} - t)^T(\Phi w_{ML} - t) \right) = 0\\
+             \iff \frac{\partial}{\partial w_{ML}} \left(w_{ML}^T\Phi^T\Phi w_{ML} - 2w_{ML}^T\Phi^Tt+t^Tt \right) = 0\\
+             \implies 2\Phi^T\Phi w_{ML} - 2w_{ML}^T\Phi^Tt = 0 \\
+             \implies w_{ML} = (\Phi^T\Phi)^{-1}\Phi^Tt
+           \end{aligned}
+         \end{align*}
+         \begin{flushright}
+           $\square$\\
+         \end{flushright}
+
+
+
+
+
+
+
+
+
+
+         
+
+\vspace{5mm}
+\section*{Exercise 2}
+         {\it Consider a data set in which each data point \((x_n, t_n)\) is associated with a weighting factor \(r_n>0\), so that the sum-of-squares error function becomes
+           \begin{align*}
+             E_D(w) = \frac{1}{2}\sum_{n} r_n(t_n-w^T\phi(x_n))^2
+           \end{align*}
+           Find an expression for the solution \(w*\) that minimizes this error function. Give two alternative interpretations of the weighted sum-of-squares error function in terms of (i) data dependent noise variance and (ii) replicated data points.}
+         
+         \subsection*{i)}
+         The energy function can be reformulated as follows:
+         \begin{align*}
+           \frac{1}{2}\sum_{n} r_n(t_n-w^T\phi(x_n))^2 = \frac{1}{2}\sum_{n} {\scriptscriptstyle+}\sqrt{r_n}^2(t_n-w^T\phi(x_n))^2 \\
+           = \frac{1}{2}\sum_{n} ({\scriptscriptstyle+}\sqrt{r_n}t_n-  {\scriptscriptstyle+}\sqrt{r_n}w^T\phi(x_n))^2 
+         \end{align*}
+         Which brings up the very same optimization objective as the one shown in Exercise 1 (assuming that the weighting factors are given and not learned, that is). Therefore, just two pre-processing calculations are needed:
+         \begin{align*}
+           \begin{aligned}
+             t_{ML} = t\circ{\scriptscriptstyle+}\sqrt{r}\\
+             \Phi_{ML} = \Phi\odot{\scriptscriptstyle+}\sqrt{r}\\
+           \end{aligned}
+         \end{align*}
+         Whereas \({\scriptscriptstyle+}\sqrt{r}\) is the element-weise positive square root of the \(r\) vector in \(\mathbb{R}^N\), \(a\circ b\) represents the element-weise multiplication of two vectors of same dimensionality, and \(a\odot b\) abuses this notation, to represent the element-weise multiplication of each vector in the matrix a with the vector b. In This terms, the solutions is simply to apply the normal equations to the preprocessed data:
+         \begin{align*}
+            w_{ML} = (\Phi_{ML}^T\Phi_{ML})^{-1}\Phi_{ML}^Tt_{ML}
+         \end{align*}}
+
+         \begin{flushright}
+           $\square$\\
+         \end{flushright}
+
+
+
+
+         \vspace{5mm}
+\section*{Exercise 3}
+         {\it Generate own data sets, e.g. using \(t = f(x) + 0.2\epsilon\) with \(f(x) = sin(2\pi x)\) and \(\epsilon \sim \mathcal{N}(0,1)\), and illustrate  the bias-variance decomposition by fitting a polynomial model \(y(x; w) = \sum_{i=0}^r w^ix^r\) to many different data sets \(D_1 , ... , D_L\) , each of length \(N\).\\
+           Let \(w∗^D\) denote the parameters minimizing the mean squared error on dataset \(D\). Then,
+           \begin{align*}
+             &bias^2 \approx \frac{1}{L}\sum_l\frac{1}{N}\sum_n(\overline{y}(x)-f(x))^2\\
+             &variance \approx \frac{1}{L}\sum_l\frac{1}{N}\sum_n(y(x;w*^{D_t})-\overline{y}(x)^2\\
+         \end{align*}}
+         where \(\overline{y}(x) = \frac{1}{L}\sum_t y(x;w*^{D_t})\)
+         }
+
+
+           \subsection*{Solution:}
+           See/execute Python2 script{\it fernandez\_blatt5.py} for the details. As explained in the \href{http://www.ccc.cs.uni-frankfurt.de/wp-content/uploads/2016/10/week7.pdf}{{\it lecture's slides}}), the \(L_2\) loss function can be decomposed into \textbf{bias\(^2\) + variance + noise}. For a given dataset of limited size, only limited assumptions can be done: if only the variance term is taken into account (that is, no regularization term is provided), the hypothesis will maximize its adaptation to the dataset, potentially fitting perfectly to it, but it will fail to generalize, that is: to capture the underlying features. On the other side, a model excesively based on the bias term (that is, with a very high regularization index), will penalize every hypothesis that goes too far away from some given assumptions (in this case, the overall distance to the zero-vector). This assumptions may be unrealistic and relying heavily on them may be therefore a bad strategy.\\
+           Both terms are based on the same input parameters, but represent opposite ideas. The bottom line behind this explanation is that a \textbf{bias-variance tradeoff} takes always place for datasets of limited size, and, unless the size of the dataset can be increased, a compromise between both of them must be achieved. This is typically achieved by testing many different regularization factors, and cross-validating the results, as shown in the Figure 1:
+           \begin{figure}[ht]
+	   \centering
+           \includegraphics[width=0.8\textwidth, angle=0]{cv_reg.png}
+	   \caption{test error and its decomposition for different reg. factors (lecture slides)}
+	   \label{fig2}
+           \end{figure}
+
+
+           \begin{figure}[ht]
+	   \centering
+           \includegraphics[width=1.1\textwidth, angle=0]{var_bias.png}
+	   \caption{generated example illustrating a case of variance (blue) vs. bias (green) tradeoff}
+	   \label{fig2}
+         \end{figure}
+
+           
+
+\end{document}
+
+
+
+
+\begin{flushright}
+  $\square$\\
+\end{flushright}
