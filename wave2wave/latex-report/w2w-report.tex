@@ -174,7 +174,7 @@ Find the parameters for the signal \(S'{\scriptstyle (t)}\) (the {\it reconstruc
       E[x{\scriptstyle (t)}] = \sum_{t=1}^{|x|}\{(x{\scriptstyle (t)})^2\}\\[15pt]
     \end{aligned}
   \end{align*}
-  And therefore, the optimization objective remains then as follows:
+  And therefore, the optimization objective remains then as:
   \begin{align*}
     \begin{aligned}
       (\vec{k}^*, \vec{d}^*) &= \underset{\vec{k}, \vec{d}}{\text{minimize }}\Bigg[
@@ -190,15 +190,15 @@ Find the parameters for the signal \(S'{\scriptstyle (t)}\) (the {\it reconstruc
         \bigg\lVert \vec{S}-\Phi_{\vec{d}\;} \vec{k}\bigg\rVert_2^2
   \end{tcolorbox}
 
-  With the Signals and parameters defined as it follows:
+  With the Signals and parameters defined as:
   \begin{align*}
     \vec{S}=\begin{pmatrix} S{\scriptstyle (1)} \\ \vdots\\ S{\scriptstyle (|S|)} \end{pmatrix} \quad
     \vec{k}=\begin{pmatrix} k_1 \\ \vdots\\ k_N \end{pmatrix} \quad
     \vec{d}=\begin{pmatrix} d_1 \\ \vdots\\ d_N \end{pmatrix} \quad
     \Phi_{\vec{d}} = 
     \begin{pmatrix}
-      \varphi_1(m_1{\scriptstyle (1)}) & \cdots & \varphi_N(m_N{\scriptstyle (1)}) \\
-      \varphi_1(m_1{\scriptstyle (2)}) & \cdots & \varphi_N(m_N{\scriptstyle (2)}) \\
+      \varphi_1(m_1{\scriptstyle (1+d_1)}) & \cdots & \varphi_N(m_N{\scriptstyle (1+d_N)}) \\
+      \varphi_1(m_1{\scriptstyle (2+d_1)}) & \cdots & \varphi_N(m_N{\scriptstyle (2+d_N)}) \\
       \vdots  &  \ddots & \vdots  \\
       \varphi_1(m_1{\scriptstyle (|S'|)}) & \cdots & \varphi_N(m_N{\scriptstyle (|S'|)}) \\
     \end{pmatrix}
@@ -208,8 +208,8 @@ Find the parameters for the signal \(S'{\scriptstyle (t)}\) (the {\it reconstruc
   \begin{tcolorbox}[ams align*]
     %\label{whatever}
     \begin{aligned}
-      &\vec{d}_n^* = idx(max(CC[S{\scriptstyle (t}, m_n{\scriptstyle (t}])) \quad : \quad \forall\, n \in \{1, ...,N\}\\
-      &\vec{k}_n^* = (\Phi_{\vec{d}^*}^T\Phi_{\vec{d}^*})^{-1}\Phi_{\vec{d}^*}^T \vec{S}
+      &\vec{d}_n^* = ??\\ %idx(max(CC[S{\scriptstyle (t}, m_n{\scriptstyle (t}])) \quad : \quad \forall\, n \in \{1, ...,N\}\\
+      &\vec{k}_n^* = ?? % (\Phi_{\vec{d}^*}^T\Phi_{\vec{d}^*})^{-1}\Phi_{\vec{d}^*}^T \vec{S}
     \end{aligned}
   \end{tcolorbox}
 
@@ -230,13 +230,14 @@ The \(k^*\) minimum occurs when this derivative is set to zero, which has a sing
     \end{aligned}
 \end{align*}
 
-But as it can be observed, the value of \(\vec{k}_{opt}\) also depends on \(\vec{d}\), and therefore, by definition, the optimal value \(\vec{d}^*\) is the one that provides the best optimization \(\vec{k}^*\):
+But as it can be observed, the value of \(\vec{k}_{opt}\) also depends on \(\vec{d}\), and therefore, by definition, the optimal value \(\vec{d}^*\) is the one that provides the best \(\vec{k}^*\) optimization:
 \begin{align*}
     \begin{aligned}
-      \vec{k}^* =  (\Phi_{\vec{d}^*\;}^T \Phi_{\vec{d}^*\;})^{-1} \Phi_{\vec{d}^*\;}^T\vec{S}
+      \vec{k}^* =  (\Phi_{\vec{d}^*\;}^T \Phi_{\vec{d}^*\;})^{-1} \Phi_{\vec{d}^*\;}^T\vec{S} = \Phi_{\vec{d}^*\;}^+ \vec{S}
     \end{aligned}
 \end{align*}
-But what is that value? Recovering the original minimization problem in its algebraic form,
+Whereas \(\Phi_{\vec{d}^*\;}^+ = (\Phi_{\vec{d}^*\;}^T \Phi_{\vec{d}^*\;})^{-1} \Phi_{\vec{d}^*\;}^T\) is the \textbf{Moore-Penrose pseudoinverse} of \(\Phi_{\vec{d}^*\;}\).\\
+Recovering the original minimization problem in its algebraic form,
 \begin{align*}
   \begin{aligned}
     (\vec{k}^*, \vec{d}^*) &= \underset{\vec{k}, \vec{d}}{\text{minimize }}
@@ -246,20 +247,26 @@ But what is that value? Recovering the original minimization problem in its alge
 It is now possible to substitute \(\vec{k}\) with the already known expression for \(\vec{k}_{opt}\) (note that this is valid for every \(\vec{d}\)), and reformulate the optimization problem:
 \begin{align*}
   \begin{aligned}
-    \vec{S}'  &= \Phi_{\vec{d}\;} \vec{k}= \Phi_{\vec{d}\;} \Big\{(\Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;})^{-1} \Phi_{\vec{d}\;}^T\vec{S} \Big\}\\[10pt]
+    \vec{S}'  &= \Phi_{\vec{d}\;} \vec{k}= \Phi_{\vec{d}^*\;} \Phi_{\vec{d}^*\;}^+ \vec{S} = \Psi_{\vec{d}\;} \vec{S} \\[10pt]
     %&=  \langle \Phi_{\vec{d}\;}(\Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;})^{-1} \Phi_{\vec{d}\;}^T \quad, \quad \vec{S} \rangle\\
     \vec{d}^* &= \underset{\vec{d}}{\text{minimize }}
     \bigg\lVert \vec{S}-\Big\{\Phi_{\vec{d}\;} (\Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;})^{-1} \Phi_{\vec{d}\;}^T\Big\}\vec{S} \bigg\rVert_2^2 &= \underset{\vec{d}}{\text{minimize }}
     \bigg\lVert \vec{S}- \Psi_{\vec{d}\;} \vec{S} \bigg\rVert_2^2
     \end{aligned}
 \end{align*}
-In this last expression, note that \(\Phi_{\vec{d}\;} (\Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;})^{-1} \Phi_{\vec{d}\;}^T\vec{S} \) is equivalent to \(\vec{S}'\), expressed as \(\vec{S}\) projected onto the symmetrical matrix \(\Psi_{\vec{d}\;} := \Phi_{\vec{d}\;} (\Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;})^{-1} \Phi_{\vec{d}\;}^T\).\\[7pt]
-This observation has very interesting implications:
-  \begin{tcolorbox}[ams text]
-    %\label{whatever}
-    If \(\Psi=I\), then \(S'=S\) and therefore \(E[R]=0\). This only can happen if \(\Phi\) has at least as many linearly independent columns as rows (a proof for that is not provided here). In other words, \textbf{any original signal of size \(K\) can be exactly reconstructed as a linear combination if \(K\)-many linearly independent materials are provided}.\\
-    Furthermore, by performing the {\it singular value decomposition} of \(\Psi\), \textbf{it is possible to know how much each material contributes to the overall minimization of the residual signal}. This can be very useful for further optimization/tweaking of the algorithm.
-  \end{tcolorbox}
+Whereas \(\Psi_{\vec{d}^*\;} =  \Phi_{\vec{d}^*\;} \Phi_{\vec{d}^*\;}^+\) is the \textbf{orthogonal projector} of \(\Phi_{\vec{d}^*\;}\). This matrix has various valuable properties:
+\begin{itemize}
+\item Symmetric (\(\Psi_{\vec{d}^*\;} = \Psi_{\vec{d}^*\;}^T\))
+\item Idempotent (\(\Psi_{\vec{d}^*\;} = \Psi_{\vec{d}^*\;}^2\))
+\item Self-Adjoint (\(\Psi_{\vec{d}^*\;}\Phi_{\vec{d}^*\;} = \Phi_{\vec{d}^*\;}\))
+\end{itemize}
+
+%% This observation has very interesting implications:
+%%   \begin{tcolorbox}[ams text]
+%%     %\label{whatever}
+%%     If \(\Psi=I\), then \(S'=S\) and therefore \(E[R]=0\). This only can happen if \(\Phi\) has at least as many linearly independent columns as rows (a proof for that is not provided here). In other words, \textbf{any original signal of size \(K\) can be exactly reconstructed as a linear combination if \(K\)-many linearly independent materials are provided}.\\
+%%     Furthermore, by performing the {\it singular value decomposition} of \(\Psi\), \textbf{it is possible to know how much each material contributes to the overall minimization of the residual signal}. This can be very useful for further optimization/tweaking of the algorithm.
+%%   \end{tcolorbox}
 
   %% The properties of \(\Psi_{\vec{d}\;}\) also allow to go on with the optimization objective:
   %% \begin{align*}
@@ -268,36 +275,59 @@ This observation has very interesting implications:
   %%     \bigg\lVert \vec{S}- \Psi_{\vec{d}\;} \vec{S} \bigg\rVert_2^2
   %%     %= \underset{\vec{d}}{\text{minimize }} \bigg\lVert I- \Psi_{\vec{d}\;} \bigg\rVert_2^2
   %%   \end{aligned}
-  %% \end{align*}
-
-  
-
-  Retaking the optimization objective:
+%% \end{align*}
+Also note that it is a mean to express the reconstruction as a projection of the original: (\(\vec{S}' = \Psi_{\vec{d}^*\;}\vec{S}\)). Retaking the optimization objective:
   \begin{align*}
     \begin{aligned}
-      \vec{d}^* &= \underset{\vec{d}}{\text{minimize }}
-      E[S{\scriptstyle (t)}-S'{\scriptstyle (t)}]\\
-      &= \underset{\vec{d}}{\text{minimize }} E[S{\scriptstyle (t)}]+E[S'{\scriptstyle (t)}]-2\langle S{\scriptstyle (t)},S'{\scriptstyle (t)}\rangle\\
-      &= \underset{\vec{d}}{\text{minimize }} \langle \vec{S}, \vec{S} \rangle + \langle \vec{S}', \vec{S}' \rangle - 2 \langle \vec{S},  \vec{S}' \rangle\\
-      &= \underset{\vec{d}}{\text{minimize }} \langle \vec{S}', \vec{S}' \rangle - 2 \langle \vec{S},  \vec{S}' \rangle\\
-      &= \underset{\vec{d}}{\text{maximize }} 2 \langle \vec{S},  \vec{S}' \rangle - \langle \vec{S}', \vec{S}' \rangle\\
-      &= \underset{\vec{d}}{\text{maximize }} \langle \vec{S}' \;\;,\; 2\vec{S}-\vec{S}'  \rangle\\
-      &= \underset{\vec{d}}{\text{maximize }} \langle \Phi_{\vec{d}\;} k \;\;,\; 2\vec{S}-\Phi_{\vec{d}\;} k  \rangle\\
-      %\bigg\lVert \vec{S}- \vec{S'} \bigg\rVert_2^2
-      %= \underset{\vec{d}}{\text{minimize }} \bigg\lVert I- \Psi_{\vec{d}\;} \bigg\rVert_2^2
+      \vec{d}^* &=  \underset{ \vec{d}}{\text{minimize }}
+      \bigg\lVert \vec{S}- \Psi_{\vec{d}\;} \vec{S} \bigg\rVert_2^2\\%%E[S{\scriptstyle (t)}-S'{\scriptstyle (t)}]\\
+      &=  \underset{ \vec{d}}{\text{minimize }} \langle \vec{S}, \vec{S} \rangle + \langle \Psi_{\vec{d}\;} \vec{S}, \Psi_{\vec{d}\;} \vec{S} \rangle - 2 \langle \vec{S},  \Psi_{\vec{d}\;} \vec{S} \rangle\\
+      &=  \underset{ \vec{d}}{\text{minimize }} \langle \Psi_{\vec{d}\;} \vec{S}, \Psi_{\vec{d}\;} \vec{S} \rangle - 2 \langle \vec{S},  \Psi_{\vec{d}\;} \vec{S} \rangle\\
+      &=  \underset{ \vec{d}}{\text{minimize }} \vec{S\;}^T \Psi_{\vec{d}\;}^T\Psi_{\vec{d}\;} \vec{S}  - 2 \vec{S\;}^T \Psi_{\vec{d}\;} \vec{S}\\
+      &=  \underset{ \vec{d}}{\text{minimize }} \vec{S\;}^T \Psi_{\vec{d}\;} \vec{S}  - 2 \vec{S\;}^T \Psi_{\vec{d}\;} \vec{S}\\
+      &=  \underset{ \vec{d}}{\text{maximize }} \vec{S\;}^T \Psi_{\vec{d}\;} \vec{S}\\
     \end{aligned}
   \end{align*}
-  This yields, for each d, the following optimizations:
-  \begin{align*}
-  \begin{aligned}
-    &d_1^* = \underset{\delta}{\text{maximize }} \Big\langle m_1{\scriptstyle (t+\delta)}\quad ,\quad 2\vec{S}- (m_1{\scriptstyle (t+\delta)}+m_2{\scriptstyle (t+d_2^*)}+...+m_N{\scriptstyle (t+d_N^*)})\Big\rangle\\
-    &d_2^* = \underset{\delta}{\text{maximize }} \Big\langle m_2{\scriptstyle (t+\delta)}\quad ,\quad 2\vec{S}- (m_1{\scriptstyle (t+d_1^*)} + m_2{\scriptstyle (t+\delta)}+...+m_N{\scriptstyle (t+d_N^*)})\Big\rangle\\
-    &...\\
-    &d_N^* = \underset{\delta}{\text{maximize }} \Big\langle m_N{\scriptstyle (t+\delta)}\quad ,\quad 2\vec{S}- (m_1{\scriptstyle (t+d_1^*)} + m_2{\scriptstyle (t+d_2^*)}+...+m_N{\scriptstyle (t+\delta)})\Big\rangle\\
-    \end{aligned}
-  \end{align*}
-  Which form an equation system of \(N\) equations with \(N\) variables each (note that \(\langle m_i{\scriptstyle (t+\delta)}, m_i{\scriptstyle (t+\delta)}\rangle \) is the energy of the signal \(m_i{\scriptstyle (t)}\) and doesn't depend on \(\delta\), therefore is not a variable).\\
-  STRATEGIES TO CONTINUE: EITHER SOLVE THE SYSTEM IF POSSIBLE, OR MAYBE SHOW THAT MAXIMIZING <S, S'> IS ALREADY THE BEST SOLUTION BY ANALYZING THE WORST-CASE CEILINGS (IF POSSIBLE), OR MAYBE SHOWING THAT OPTIMIZATION OF K CAN TAKE CARE OF E[S'] AND THEREFORE MAXIMIZING <S,S'> IS THE WAY TO GO...
+
+STRATEGY TO CONTINUE: SHOW THAT THIS IS EQUIVALENT TO MINIMIZING THE FROBENIUS BETWEEN PSI AND I... MAYBE CEILING ANALYZE OF WORST-CASES ALLOWS AN EXPLICIT FORMULATION OF THE DIFFERENT BETWEEN PSI AND I, AND MINIMIZING THIS FORMULA MIGHT BE A CONVEX PROBLEM (IN SOME HIGHER DIMENSIONAL SPACE MAYBE).
+
+
+
+
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %%%% REVISE THIS (HAS THE SEPARATE DEFINITIONS FOR d*)
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  
+  %% Substituting with \(\vec{k} = (\Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;})^{-1} \Phi_{\vec{d}\;}^T\vec{S}\) will return the optimal \(\vec{k}\) for each \(\vec{d}\), and therefore, the problem is reduced to the optimization of \(\vec{d}\):
+  %% \begin{align*}
+  %%   \begin{aligned}
+  %%     \vec{d}^*
+  %%     &=   \underset{\vec{d}}{\text{maximize }} \langle \Phi_{\vec{d}\;} (\Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;})^{-1} \Phi_{\vec{d}\;}^T\vec{S} \quad,\quad 2\vec{S}-\Phi_{\vec{d}\;} (\Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;})^{-1} \Phi_{\vec{d}\;}^T\vec{S}  \rangle\\
+  %%     &=  \underset{\vec{d}}{\text{maximize }} \langle \Psi_{\vec{d}\;} \vec{S} \quad,\quad 2\vec{S}-\Psi_{\vec{d}\;} \vec{S}  \rangle\\
+  %%     &=  \underset{\vec{d}}{\text{maximize }} \langle \Psi_{\vec{d}\;} \vec{S} \quad,\quad (2-\Psi_{\vec{d}\;}) \vec{S}  \rangle\\
+  %%     &=  \underset{\vec{d}}{\text{maximize }} \langle \Psi_{\vec{d}\;} \quad,\quad (2-\Psi_{\vec{d}\;})  \rangle\\
+  %%     &=  \underset{\vec{d}}{\text{maximize }} \Big[ 2\Psi_{\vec{d}\;}^T- \Psi_{\vec{d}\;}^T\Psi_{\vec{d}\;} \Big]\\
+  %%     &=  \underset{\vec{d}}{\text{maximize }} \Big[ 2\Psi_{\vec{d}\;}- \Psi_{\vec{d}\;}^2\Big]\\ 
+  %%     %\bigg\lVert \vec{S}- \vec{S'} \bigg\rVert_2^2
+  %%     %= \underset{\vec{d}}{\text{minimize }} \bigg\lVert I- \Psi_{\vec{d}\;} \bigg\rVert_2^2
+  %%   \end{aligned}
+  %% \end{align*}
+  
+  %% This yields, for each d, the following optimizations:
+  %% \begin{align*}
+  %% \begin{aligned}
+  %%   &d_1^* = \underset{\delta}{\text{maximize }} \Big\langle m_1{\scriptstyle (t+\delta)}\quad ,\quad 2\vec{S}- (m_1{\scriptstyle (t+\delta)}+m_2{\scriptstyle (t+d_2^*)}+...+m_N{\scriptstyle (t+d_N^*)})\Big\rangle\\
+  %%   &d_2^* = \underset{\delta}{\text{maximize }} \Big\langle m_2{\scriptstyle (t+\delta)}\quad ,\quad 2\vec{S}- (m_1{\scriptstyle (t+d_1^*)} + m_2{\scriptstyle (t+\delta)}+...+m_N{\scriptstyle (t+d_N^*)})\Big\rangle\\
+  %%   &...\\
+  %%   &d_N^* = \underset{\delta}{\text{maximize }} \Big\langle m_N{\scriptstyle (t+\delta)}\quad ,\quad 2\vec{S}- (m_1{\scriptstyle (t+d_1^*)} + m_2{\scriptstyle (t+d_2^*)}+...+m_N{\scriptstyle (t+\delta)})\Big\rangle\\
+  %%   \end{aligned}
+  %% \end{align*}
+  %% Which form an equation system of \(N\) equations with \(N\) variables each (note that \(\langle m_i{\scriptstyle (t+\delta)}, m_i{\scriptstyle (t+\delta)}\rangle \) is the energy of the signal \(m_i{\scriptstyle (t)}\) and doesn't depend on \(\delta\), therefore is not a variable).\\
+  %% STRATEGIES TO CONTINUE: EITHER SOLVE THE SYSTEM IF POSSIBLE, OR MAYBE SHOW THAT MAXIMIZING <S, S'> IS ALREADY THE BEST SOLUTION BY ANALYZING THE WORST-CASE CEILINGS (IF POSSIBLE), OR MAYBE SHOWING THAT OPTIMIZATION OF K CAN TAKE CARE OF E[S'] AND THEREFORE MAXIMIZING <S,S'> IS THE WAY TO GO...
+
+  
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
   %% of finding the values for \(\vec{d}^*\), recall that:
   %% \begin{align*}
