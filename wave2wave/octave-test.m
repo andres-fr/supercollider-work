@@ -65,16 +65,6 @@ endfunction
 
 
 
-########################
-## cual es el plan para hoy??
-## acabas de demostrar que no es secuencial CC->k.
-## Pero al menos esta muy pulido! para el prototipo,
-## seria ideal que pasaras de K y te centraras en la CC:
-
-## 1) importar, normalizar (0 mean, 1 max) plotear y exportar archivos de audio
-
-## 2) hacer FFT y cross-correlation, comprobar que funciona
-
 ## 3) un test sencillo:
 ##    mezclar 3 materiales A, B, C con delays distintos
 ##    proponer 10 materiales entre los que estan A,B,C
