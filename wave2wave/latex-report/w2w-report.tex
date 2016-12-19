@@ -217,26 +217,26 @@ Find the parameters for the signal \(S'{\scriptstyle (t)}\) (the {\it reconstruc
   
 
 \subsection*{Proof for the optimization objective and algorithm}
-The minimization of \(E[R{\scriptstyle (t)}]= \Big\lVert \vec{S}-\Phi_{\vec{d}\;} \vec{k}\Big\rVert_2^2\) for \(k\) corresponds to the well-known problem of the {\it least squares}, solvable with the {\it normal equations}. For any given \(k\), the derivative of the corresponding direction \(\delta k\) is:
+The minimization of \(E[R{\scriptstyle (t)}]= \Big\lVert \vec{S}-\Phi_{\vec{d}\;} \vec{k}\Big\rVert_2^2\) for \(k\) corresponds to the well-known problem of the {\it least squares}, solvable with the {\it normal equations}. For any given \(\vec{k}\) and \(\vec{d}\), the derivative of the corresponding direction \(\delta k\) is:
 \begin{align*}
     \begin{aligned}
       \nabla_{\vec{k}} \Big\lVert \vec{S}-\Phi_{\vec{d}\;} \vec{k}\Big\rVert_2^2 \cdot \delta \vec{k} = 2 \langle \Phi_{\vec{d}\;}\delta \vec{k}\;,\; \vec{S}-\Phi_{\vec{d}\;} \vec{k} \rangle = 2\delta \vec{k}^T(\Phi_{\vec{d}\;}^T\vec{S} - \Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;} \vec{k})
     \end{aligned}
 \end{align*}
-The \(k^*\) minimum occurs when this derivative is set to zero, which has a single solution at \(\Phi_{\vec{d}\;}^T\vec{S} - \Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;} \vec{k}\):
+In this context, for a fixed \(\vec{d}\) the minimum of \(\vec{k}\) occurs when this derivative is set to zero, which has a single solution at \(\Phi_{\vec{d}\;}^T\vec{S} - \Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;} \vec{k}\):
 \begin{align*}
     \begin{aligned}
       \vec{k}_{opt} =  (\Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;})^{-1} \Phi_{\vec{d}\;}^T\vec{S}
     \end{aligned}
 \end{align*}
 
-But as it can be observed, the value of \(\vec{k}_{opt}\) also depends on \(\vec{d}\), and therefore, by definition, the optimal value \(\vec{d}^*\) is the one that provides the best \(\vec{k}^*\) optimization:
+But as it can be observed, the value of \(\vec{k}_{opt}\) is also affected by changes in \(\vec{d}\). Hence, the optimal value \(\vec{d}^*\) is defined as the one that provides the best \(\vec{k}_{opt}\) possible, that is \(\vec{k}^*\):
 \begin{align*}
     \begin{aligned}
       \vec{k}^* =  (\Phi_{\vec{d}^*\;}^T \Phi_{\vec{d}^*\;})^{-1} \Phi_{\vec{d}^*\;}^T\vec{S} = \Phi_{\vec{d}^*\;}^+ \vec{S}
     \end{aligned}
 \end{align*}
-Whereas \(\Phi_{\vec{d}^*\;}^+ = (\Phi_{\vec{d}^*\;}^T \Phi_{\vec{d}^*\;})^{-1} \Phi_{\vec{d}^*\;}^T\) is the \textbf{Moore-Penrose pseudoinverse} of \(\Phi_{\vec{d}^*\;}\).\\
+Whereas \(\Phi_{\vec{d}\;}^+ = (\Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;})^{-1} \Phi_{\vec{d}\;}^T\) is the \textbf{Moore-Penrose pseudoinverse} of \(\Phi_{\vec{d}\;}\).\\
 Recovering the original minimization problem in its algebraic form,
 \begin{align*}
   \begin{aligned}
@@ -244,22 +244,27 @@ Recovering the original minimization problem in its algebraic form,
     \bigg\lVert \vec{S}-\Phi_{\vec{d}\;} \vec{k}\bigg\rVert_2^2
     \end{aligned}
 \end{align*}
-It is now possible to substitute \(\vec{k}\) with the already known expression for \(\vec{k}_{opt}\) (note that this is valid for every \(\vec{d}\)), and reformulate the optimization problem:
+It is now possible to substitute \(\vec{k}\) with the already known expression for \(\vec{k}_{opt}\), and since it only depends on \(\vec{d}\) and \(\vec{S}\), the optimization problem gets simplified:
 \begin{align*}
   \begin{aligned}
-    \vec{S}'  &= \Phi_{\vec{d}\;} \vec{k}= \Phi_{\vec{d}^*\;} \Phi_{\vec{d}^*\;}^+ \vec{S} = \Psi_{\vec{d}\;} \vec{S} \\[10pt]
+    %\vec{S}'  &= \Phi_{\vec{d}\;} \vec{k}= \Phi_{\vec{d}^*\;} \Phi_{\vec{d}^*\;}^+ \vec{S} = \Psi_{\vec{d}\;} \vec{S} \\[10pt]
     %&=  \langle \Phi_{\vec{d}\;}(\Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;})^{-1} \Phi_{\vec{d}\;}^T \quad, \quad \vec{S} \rangle\\
     \vec{d}^* &= \underset{\vec{d}}{\text{minimize }}
-    \bigg\lVert \vec{S}-\Big\{\Phi_{\vec{d}\;} (\Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;})^{-1} \Phi_{\vec{d}\;}^T\Big\}\vec{S} \bigg\rVert_2^2 &= \underset{\vec{d}}{\text{minimize }}
+    \bigg\lVert \vec{S}-\Phi_{\vec{d}\;} (\Phi_{\vec{d}\;}^+ \vec{S}) \bigg\rVert_2^2 &= \underset{\vec{d}}{\text{minimize }}
     \bigg\lVert \vec{S}- \Psi_{\vec{d}\;} \vec{S} \bigg\rVert_2^2
     \end{aligned}
 \end{align*}
-Whereas \(\Psi_{\vec{d}^*\;} =  \Phi_{\vec{d}^*\;} \Phi_{\vec{d}^*\;}^+\) is the \textbf{orthogonal projector} of \(\Phi_{\vec{d}^*\;}\). This matrix has various valuable properties:
-\begin{itemize}
-\item Symmetric (\(\Psi_{\vec{d}^*\;} = \Psi_{\vec{d}^*\;}^T\))
-\item Idempotent (\(\Psi_{\vec{d}^*\;} = \Psi_{\vec{d}^*\;}^2\))
-\item Self-Adjoint (\(\Psi_{\vec{d}^*\;}\Phi_{\vec{d}^*\;} = \Phi_{\vec{d}^*\;}\))
-\end{itemize}
+Whereas \(\Psi_{\vec{d}\;} =  \Phi_{\vec{d}\;} \Phi_{\vec{d}\;}^+\) is the \textbf{orthogonal projector} of \(\Phi_{\vec{d}\;}\). This matrix has various valuable properties. Given \(\Phi_{\vec{d}\;}\in\mathbb{R}^{a\times b}\), the following holds for \(\Psi_{\vec{d}\;}\):
+\begin{enumerate}
+\item it is a square matrix (\(\Psi_{\vec{d}\;}\in\mathbb{R}^{a\times a}\)\))
+\item it is symmetric (\(\Psi_{\vec{d}\;} = \Psi_{\vec{d}\;}^T\))
+\item it is idempotent (\(\Psi_{\vec{d}\;} = \Psi_{\vec{d}\;}^2\))
+\item it has \(a\) eigenvalues, and from them \(min(a,b)\) are ones and the rest zeros. The corresponding eigenspaces are, respectively, its range and kernel.
+%\item Preserves length and angle (\( \lVert x\rVert_2^2= \lVert \Psi_{\vec{d}\;}\vec{x}\rVert_2^2\quad\)   and \(\quad\langle x, y\rangle =  \langle  \Psi_{\vec{d}\;}x,  \Psi_{\vec{d}\;}y\rangle \))  
+\item Self-Adjoint (\(\Psi_{\vec{d}\;}\Phi_{\vec{d}\;} = \Phi_{\vec{d}\;}\), or, conversely, \(\Psi_{\vec{d}\;} m_{i}{\scriptstyle (t+d_i)} = m_i{\scriptstyle (t+d_i)}\))
+\item Provides a direct relation between any given original and its optimal reconstruction: (\(\vec{S}'^* = \Psi_{\vec{d}\;^*}\vec{S}\)).
+  \item For every two signals \(x,y\), it holds: \(\langle \Psi x, y\rangle = \langle x, \Psi y\rangle= \langle \Psi x, \Psi y \rangle\)
+\end{enumerate}
 
 %% This observation has very interesting implications:
 %%   \begin{tcolorbox}[ams text]
@@ -276,18 +281,76 @@ Whereas \(\Psi_{\vec{d}^*\;} =  \Phi_{\vec{d}^*\;} \Phi_{\vec{d}^*\;}^+\) is the
   %%     %= \underset{\vec{d}}{\text{minimize }} \bigg\lVert I- \Psi_{\vec{d}\;} \bigg\rVert_2^2
   %%   \end{aligned}
 %% \end{align*}
-Also note that it is a mean to express the reconstruction as a projection of the original: (\(\vec{S}' = \Psi_{\vec{d}^*\;}\vec{S}\)). Retaking the optimization objective:
+Proofs for this are not included here, but can be found in [WIKIPEDIA STFG]. Using some of this properties, it is possible to further reformulate the optimization objective into a more convenient expression:
   \begin{align*}
     \begin{aligned}
       \vec{d}^* &=  \underset{ \vec{d}}{\text{minimize }}
       \bigg\lVert \vec{S}- \Psi_{\vec{d}\;} \vec{S} \bigg\rVert_2^2\\%%E[S{\scriptstyle (t)}-S'{\scriptstyle (t)}]\\
+      &=  \underset{ \vec{d}}{\text{minimize }} \langle \vec{S}- \Psi_{\vec{d}\;} \vec{S} \;,\; \vec{S}- \Psi_{\vec{d}\;} \vec{S}\rangle\\
       &=  \underset{ \vec{d}}{\text{minimize }} \langle \vec{S}, \vec{S} \rangle + \langle \Psi_{\vec{d}\;} \vec{S}, \Psi_{\vec{d}\;} \vec{S} \rangle - 2 \langle \vec{S},  \Psi_{\vec{d}\;} \vec{S} \rangle\\
       &=  \underset{ \vec{d}}{\text{minimize }} \langle \Psi_{\vec{d}\;} \vec{S}, \Psi_{\vec{d}\;} \vec{S} \rangle - 2 \langle \vec{S},  \Psi_{\vec{d}\;} \vec{S} \rangle\\
       &=  \underset{ \vec{d}}{\text{minimize }} \vec{S\;}^T \Psi_{\vec{d}\;}^T\Psi_{\vec{d}\;} \vec{S}  - 2 \vec{S\;}^T \Psi_{\vec{d}\;} \vec{S}\\
       &=  \underset{ \vec{d}}{\text{minimize }} \vec{S\;}^T \Psi_{\vec{d}\;} \vec{S}  - 2 \vec{S\;}^T \Psi_{\vec{d}\;} \vec{S}\\
       &=  \underset{ \vec{d}}{\text{maximize }} \vec{S\;}^T \Psi_{\vec{d}\;} \vec{S}\\
+      &=  \underset{ \vec{d}}{\text{maximize }} \langle \vec{S\;}, \Psi_{\vec{d}\;} \vec{S} \rangle\\
     \end{aligned}
   \end{align*}
+  And since \(\vec{S}\) is given and not altered through the optimization process, it follows a spectral analysis of \( \Psi_{\vec{d}\;}\) in order to understand better how the properties of \(\Phi_{\vec{d}\;}\) and changes on \(\vec{d}\) affect the outcome. First, a quick reminder on SVD decomposition: any matrix \(M\in\mathbb{R}^{a\times b}\) can be decomposed in the following expression:
+  \begin{align*}
+    \begin{aligned}
+      M = U\Sigma V^T
+    \end{aligned}
+  \end{align*}
+  whereas:
+  \begin{align*}
+    \begin{aligned}
+      &U\in\mathbb{R}^{a\times a} \text{ is an orthogonal matrix } (U U^T = U^TU = I)\\
+      &V\in\mathbb{R}^{b\times b} \text{ is an orthogonal matrix } (V U^T = V^TV =I)\\
+      &\Sigma\in\mathbb{R}^{a\times b} \text{ is a diagonal matrix containing the {\it singular values} of M}\\
+      &M^T = V\Sigma U^T \text{ is the transpose}\\
+      &M^+ = V\Sigma^+ U^T \text{is the pseudoinverse (equivalent to the Moore-Penrose pseudoinverse)}\\
+      &\Sigma^+ \text{ is the pseudoinverse of \(\Sigma\), and can be calculated by replacing each non-zero diagonal}\\
+      &\quad\quad\text{entry \(\lambda\) by its reciprocal \(\frac{1}{\lambda}\), and transposing after.}
+    \end{aligned}
+  \end{align*}
+  With this knowledge, it is possible to express \( \Psi_{\vec{d}\;}\) in terms of the SVD decomposition of \( \Phi_{\vec{d}\;} = U\Sigma V^T\):
+  \begin{align*}
+    \begin{aligned}
+      \Psi_{\vec{d}\;} &= \Phi_{\vec{d}\;} \Phi_{\vec{d}\;}^+\\
+      &= U\Sigma V^T V\Sigma^+ U^T\\
+      &= U\Sigma \Sigma^+ U^T\\
+    \end{aligned}
+  \end{align*}
+  Which, combined with the properties of \(U\) and \(\Sigma\), leads to the following conclusions:
+  \begin{itemize}
+  \item For a given \( \Phi_{\vec{d}\;}\in\mathbb{R}^{a\times b}\) with \(b\) linearly independent columns, the diagonal matrix \(\Sigma \Sigma^+\in\mathbb{R}^{b\times b}\) will have a total of \(a\) diagonal entries. From this total, \(min(a,b)\) will equal to one, and the rest will equal to zero. This leads to the following observation:
+    \begin{align*}
+      \begin{aligned}
+        b\geq a &\iff \Sigma \Sigma^+ = I\in\mathbb{R}^{a\times a}\\
+        &\iff \Psi_{\vec{d}\;} = U\Sigma \Sigma^+ U^T = UIU^T = UU^T = I\in\mathbb{R}^{a\times a}\\
+        &\iff \vec{S}' = \Psi_{\vec{d}\;}\vec{S} = I\vec{S} = \vec{S}\\
+        &\iff \vec{S}' = \vec{S}\\
+        \end{aligned}
+    \end{align*}
+    In other words:
+    \begin{tcolorbox}[ams text]
+    %\label{whatever}
+      If the original signal has a length of \(a\) samples, and the set of materials has at least \(a\) linearly independent elements, it is possible to fully reconstruct the original as a linear combination of \(a\)-many of such elements
+    \end{tcolorbox}
+  \item In case \(b<a\), \(\Sigma\Sigma^+\) acts like a filter: when it is totally open, it forms an identity matrix that leads to no transformation of the input to \( \Psi_{\vec{d}\;}\) (because \(UU^T=I\)). When an entry is zero, the corresponding dimension will be filtered out.
+    \begin{tcolorbox}[ams text]
+    %\label{whatever}
+      The best case of maximizing \(\langle \vec{S}', \Psi_{\vec{d}\;}\vec{S} \rangle\) is achieved when \(\vec{S}' = \vec{S}\), because orthogonal matrices preserves the length
+    \end{tcolorbox}
+
+
+    will be  the maximum value of the optimization objective (namely to maximize \(\langle \vec{S}', \Psi_{\vec{d}\;}\vec{S} \rangle\)), is achieved when \(\vec{S}' = \vec{S}\), because orthogonal matrices preserve the length \(UU^T\)
+  \end{itemize}
+  This case would be uninteresting for the described setup (the )
+
+  .\\[20pt]
+  Now, performing a SVD decomposition of the psi matrix shows that it has exactly p=min(col, row) non-zero singular values, and that all of them are equal to 1. This means many things, one ofthem is that PSI ALWAYS SHRINKS THE LENGTH OF ITS INPUT.
+  In words, finding the \(\vec{d}\) and \(\vec{k}\) that minimize  the energy between \(\vec{S}\) and \(\vec{S}'\) is equivalent to find the \(\vec{d}\)
 
 STRATEGY TO CONTINUE: SHOW THAT THIS IS EQUIVALENT TO MINIMIZING THE FROBENIUS BETWEEN PSI AND I... MAYBE CEILING ANALYZE OF WORST-CASES ALLOWS AN EXPLICIT FORMULATION OF THE DIFFERENT BETWEEN PSI AND I, AND MINIMIZING THIS FORMULA MIGHT BE A CONVEX PROBLEM (IN SOME HIGHER DIMENSIONAL SPACE MAYBE).
 
@@ -417,18 +480,7 @@ STRATEGY TO CONTINUE: SHOW THAT THIS IS EQUIVALENT TO MINIMIZING THE FROBENIUS B
     S'{\scriptstyle (t)} = \sum_{n=1}^N\{k_n\cdot m_n{\scriptstyle (t+d_n)}\} \qquad : \quad \forall\; m_n{\scriptstyle (t)}  \in M'
     \end{align*}
     Which is very convenient, since it can be highly optimized as it will be explained. The hope is that this optimization makes up for the problem of an oversized input space and preprocessing stage. Of course, further optimizations can and will be done, but they imply the reduction of the input and transformation spaces in some way, and are therefore kept outside of the model: the intention here is to formulate it as general as possible.
-  \item It remains the problem of defining the optimal \((k_1, ..., k_N)\) and \((d_1, ..., d_N)\) values, that is, the normalization factors and delays for the samples in the expanded material set \(M'\).
-      \begin{itemize}
-      \item The positions of the materials should be the ones that maximize the cross-correlation between \(S\) and \(S'\), that is: \(max \vec{d} = idx(max(CC))\)
-      \item The normalization factors should minimize the energy of the \(S-S'\)signal
-      \end{itemize}
-      As a matter of fact, the energy can be minimized for every d-vector. But the optimal d-vector remains the same for every non-zero k-vec. This means, both are independent but the cost is optimal if d is done before, because we define our criterium as (HERE COMBINE BOTH LINEARLY!!!).
-    \item So the algorithm remains as
-      \begin{enumerate}
-      \item Choose some S, and M' in a non-deterministical way (talk about heuristic)
-      \item Calculate the d by maximizing the CC
-      \item Calculate the k by minimizing E
-      \end{enumerate}
+ 
   \end{enumerate}
   \subsection*{Numbers}
   Since the problem is a linear one, the opt. objective has some nice properties:\\

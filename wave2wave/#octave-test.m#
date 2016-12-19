@@ -184,9 +184,9 @@ m1 = pre_post_pad(anvil, 0, length(S));
 m2 = pre_post_pad(triangle, 44100, length(S));
 m3 = pre_post_pad(flexatone, 2*44100, length(S));
 m4 = pre_post_pad(recoreco, 3*44100, length(S));
-phi = ;
+phi = [m1,m2,m3,m4];
 
 [U, E, V] = svd(phi);
 
-size(decomp)
+size(phi)
 decomp(3)

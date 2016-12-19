@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2016.10.31)  16 DEC 2016 03:23
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2016.10.31)  17 DEC 2016 17:53
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -2011,12 +2011,58 @@ Class scrartcl Warning: Usage of deprecated font command `\it'!
 (scrartcl)              by `\normalfont \itshape ' on input line 220.
 
 
+! LaTeX Error: Bad math environment delimiter.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.259 ..._{\vec{d}\;}\in\mathbb{R}^{a\times a}\)\)
+                                                  )
+Your command was ignored.
+Type  I <command> <return>  to replace it with another command,
+or  <return>  to continue without it.
+
+
 Package Fancyhdr Warning: \headheight is too small (17.0pt): 
  Make it at least 25.2232pt.
  We now make it that large for the rest of the document.
  This may cause the page layout to be inconsistent, however.
 
 [5]
+
+Class scrartcl Warning: Usage of deprecated font command `\it'!
+(scrartcl)              You should note, that in 1994 font command `\it' has
+(scrartcl)              been defined for compatiblitiy to Script 2.0 only.
+(scrartcl)              Now, after two decades of LaTeX2e and NFSS2, you
+(scrartcl)              shouldn't use such commands any longer and within
+(scrartcl)              KOMA-Script usage of `\it' is definitely deprecated.
+(scrartcl)              See `fntguide.pdf' for more information about
+(scrartcl)              recommended font commands.
+(scrartcl)              Note also, that KOMA-Script will remove the definition
+(scrartcl)              of `\it' anytime until release of about version 3.20.
+(scrartcl)              But for now, KOMA-Script will replace deprecated `\it'
+(scrartcl)              by `\normalfont \itshape ' on input line 315.
+
+
+Class scrartcl Warning: Usage of deprecated font command `\it'!
+(scrartcl)              You should note, that in 1994 font command `\it' has
+(scrartcl)              been defined for compatiblitiy to Script 2.0 only.
+(scrartcl)              Now, after two decades of LaTeX2e and NFSS2, you
+(scrartcl)              shouldn't use such commands any longer and within
+(scrartcl)              KOMA-Script usage of `\it' is definitely deprecated.
+(scrartcl)              See `fntguide.pdf' for more information about
+(scrartcl)              recommended font commands.
+(scrartcl)              Note also, that KOMA-Script will remove the definition
+(scrartcl)              of `\it' anytime until release of about version 3.20.
+(scrartcl)              But for now, KOMA-Script will replace deprecated `\it'
+(scrartcl)              by `\normalfont \itshape ' on input line 315.
+
+
+Overfull \hbox (7.6635pt too wide) in paragraph at lines 315--315
+[] 
+ []
+
 
 Package Fancyhdr Warning: \headheight is too small (17.0pt): 
  Make it at least 25.2232pt.
@@ -2025,55 +2071,31 @@ Package Fancyhdr Warning: \headheight is too small (17.0pt):
 
 [6]
 
-Class scrartcl Warning: Usage of deprecated font command `\it'!
-(scrartcl)              You should note, that in 1994 font command `\it' has
-(scrartcl)              been defined for compatiblitiy to Script 2.0 only.
-(scrartcl)              Now, after two decades of LaTeX2e and NFSS2, you
-(scrartcl)              shouldn't use such commands any longer and within
-(scrartcl)              KOMA-Script usage of `\it' is definitely deprecated.
-(scrartcl)              See `fntguide.pdf' for more information about
-(scrartcl)              recommended font commands.
-(scrartcl)              Note also, that KOMA-Script will remove the definition
-(scrartcl)              of `\it' anytime until release of about version 3.20.
-(scrartcl)              But for now, KOMA-Script will replace deprecated `\it'
-(scrartcl)              by `\normalfont \itshape ' on input line 438.
+! Package pgfkeys Error: I do not know the key '/tcb/ams text' and I am going t
+o ignore it. Perhaps you misspelled it.
 
-! Missing $ inserted.
-<inserted text> 
-                $
-l.442 ...al (show CC, distribut. property). The k_
-                                                  s are a little more tricky...
-I've inserted a begin-math/end-math symbol since I think
-you left one out. Proceed, with fingers crossed.
-
-! Missing $ inserted.
-<inserted text> 
-                $
-l.443 
-      
-I've inserted a begin-math/end-math symbol since I think
-you left one out. Proceed, with fingers crossed.
+See the pgfkeys package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.336     \begin{tcolorbox}[ams text]
+                                     
+This error message was generated by an \errmessage
+command, so I can't give any explicit help.
+Pretend that you're Hercule Poirot: Examine all clues,
+and deduce the truth by order and method.
 
 
-Overfull \hbox (17.56581pt too wide) in paragraph at lines 441--443
-\OT1/lmr/m/n/10.95 The k$[]\OML/lmm/m/it/10.95 arealittlemoretricky\OT1/lmr/m/n
-/10.95 (\OML/lmm/m/it/10.95 showthatdisindependentfromk\OT1/lmr/m/n/10.95 )\OML
-/lmm/m/it/10.95 :Showminimizationofenergy$ 
- []
+! Package pgfkeys Error: I do not know the key '/tcb/ams text' and I am going t
+o ignore it. Perhaps you misspelled it.
 
-
-Class scrartcl Warning: Usage of deprecated font command `\it'!
-(scrartcl)              You should note, that in 1994 font command `\it' has
-(scrartcl)              been defined for compatiblitiy to Script 2.0 only.
-(scrartcl)              Now, after two decades of LaTeX2e and NFSS2, you
-(scrartcl)              shouldn't use such commands any longer and within
-(scrartcl)              KOMA-Script usage of `\it' is definitely deprecated.
-(scrartcl)              See `fntguide.pdf' for more information about
-(scrartcl)              recommended font commands.
-(scrartcl)              Note also, that KOMA-Script will remove the definition
-(scrartcl)              of `\it' anytime until release of about version 3.20.
-(scrartcl)              But for now, KOMA-Script will replace deprecated `\it'
-(scrartcl)              by `\normalfont \itshape ' on input line 445.
+See the pgfkeys package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.341     \begin{tcolorbox}[ams text]
+                                     
+(That was another \errmessage.)
 
 
 Package Fancyhdr Warning: \headheight is too small (17.0pt): 
@@ -2082,20 +2104,6 @@ Package Fancyhdr Warning: \headheight is too small (17.0pt):
  This may cause the page layout to be inconsistent, however.
 
 [7]
-
-Class scrartcl Warning: Usage of deprecated font command `\it'!
-(scrartcl)              You should note, that in 1994 font command `\it' has
-(scrartcl)              been defined for compatiblitiy to Script 2.0 only.
-(scrartcl)              Now, after two decades of LaTeX2e and NFSS2, you
-(scrartcl)              shouldn't use such commands any longer and within
-(scrartcl)              KOMA-Script usage of `\it' is definitely deprecated.
-(scrartcl)              See `fntguide.pdf' for more information about
-(scrartcl)              recommended font commands.
-(scrartcl)              Note also, that KOMA-Script will remove the definition
-(scrartcl)              of `\it' anytime until release of about version 3.20.
-(scrartcl)              But for now, KOMA-Script will replace deprecated `\it'
-(scrartcl)              by `\normalfont \itshape ' on input line 472.
-
 
 Package Fancyhdr Warning: \headheight is too small (17.0pt): 
  Make it at least 25.2232pt.
@@ -2115,10 +2123,89 @@ Class scrartcl Warning: Usage of deprecated font command `\it'!
 (scrartcl)              Note also, that KOMA-Script will remove the definition
 (scrartcl)              of `\it' anytime until release of about version 3.20.
 (scrartcl)              But for now, KOMA-Script will replace deprecated `\it'
-(scrartcl)              by `\normalfont \itshape ' on input line 509.
+(scrartcl)              by `\normalfont \itshape ' on input line 490.
 
+! Missing $ inserted.
+<inserted text> 
+                $
+l.494 ...al (show CC, distribut. property). The k_
+                                                  s are a little more tricky...
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+! Missing $ inserted.
+<inserted text> 
+                $
+l.495 
+      
+I've inserted a begin-math/end-math symbol since I think
+you left one out. Proceed, with fingers crossed.
+
+
+Overfull \hbox (17.56581pt too wide) in paragraph at lines 493--495
+\OT1/lmr/m/n/10.95 The k$[]\OML/lmm/m/it/10.95 arealittlemoretricky\OT1/lmr/m/n
+/10.95 (\OML/lmm/m/it/10.95 showthatdisindependentfromk\OT1/lmr/m/n/10.95 )\OML
+/lmm/m/it/10.95 :Showminimizationofenergy$ 
+ []
+
+
+Class scrartcl Warning: Usage of deprecated font command `\it'!
+(scrartcl)              You should note, that in 1994 font command `\it' has
+(scrartcl)              been defined for compatiblitiy to Script 2.0 only.
+(scrartcl)              Now, after two decades of LaTeX2e and NFSS2, you
+(scrartcl)              shouldn't use such commands any longer and within
+(scrartcl)              KOMA-Script usage of `\it' is definitely deprecated.
+(scrartcl)              See `fntguide.pdf' for more information about
+(scrartcl)              recommended font commands.
+(scrartcl)              Note also, that KOMA-Script will remove the definition
+(scrartcl)              of `\it' anytime until release of about version 3.20.
+(scrartcl)              But for now, KOMA-Script will replace deprecated `\it'
+(scrartcl)              by `\normalfont \itshape ' on input line 497.
+
+
+Class scrartcl Warning: Usage of deprecated font command `\it'!
+(scrartcl)              You should note, that in 1994 font command `\it' has
+(scrartcl)              been defined for compatiblitiy to Script 2.0 only.
+(scrartcl)              Now, after two decades of LaTeX2e and NFSS2, you
+(scrartcl)              shouldn't use such commands any longer and within
+(scrartcl)              KOMA-Script usage of `\it' is definitely deprecated.
+(scrartcl)              See `fntguide.pdf' for more information about
+(scrartcl)              recommended font commands.
+(scrartcl)              Note also, that KOMA-Script will remove the definition
+(scrartcl)              of `\it' anytime until release of about version 3.20.
+(scrartcl)              But for now, KOMA-Script will replace deprecated `\it'
+(scrartcl)              by `\normalfont \itshape ' on input line 524.
+
+
+Package Fancyhdr Warning: \headheight is too small (17.0pt): 
+ Make it at least 25.2232pt.
+ We now make it that large for the rest of the document.
+ This may cause the page layout to be inconsistent, however.
+
+[9]
+
+Class scrartcl Warning: Usage of deprecated font command `\it'!
+(scrartcl)              You should note, that in 1994 font command `\it' has
+(scrartcl)              been defined for compatiblitiy to Script 2.0 only.
+(scrartcl)              Now, after two decades of LaTeX2e and NFSS2, you
+(scrartcl)              shouldn't use such commands any longer and within
+(scrartcl)              KOMA-Script usage of `\it' is definitely deprecated.
+(scrartcl)              See `fntguide.pdf' for more information about
+(scrartcl)              recommended font commands.
+(scrartcl)              Note also, that KOMA-Script will remove the definition
+(scrartcl)              of `\it' anytime until release of about version 3.20.
+(scrartcl)              But for now, KOMA-Script will replace deprecated `\it'
+(scrartcl)              by `\normalfont \itshape ' on input line 561.
+
+
+Package Fancyhdr Warning: \headheight is too small (17.0pt): 
+ Make it at least 25.2232pt.
+ We now make it that large for the rest of the document.
+ This may cause the page layout to be inconsistent, however.
+
+[10]
 ! Too many }'s.
-l.531          \end{align*}}
+l.583          \end{align*}}
                             
 You've closed more groups than you opened.
 Such booboos are generally harmless, so keep going.
@@ -2135,7 +2222,7 @@ Class scrartcl Warning: Usage of deprecated font command `\it'!
 (scrartcl)              Note also, that KOMA-Script will remove the definition
 (scrartcl)              of `\it' anytime until release of about version 3.20.
 (scrartcl)              But for now, KOMA-Script will replace deprecated `\it'
-(scrartcl)              by `\normalfont \itshape ' on input line 542.
+(scrartcl)              by `\normalfont \itshape ' on input line 594.
 
 
 ! Package inputenc Error: Unicode char \u8:∗ not set up for use with LaTeX.
@@ -2144,22 +2231,15 @@ See the inputenc package documentation for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.543            Let \(w∗
+l.595            Let \(w∗
                            ^D\) denote the parameters minimizing the mean sq...
 
 Your command was ignored.
 Type  I <command> <return>  to replace it with another command,
 or  <return>  to continue without it.
 
-
-Package Fancyhdr Warning: \headheight is too small (17.0pt): 
- Make it at least 25.2232pt.
- We now make it that large for the rest of the document.
- This may cause the page layout to be inconsistent, however.
-
-[9]
 ! Too many }'s.
-l.549          }
+l.601          }
                 
 You've closed more groups than you opened.
 Such booboos are generally harmless, so keep going.
@@ -2176,7 +2256,7 @@ Class scrartcl Warning: Usage of deprecated font command `\it'!
 (scrartcl)              Note also, that KOMA-Script will remove the definition
 (scrartcl)              of `\it' anytime until release of about version 3.20.
 (scrartcl)              But for now, KOMA-Script will replace deprecated `\it'
-(scrartcl)              by `\normalfont \itshape ' on input line 553.
+(scrartcl)              by `\normalfont \itshape ' on input line 605.
 
 
 Class scrartcl Warning: Usage of deprecated font command `\it'!
@@ -2190,10 +2270,10 @@ Class scrartcl Warning: Usage of deprecated font command `\it'!
 (scrartcl)              Note also, that KOMA-Script will remove the definition
 (scrartcl)              of `\it' anytime until release of about version 3.20.
 (scrartcl)              But for now, KOMA-Script will replace deprecated `\it'
-(scrartcl)              by `\normalfont \itshape ' on input line 553.
+(scrartcl)              by `\normalfont \itshape ' on input line 605.
 
 
-LaTeX Warning: File `cv_reg.png' not found on input line 557.
+LaTeX Warning: File `cv_reg.png' not found on input line 609.
 
 
 ! Package pdftex.def Error: File `cv_reg.png' not found.
@@ -2202,19 +2282,26 @@ See the pdftex.def package documentation for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.557 ...width=0.8\textwidth, angle=0]{cv_reg.png}
+l.609 ...width=0.8\textwidth, angle=0]{cv_reg.png}
                                                   
 Using draft setting for this image.
 Try typing  <return>  to proceed.
 If that doesn't work, type  X <return>  to quit.
 
-LaTeX Font Info:    Try loading font information for OT1+lmtt on input line 557
+LaTeX Font Info:    Try loading font information for OT1+lmtt on input line 609
 .
 (/usr/share/texmf/tex/latex/lm/ot1lmtt.fd
 File: ot1lmtt.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 
-LaTeX Warning: File `var_bias.png' not found on input line 565.
+Package Fancyhdr Warning: \headheight is too small (17.0pt): 
+ Make it at least 25.2232pt.
+ We now make it that large for the rest of the document.
+ This may cause the page layout to be inconsistent, however.
+
+[11]
+
+LaTeX Warning: File `var_bias.png' not found on input line 617.
 
 
 ! Package pdftex.def Error: File `var_bias.png' not found.
@@ -2223,14 +2310,14 @@ See the pdftex.def package documentation for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.565 ...dth=1.1\textwidth, angle=0]{var_bias.png}
+l.617 ...dth=1.1\textwidth, angle=0]{var_bias.png}
                                                   
 Using draft setting for this image.
 Try typing  <return>  to proceed.
 If that doesn't work, type  X <return>  to quit.
 
 
-Overfull \hbox (41.82791pt too wide) in paragraph at lines 565--566
+Overfull \hbox (41.82791pt too wide) in paragraph at lines 617--618
  [][] 
  []
 
@@ -2241,7 +2328,7 @@ See the pageslts package documentation for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.572 \end{document}
+l.624 \end{document}
                     
 The pageslts package was used, but
 \pagenumbering
@@ -2265,23 +2352,23 @@ Package Fancyhdr Warning: \headheight is too small (17.0pt):
  We now make it that large for the rest of the document.
  This may cause the page layout to be inconsistent, however.
 
-[10]
-
-Package Fancyhdr Warning: \headheight is too small (17.0pt): 
- Make it at least 25.2232pt.
- We now make it that large for the rest of the document.
- This may cause the page layout to be inconsistent, however.
-
-[11]
-
-Package Fancyhdr Warning: \headheight is too small (17.0pt): 
- Make it at least 25.2232pt.
- We now make it that large for the rest of the document.
- This may cause the page layout to be inconsistent, however.
-
 [12]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 572.
-Package atveryend Info: Executing hook `AfterLastShipout' on input line 572.
+
+Package Fancyhdr Warning: \headheight is too small (17.0pt): 
+ Make it at least 25.2232pt.
+ We now make it that large for the rest of the document.
+ This may cause the page layout to be inconsistent, however.
+
+[13]
+
+Package Fancyhdr Warning: \headheight is too small (17.0pt): 
+ Make it at least 25.2232pt.
+ We now make it that large for the rest of the document.
+ This may cause the page layout to be inconsistent, however.
+
+[14]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 624.
+Package atveryend Info: Executing hook `AfterLastShipout' on input line 624.
 \c@pagesLTS.arabic.1.local.count=\count221
  
 AED: pageslts setting VeryLastPage via AfterLastShipout 
@@ -2293,7 +2380,7 @@ Package pageslts Info: Total number of pages is even.
 
 
 (./w2w-report.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 572.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 624.
 
 
  *File List*
@@ -2438,22 +2525,22 @@ w2w-report.out
  ot1lmtt.fd    2009/10/30 v1.6 Font defs for Latin Modern
  ***********
 
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 572.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 624.
 Package rerunfilecheck Info: File `w2w-report.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
 
 LaTeX Warning: There were multiply-defined labels.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 572.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 624.
  ) 
 Here is how much of TeX's memory you used:
- 33181 strings out of 495000
- 650020 string characters out of 6181168
- 797527 words of memory out of 5000000
+ 33185 strings out of 495000
+ 650056 string characters out of 6181168
+ 797528 words of memory out of 5000000
  35854 multiletter control sequences out of 15000+600000
  54259 words of font info for 51 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 69i,19n,105p,10426b,471s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 69i,19n,105p,10426b,488s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texmf/fonts/enc/dvips/lm/lm-rmtt.enc}{/usr/share/texmf/fonts/enc/
 dvips/lm/lm-mathsy.enc}{/usr/share/texmf/fonts/enc/dvips/lm/lm-rm.enc}{/usr/sha
 re/texmf/fonts/enc/dvips/lm/lm-mathit.enc}{/usr/share/texmf/fonts/enc/dvips/lm/
@@ -2469,10 +2556,10 @@ xmf/fonts/type1/public/lm/lmsy8.pfb></usr/share/texmf/fonts/type1/public/lm/lmt
 t10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/symbols/msam
 10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm1
 0.pfb>
-Output written on w2w-report.pdf (12 pages, 250240 bytes).
+Output written on w2w-report.pdf (14 pages, 256715 bytes).
 PDF statistics:
- 186 PDF objects out of 1000 (max. 8388607)
- 154 compressed objects within 2 object streams
- 41 named destinations out of 1000 (max. 500000)
+ 200 PDF objects out of 1000 (max. 8388607)
+ 166 compressed objects within 2 object streams
+ 45 named destinations out of 1000 (max. 500000)
  13 words of extra memory for PDF output out of 10000 (max. 10000000)
 
