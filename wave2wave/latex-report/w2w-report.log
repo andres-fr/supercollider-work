@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2016.10.31)  17 DEC 2016 17:53
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2016.10.31)  20 DEC 2016 15:40
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -2011,6 +2011,13 @@ Class scrartcl Warning: Usage of deprecated font command `\it'!
 (scrartcl)              by `\normalfont \itshape ' on input line 220.
 
 
+Package Fancyhdr Warning: \headheight is too small (17.0pt): 
+ Make it at least 25.2232pt.
+ We now make it that large for the rest of the document.
+ This may cause the page layout to be inconsistent, however.
+
+[5]
+
 ! LaTeX Error: Bad math environment delimiter.
 
 See the LaTeX manual or LaTeX Companion for explanation.
@@ -2023,13 +2030,6 @@ Your command was ignored.
 Type  I <command> <return>  to replace it with another command,
 or  <return>  to continue without it.
 
-
-Package Fancyhdr Warning: \headheight is too small (17.0pt): 
- Make it at least 25.2232pt.
- We now make it that large for the rest of the document.
- This may cause the page layout to be inconsistent, however.
-
-[5]
 
 Class scrartcl Warning: Usage of deprecated font command `\it'!
 (scrartcl)              You should note, that in 1994 font command `\it' has
@@ -2536,7 +2536,7 @@ Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 624.
 Here is how much of TeX's memory you used:
  33185 strings out of 495000
  650056 string characters out of 6181168
- 797528 words of memory out of 5000000
+ 799528 words of memory out of 5000000
  35854 multiletter control sequences out of 15000+600000
  54259 words of font info for 51 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
@@ -2556,7 +2556,7 @@ xmf/fonts/type1/public/lm/lmsy8.pfb></usr/share/texmf/fonts/type1/public/lm/lmt
 t10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/symbols/msam
 10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm1
 0.pfb>
-Output written on w2w-report.pdf (14 pages, 256715 bytes).
+Output written on w2w-report.pdf (14 pages, 256726 bytes).
 PDF statistics:
  200 PDF objects out of 1000 (max. 8388607)
  166 compressed objects within 2 object streams

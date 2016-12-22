@@ -5,6 +5,10 @@
 ## C-, C-RET send paragraph
 ## C-c C-l send buffer
 ## C-c M-l clear repl
+
+## run this on a shell to monitor memory usage
+## watch -n 5 free -m
+
 ################################################################################
 
 
@@ -20,11 +24,16 @@
 ################################################################################
 ### GLOBALS
 ################################################################################
-MATERIALS_DIR =  strcat(pwd(),"/materials/");
+global MATERIALS_DIR =  strcat(pwd(),"/materials/");
 
-
-
-
+# it is important to know the original and materials before loading
+# them, in order to allocate the proper amount of memory
+global ORIGINAL_ADDRESS = (strcat(MATERIALS_DIR, "child.wav"));
+global MATERIAL_ADDRESSES =arrayfun(@(x) strcat(MATERIALS_DIR,x{1}),
+                                    {"anvil.wav", "triangle.wav",
+                                     "flexatone.wav", "recoreco.wav"},
+                                    "UniformOutput", false)(:);
+global SAMPLERATE = 44100;
 
 
 ################################################################################
@@ -39,31 +48,50 @@ function outsig = normalize_sig(sig)
   outsig = sig/max(abs(sig));
 endfunction
 
-function outsig = preprocess_sig(sig)
+function outsig = preprocess_sig(sig, outsize=0)
   outsig = normalize_sig(remove_dc(sig));
+  if (outsize) outsig = postpad(outsig, outsize)(1:outsize);
+  endif
 endfunction
 
-## function [sig, fs] = load_and_preprocess(filepath)
-##   [sig, fs] = audioread(filepath);
-##   sig = preprocess_sig(sig);
-## endfunction
-
-
-function [sig, fs] = load_and_preprocess(filepath)
-  [sig, fs] = auload(filepath);
-  sig = preprocess_sig(sig);
+function sig = load_and_preprocess(filepath, outsize=0)
+  sig = auload(filepath);
+  sig = preprocess_sig(sig, outsize);
 endfunction
 
 
-[anvil, fs] = load_and_preprocess(strcat(MATERIALS_DIR, "anvil.wav"));
-[triangle, fs] = load_and_preprocess(strcat(MATERIALS_DIR, "triangle.wav"));
-[flexatone, fs] = load_and_preprocess(strcat(MATERIALS_DIR, "flexatone.wav"));
-[recoreco, fs] = load_and_preprocess(strcat(MATERIALS_DIR, "recoreco.wav"));
-[child, fs] = load_and_preprocess(strcat(MATERIALS_DIR, "child.wav"));
+# LOAD ORIGINAL AND ALLOCATE CORRESPONDING MATRIX OF MATERIALS:
+global original = load_and_preprocess(ORIGINAL_ADDRESS);
+global materials = zeros(rows(original), rows(MATERIAL_ADDRESSES));
+# LOAD EACH MATERIAL INTO A VECTOR OF THE materials MATRIX
+for i=1:rows(MATERIAL_ADDRESSES)
+  materials(:,i) = load_and_preprocess(MATERIAL_ADDRESSES{i}, rows(original));
+endfor
 
 
 ################################################################################
-### LOADING AND PREPROCESSING AUDIO FILES
+### TESTING/PLAYING AUDIO FILES AS VECTORS
+### add  global sound_play_utility = "aplay"; to ~/.octaverc if player
+### not working
+################################################################################
+function [e] = energy(sig)
+  e = sig'*sig;
+endfunction
+
+function []= play(snd_id, fs=44100)
+  ##play(0) ## play original
+  if (snd_id==0)
+    global original;
+    sound(original,fs);
+  else
+    global materials;
+    sound(materials(:,snd_id), fs);
+  endif
+endfunction
+
+
+################################################################################
+### SANDBOX
 ################################################################################
 
 
@@ -93,6 +121,7 @@ function outsig = fftcc(sig1, sig2)
   endif
   outsig = fftconv(sig1, sig2);#, maxpadsize(sig1, sig2));
 endfunction
+
 
 
 
