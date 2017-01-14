@@ -178,8 +178,8 @@ Find the parameters for the signal \(S'{\scriptstyle (t)}\) (the {\it reconstruc
   \begin{align*}
     \begin{aligned}
       (\vec{k}^*, \vec{d}^*) &= \underset{\vec{k}, \vec{d}}{\text{minimize }}\Bigg[
-      R{\scriptstyle (t)} = E[S{\scriptstyle (t)}-S'{\scriptstyle (t)}]
-      = \sum_{t=1}^{|S|}\bigg\{\Big(S{\scriptstyle (t)}-\sum_{n=1}^N\{k_n\varphi_{m_n}{\scriptstyle (t+d_n)}\}\Bigg]
+      E[R{\scriptstyle (t)}] = E[S{\scriptstyle (t)}-S'{\scriptstyle (t)}]
+      = \sum_{t=1}^{|S|}\bigg\{\Big(S{\scriptstyle (t)}-\sum_{n=1}^N\{k_n\varphi_{m_n}{\scriptstyle (t+d_n)}\}\Big) \bigg\} \Bigg]
     \end{aligned}
   \end{align*}
   Which can also be written in the following equivalent algebraic expression:
@@ -223,7 +223,7 @@ The minimization of \(E[R{\scriptstyle (t)}]= \Big\lVert \vec{S}-\Phi_{\vec{d}\;
       \nabla_{\vec{k}} \Big\lVert \vec{S}-\Phi_{\vec{d}\;} \vec{k}\Big\rVert_2^2 \cdot \delta \vec{k} = 2 \langle \Phi_{\vec{d}\;}\delta \vec{k}\;,\; \vec{S}-\Phi_{\vec{d}\;} \vec{k} \rangle = 2\delta \vec{k}^T(\Phi_{\vec{d}\;}^T\vec{S} - \Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;} \vec{k})
     \end{aligned}
 \end{align*}
-In this context, for a fixed \(\vec{d}\) the minimum of \(\vec{k}\) occurs when this derivative is set to zero, which has a single solution at \(\Phi_{\vec{d}\;}^T\vec{S} - \Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;} \vec{k}\):
+In this context, for any fixed \(\vec{d}\) the minimum of \(\vec{k}\) occurs when this derivative is set to zero, which has a single solution at \(\Phi_{\vec{d}\;}^T\vec{S} = \Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;} \vec{k}\):
 \begin{align*}
     \begin{aligned}
       \vec{k}_{opt} =  (\Phi_{\vec{d}\;}^T \Phi_{\vec{d}\;})^{-1} \Phi_{\vec{d}\;}^T\vec{S}
@@ -340,7 +340,7 @@ Proofs for this are not included here, but can be found in [WIKIPEDIA STFG]. Usi
   \item In case \(b<a\), \(\Sigma\Sigma^+\) acts like a filter: when it is totally open, it forms an identity matrix that leads to no transformation of the input to \( \Psi_{\vec{d}\;}\) (because \(UU^T=I\)). When an entry is zero, the corresponding dimension will be filtered out.
     \begin{tcolorbox}[ams text]
     %\label{whatever}
-      The best case of maximizing \(\langle \vec{S}', \Psi_{\vec{d}\;}\vec{S} \rangle\) is achieved when \(\vec{S}' = \vec{S}\), because orthogonal matrices preserves the length
+      The best case of maximizing \(\langle \vec{S}', \Psi_{\vec{d}\;}\vec{S} \rangle\) is achieved when \(\vec{S}' = \vec{S}\), because linear operations with orthogonal matrices preserve lengths and angles
     \end{tcolorbox}
 
 

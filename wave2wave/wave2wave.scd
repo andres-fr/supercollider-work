@@ -51,7 +51,7 @@ BUG?? crossCorrelation outputs peak 1 sample sooner??
 /// GENERAL CONFIG AND DATA MODEL
 ///////////////////////////////////////////////////////////////////////////////////
 ( // addresses
-~working_dir = File.getcwd++"/git/supercollider-work/correlator/";
+~working_dir = File.getcwd++"/git/supercollider-work/wave2wave/";
 ~materials_dir = ~working_dir++"materials/";
 // this implies that everything in the "materials_dir" is an audio file to be loaded
 ~get_materialdir_contents = {PathName.new(~materials_dir).entries.collect({|x| x.fullPath});};
@@ -229,8 +229,10 @@ SynthDef("f_function",{ |buf, bufdur, delay=0, mul=1, out=0|
 var transp = -345;
 ~transposeFileNRT.value(addr, transp, {~playBufFromPath.value(~addNrToPath.value(addr, transp)++".wav")})*/
 
-var m = ["anvil", "flexatone", "triangle", "bowsuspend", "crotales", "recoreco", "child"];
-[-400, -300, -200, -100, 100, 200, 300, 400].do({|freq|
+//var m = ["anvil", "flexatone", "triangle", "bowsuspend", "crotales", "recoreco", "child"];
+var m = ["anvil"];
+//[-400, -300, -200, -100, 100, 200, 300, 400]
+((-125..125)*4).do({|freq|
 	m.do({|name|
 		~createTransposedAudio.value(name, freq)
 	})
@@ -240,7 +242,13 @@ var m = ["anvil", "flexatone", "triangle", "bowsuspend", "crotales", "recoreco",
 
 
 
+(
+Array.series(size: 500, start: -500, step: 2);
+)
 
+(
+(-10..10)*2
+)
 
 ///////////////////////////////////////////////////////////////////////////////////
 /// SIGNALS: THE CLIENT SIDE

@@ -368,3 +368,203 @@ If recLevel is 1.0 and preLevel is 0.0 then the new input overwrites the old dat
 
 
 
+
+
+############################################################################
+### UPDATE: JANUARY 2017
+############################################################################
+
+although the problem of finding k* is trivial, it seems that finding d* is NP-complete.
+Which means, if no prior knowledge on the signals is given, the optimal delays
+can only be achieved by testing all possible combinations. Since this is not
+feasible, it has to be approximated.
+
+For that, there are different strategies. But first, lets remember the objective:
+
+
+## OPTIMIZATION OBJECTIVE: remember that it was:
+
+d* = minimize{ E[S'] - 2<S, S'> }  = maximize{ <S, S'> - E[S'] }
+
+and since S' is the sum over i of m_i(t+d_i):
+
+d* = maximize{<S, sum...> - < sum..., sum... >  }
+   = maximize{ <S, m_1> + ... + <S, m_N> - <m_1, m_1> - <m_1, m_2> ... - <m_N, m_N>}
+
+This last expression can be simplified even more: we have N "positive" dotprods, and N^2 "negative"
+ones. The negative ones can be represented as a matrix of the form:
+|-<m1, m1>   -<m1, m2> ...  -<m1, mN> |
+|                                     |
+|                                     |
+|-<mN, m1>  ...             -<mN, mN> |
+
+In this context, the diagonal terms DO NOT DEPEND ON d*, so they can be removed, and conveniently
+substituted by the <S, m_i> ones, which do depend on d*:
+
+| <m1, S>   -<m1, m2> ...  -<m1, mN>  |
+|-<m2, m1>    <m2, S> ...  -<m2, mN>  |
+|   ...                               |
+|-<mN, m1>  ...             <mN, S>   |
+
+The optimization objective can be now reformuled as: "maximize the sum of all its elements". And
+since it is a symmetric matrix, it can be sparsified even further by ignoring one of its triangles:
+| <m1, S>   -<m1, m2> ...  -<m1, mN>  |
+|    0        <m2, S> ...  -<m2, mN>  |
+|   ...                               |
+|    0          0     ...   <mN, S>   |
+
+This will be referred to as the PROBLEM MATRIX
+so the goal is to "maximize the sum of all its elements": the diagonal elements should be high,
+and the upper triangle elements should be low (even negative).
+
+
+## PROBLEM ANALYSIS: given N materials, and an original with |S| samples:
+
+First of all, calculate the cross-correlation of every non-zero element in the PROBLEM MATRIX. This means,
+for N materials, we have 
+  N(N+1)/2 = O(N^2) = P 
+cross-correlations to be calculated. Once they are stored in arrays, the dot product for each point
+can be retrieved in O(1), which is very nice. 
+
+# The naive approach would be then the brute-force, that is trying all possible delay combinations and
+measuring the residual energy for each. This would require a total of |S|^N iterations, which is NP and
+clearly unfeasible.
+
+# A polynomial approach is still doable: We see that every m_i material is represented in
+exactly N elements in the matrix, so recalculating the residual energy for a new delay d_i requires:
+  N*O(1) = O(N) = P
+many operations.
+
+But in order to find the BEST d_i for each m_i, ALL  of the samples in |S| have to be recalculated.
+Or, what is the same, the whole CC arrays have to be added. This requires:
+|S| * O(N) = O(|S|*N) = P
+many operations.
+
+So far so good: it is possible to calculate the best delay possible for an isolated material in a somewhat
+quadratic time. If we wanted to know which material is the most appropiate to go on with, it would be necessary
+to perform this O(|S|*N) operations for everyone of the N(N+1)/2 = O(N^2) materials:
+
+O(N^2) * O(|S|*N) = O(|S| N^3)
+
+As we see, this would highly raise the asymptotic. This isn't expected to be a real-time algorithm,
+but a quick glance at some "plausible" parameters shows its unfeasability:
+
+DESIRABLE EXAMPLE:
+  samplerate: 44100 hz
+  duration:   5 min
+  #materials: 3000
+5*60*44100 * 1500 * 3001 = 5,9554845×10^13 operations required by a single step.
+In a fairly good processor able to calculate 50MIPS, this would mean about 1.2 million seconds per step
+
+VERY REDUCED EXAMPLE:
+  samplerate: 44100 hz
+  duration:   20 seconds
+  #materials: 500
+20*44100 * 250 * 501= 110 470 500 000 operations required by a single step.
+In a 50MIPS processor, this would take still 2200 seconds, ca. 36 minutes per step.
+
+
+Luckily enough, this last step is not required: the algorithm can pick any random material and optimize it in
+O(|S|*N): the overall residual energy would decrease, or, in worst case, stay where it is!
+So, picking random materials is the way to go:
+
+OPTIMIZING A SINGLE MATERIAL:
+  samplerate: 44100 hz
+  duration:   5 min
+  #materials: 3000
+5*60*44100 * 3000 = 13 min aprox in a 50MIPS processor
+
+for 2 min, 1500 samples the time would be 158 seconds, which is feasible.
+
+
+With an infinite number of iterations, this algorithm would always converge to the global optimum.
+So now the algo can be described:
+
+
+### ALGORITHM:
+
+1)given:
+  S := original signal of length |S|
+  M := {m1, ... , mN} set of N materials BEGINNING BY 1
+
+a) load all materials into RAM
+b) calculate all cross-correlations and store them as follows:
+    b1) store the CCs with the original into the array CCS[i] = CC[mi, S]
+    b2) store the CCs between materials into the array CCm[i][j] = CC[mi, mj]
+        whereas i<j<=M
+     -> if i<j:  store NOTHING but the getter of CC[i][j] retrieves CC[j][i] (because the matrix is symm.)
+
+2) INITIALIZE d* = [index(max(CC[i][i])) for i in range(M)] # initialize by maximizing dotprod with original
+
+3) calculate residual energy: sum of all CC elements for j>=i with current d*:
+def loss():
+   ccs = sum([ CCS[i][d*[i]] for i in range(M) ])
+   ccm = sum([ sum([CCM[i][j][d*[i]-d*[j]]  for j in range(i,M)])  for i in range(M)]
+   return (ccs-ccm)
+
+4) define termination conditions for the loop:
+
+
+
+
+2) MAIN LOOP: randomly update indexes of d* until termination_conditions are met
+
+MAX_ITERATIONS = 1000
+MAX_TIME = 120 # in seconds
+LOSS_IMPROVEMENT = [] # a list where the loss evolution is stored
+EPSILON = 0.01 * energy(S)
+
+current_iterations = 0
+elapsed = time()
+
+def termination_conditions():
+   b1 = current_iterations >= MAX_ITERATIONS
+   b2 = elapsed >= MAX_TIME
+   b3 = sum(LOSS_IMPROVEMENT[last_n/2]) < EPSILON
+   return b1 or b2 or b3
+
+while not termination_conditions():
+   # randomly choose one material to move
+   m = randint(1, M) 
+   current_dm = d*[m]
+   # sum the affected CC arrays and find the new maximum
+   cctemp = CCS[m] - sum_eltweise([CCM[m][j] for j in range(M) if j!=m])
+   new_dm = idx(max(cctemp))
+   # store the improvement and the new maximum
+   LOSS_IMPROVEMENT.push(cctemp[new_dm]-cctemp[current_dm])
+   d*[m] = new_dm
+
+
+And that's it!! the vector d* should store the optimized delays d_i for each m_i
+After that easily optimize the k* with the normal equation
+
+
+
+
+
+### IMPROVEMENT OF THE ALGORITHM:
+the algo above takes a predefined set of samples, and adds them all, each one once.
+The following algo introduces the following changes:
+  1) analyze the maxima of all CCS, and pick all the samples that are above mu-sigma
+     to form an initial d*.
+  2) d* is now an adj.list, with key=materialID and value=[t1, t2 ...]
+     this means the same material can appear several times.
+  3) the main loop chooses as before a random sample, and ADDS it to the reconstruction.
+     Existing samples aren't reviewed in this approach (may in the future).
+  4) 
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
