@@ -1,5 +1,5 @@
 // original file from http://stackoverflow.com/questions/19377942/processing-large-files-with-libsndfile
-// g++ -std=c++14 -Wall -pedantic -Wextra /home/afr/git/supercollider-work/wave2wave/c++/MAIN.cpp -o MAIN -l sndfile && ./MAIN
+// g++ -std=c++14 -Wall -pedantic -Wextra <C++ FILE PATH> -o MAIN -l sndfile && ./MAIN
 
 #include <sndfile.hh>
 #include <iostream>
@@ -20,8 +20,8 @@ int main()
   short BufferIn[BLOCK_SIZE];
   short BufferOut[BLOCK_SIZE];
 
-  string FileIn = "/home/afr/git/supercollider-work/wave2wave/materials/anvil.wav";
-  string FileOut = "/home/afr/git/supercollider-work/wave2wave/c++/asereje.wav";
+  string FileIn = <INPUT WAV FILE PATH WITH EXTENSION>;
+  string FileOut = <OUTPUT WAV FILE PATH WITH EXTENSION>;
 
 
   // open FileIn and display info
