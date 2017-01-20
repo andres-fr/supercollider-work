@@ -60,7 +60,7 @@ int main(){
 
   // check configurations and abort if not compatible
   if(sfinfo1.channels != sfinfo2.channels){
-      std::cout << "Channelammount differs from eachother, abort program.";
+      std::cout << "Channel ammount differs from eachother, abort program.";
       printf("\n\nPress any key to exit.");
       return 1;
     }

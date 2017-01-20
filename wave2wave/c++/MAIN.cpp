@@ -1,71 +1,65 @@
-// original file from http://stackoverflow.com/questions/19377942/processing-large-files-with-libsndfile
-// g++ -std=c++14 -Wall -pedantic -Wextra /home/afr/git/supercollider-work/wave2wave/c++/MAIN.cpp -o MAIN -l sndfile && ./MAIN
+//g++ -O3 -std=c++14 -Wall -Wextra -pedantic MAIN.cpp floatsignal.cpp wavclient.cpp -o MAIN -lsndfile && valgrind --leak-check=yes --track-origins=yes ./MAIN
 
-#include <sndfile.hh>
+//#include <sndfile.hh>
+
+#include <vector>
 #include <iostream>
-#include <fstream>
-
-#define BLOCK_SIZE 32
-
+// #include <cmath>
+// #include <random>
+// #include <chrono>
+#include "floatsignal.h"
+#include "wavclient.h"
 using namespace std;
+//using namespace chrono;
 
 int main()
 
 {
-  SNDFILE *infile  = NULL;
-  SNDFILE *outfile = NULL;
-  SF_INFO    sfinfo;
-  SF_INFO    sfinfoOut;
-  sf_count_t readcount;
-  short BufferIn[BLOCK_SIZE];
-  short BufferOut[BLOCK_SIZE];
-
-  string FileIn = "/home/afr/git/supercollider-work/wave2wave/materials/anvil.wav";
-  string FileOut = "/home/afr/git/supercollider-work/wave2wave/c++/asereje.wav";
+  string OUT_PATH = "output.wav";
+  string ORIGINAL_PATH = "child-short.wav";
+  vector<string> MATERIAL_ADDRESSES = {"anvil[0].wav", "anvil[40].wav"};
 
 
-  // open FileIn and display info
-  cout << "Trying to open " << FileIn <<  endl;
-  if((infile = sf_open(FileIn.c_str(),SFM_READ,&sfinfo)) == NULL)
-    {
-      printf("Not able to open input file 1\n");
-      printf("\n\nPress any key to exit.");
-      puts(sf_strerror(NULL)) ;
-      return 1;
-    }
-  cout << "succesfully opened" <<  endl;
-  cout << "Channels: " << sfinfo.channels <<
-    "\nFrames: " << sfinfo.frames << endl;
-  cout << "Samplerate: " << sfinfo.samplerate  <<  endl;
+
+  // int LOWER_BOUND = 0;
+  // int UPPER_BOUND = 100000;
+  // int N = 150;
+
+  // for(int t=LOWER_BOUND; t<UPPER_BOUND; t++){
+  //   for(int i=0; i<N; i++){
+  //     result[i]= CCS.get(i).at(t);
+  //     for(int j=0; j<(N*(N+1)/2);j++){
+  //       result[i] -= CCM.get(i,j).at(t);
+  //     }
+  //   }
+  // }// after this loop, result (also a Signal) should
 
 
-  // configure and open FileOut
-  sfinfoOut.channels = sfinfo.channels;
-  sfinfoOut.format = sfinfo.format;
-  sfinfoOut.samplerate = sfinfo.samplerate;
-  cout << "Trying to open output " << FileOut <<  endl;
-  if((outfile = sf_open(FileOut.c_str(),SFM_WRITE,&sfinfoOut)) == NULL)      // Open Wav-file 2 instance
-    {
-      printf("Not able to create output file \n");
-      printf("\n\nPress any key to exit.");                      // Exit-text if file not present
-      puts(sf_strerror(NULL)) ;
-      return 1;
-    }
-  cout << "succesfully opened" <<  endl;
 
+  WavClient wc;
+  vector<float> ff = wc.wavPath2floatVector(ORIGINAL_PATH);
+  wc.floatVector2wav(OUT_PATH, ff);
 
-  //
-  cout << "writing to output..." <<  endl;
-  // sf_read_short returns the number of samples it read (stops at EOF)
-  while((readcount = sf_read_short(infile, BufferIn, BLOCK_SIZE)))
-    { // copy the contents from FileIn to FileOut
-      for(int i = 0; i < readcount; i++) {BufferOut[i] = BufferIn[i];}
-      for(int i = readcount; i < BLOCK_SIZE; i++){BufferOut[i] = 0;}
-      // append the contents to the current end of the file
-      sf_write_short(outfile, BufferOut, BLOCK_SIZE) ;
-    }
-  sf_close(infile);                                                    // Close Wav-file handlers
-  sf_close(outfile);
-  cout << "program finished" <<  endl;
+  cout << "main finished"<<endl;
   return 0;
 }
+
+// FloatSignal original(??);
+// vector<FloatSignal> materials(??);
+// vector<FloatSignal> CCS;
+// vector<vector<FloatSignal>> CCM;
+
+
+
+// int SIG_SIZE = 10000000;
+//   long long LOOP_SIZE = 200000000;
+//   high_resolution_clock::time_point t1 = high_resolution_clock::now();
+//   FloatSignal fs(SIG_SIZE);
+//   for (long long i=0; i<LOOP_SIZE; i++){
+//     fs.set(i%SIG_SIZE, i);
+//   }
+//   high_resolution_clock::time_point t2 = high_resolution_clock::now();
+
+//   auto duration = duration_cast<microseconds>( t2 - t1 ).count();
+
+//   cout << duration << " microseconds"<< endl;
