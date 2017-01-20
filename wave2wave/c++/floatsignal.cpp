@@ -1,3 +1,5 @@
+#include <sndfile.hh>
+#include <stdexcept>
 #include <iostream>
 #include <cmath>
 #include "floatsignal.h"
@@ -30,34 +32,68 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////////////
 // constructors and destructor
 ////////////////////////////////////////////////////////////////////////////////
-FloatSignal::FloatSignal(int size, int delay){
-  delay = delay;
+
+FloatSignal::FloatSignal(int size, float* conts){
+  contents = conts;
   sz = size;
-  contents = new float[sz]();
+  delay = 0;
+  sfInfo = new SF_INFO;
+  sfInfo->format = 0;
 }
+
+FloatSignal::FloatSignal(string pathIn){
+  sz = 0;
+  delay = 0;
+  sfInfo = new SF_INFO;
+  sfInfo->format = 0;
+  // declare container for filestream open path to file
+
+  SNDFILE* infile = sf_open(pathIn.c_str(), SFM_READ, sfInfo);
+
+  // check that file opens
+  if(infile == nullptr){
+    throw invalid_argument("FloatSignal: Unable to open input file: "+pathIn);
+  }
+  // configure auto-normalization settings
+  if (!AUTO_NORMALIZE){
+    sf_command(infile, SFC_SET_NORM_FLOAT, nullptr, SF_FALSE);
+  }
+  sf_command(infile, SFC_SET_NORM_FLOAT, nullptr, SF_FALSE);
+  // fit size and contents to the incoming file
+  sz = sfInfo->frames;
+  contents = new float[sz]();
+  sf_read_float(infile, contents, sz);
+  sf_close(infile);
+}
+
 
 FloatSignal::~FloatSignal(){
   delete[] contents;
+  delete sfInfo;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // getters and setters
 ////////////////////////////////////////////////////////////////////////////////
-
-int FloatSignal::getSize(){return sz;}
-int FloatSignal::getDelay(){return delay;}
+// setters
 void FloatSignal::setDelay(int d){delay=d;}
-
+void FloatSignal::setSFInfo(SF_INFO sfi){sfInfo= &sfi;}
+// getters
+float * FloatSignal::getContents() const {return contents;}
+int FloatSignal::getSize() const {return sz;}
+int FloatSignal::getDelay() const {return delay;}
+SF_INFO* FloatSignal::getSFInfo() const {return sfInfo;}
+// special getter
 float FloatSignal::at(int idx){
   int di = idx-delay;
   return (di<0 || di >= sz)? 0 : contents[di];
 }
 
-void FloatSignal::set(int idx, float val){
-  if (idx>=0 && idx < sz){contents[idx] = val;}
-  else {throw invalid_argument ("FloatSignal::set: index "+
-                                to_string(idx)+" out of range!");}
-}
+// void FloatSignal::set(int idx, float val){
+//   if (idx>=0 && idx < sz){contents[idx] = val;}
+//   else {throw invalid_argument ("FloatSignal::set: index "+
+//                                 to_string(idx)+" out of range!");}
+// }
 
 
 
@@ -70,6 +106,17 @@ void FloatSignal::print(){
   for (int i=0; i<(sz-1); i++){cout<<contents[i]<<", ";}
   cout <<contents[sz-1]<<"]"<<endl;
 }
+
+void FloatSignal::printSFInfo(){
+  cout <<"sfInfo:"<<endl
+       << "\rframes: " << sfInfo->frames << endl
+       << "\rsamplerate: " << sfInfo->samplerate << endl
+       << "\rchannels: " << sfInfo->channels << endl
+       << "\rformat: " << sfInfo->format << endl
+       << "\rsections: " << sfInfo->sections << endl
+       << "\rseekable: " << sfInfo->seekable << endl;
+}
+
 
 void FloatSignal::normalize(float norm, float mean){
   int i=0;
@@ -89,4 +136,24 @@ void FloatSignal::normalize(float norm, float mean){
   for(i=0; i<sz; i++){
     contents[i] = (contents[i]-deltamean)*deltanorm;
   }
+}
+
+
+void FloatSignal::toWav(string pathOut){
+  // check that SF_INFO was configured
+  if(sfInfo == nullptr){
+    throw invalid_argument("FloatSignal.toWav(): sfInfo not configured");
+  }
+  // declare and try to open outfile
+  SNDFILE* outfile = nullptr;
+  if((outfile = sf_open(pathOut.c_str(), SFM_WRITE, sfInfo)) == nullptr){
+    throw invalid_argument("FloatSignal:Not able to open output file "+pathOut);
+  }
+  // configure auto-normalization settings
+  if (!AUTO_NORMALIZE){
+    sf_command(outfile, SFC_SET_NORM_FLOAT, nullptr, SF_FALSE);
+  }
+  // write signal contents (disregarding delay) to stream and close file
+  sf_write_float(outfile, contents, sz);
+  sf_close(outfile);
 }

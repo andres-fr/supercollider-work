@@ -2,15 +2,30 @@
 
 //#include <sndfile.hh>
 
-#include <vector>
 #include <iostream>
 // #include <cmath>
 // #include <random>
 // #include <chrono>
 #include "floatsignal.h"
-#include "wavclient.h"
+
+
+#include "libalglib/fasttransforms.h"
+
 using namespace std;
 //using namespace chrono;
+
+
+
+//&vec[0]
+
+
+
+
+
+
+
+
+
 
 int main()
 
@@ -36,9 +51,9 @@ int main()
 
 
 
-  WavClient wc;
-  vector<float> ff = wc.wavPath2floatVector(ORIGINAL_PATH);
-  wc.floatVector2wav(OUT_PATH, ff);
+  FloatSignal fs("child-short.wav");
+  fs.printSFInfo();
+
 
   cout << "main finished"<<endl;
   return 0;
