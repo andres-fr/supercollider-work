@@ -33,6 +33,8 @@ class CrossCorrelator {
   vector<DoubleSignal*>* getMaterials() const;
   vector<DoubleSignal*>* getCCoriginals() const;
   map<pair<int,int>, DoubleSignal*>* getCCmaterials() const;
+  DoubleSignal* getMaterial(const int i);
+  DoubleSignal* getCCoriginal(const int i);
   DoubleSignal* getCCmaterial(const int i, const int j);
 };
 

@@ -29,75 +29,26 @@ int main()
 
 
   CrossCorrelator cc(ORIGINAL_PATH, MATERIAL_ADDRESSES);
-  cc.getCCoriginals()->at(0)->toWav("out0.wav",true);
-  cc.getCCoriginals()->at(1)->toWav("out1.wav",true);
+
+  // DoubleSignal* getMaterial(const int i);
+  // DoubleSignal* getCCoriginal(const int i);
+  // DoubleSignal* getCCmaterial(const int i, const int j);
+
+  cc.getMaterial(1)->toWav("mat1.wav",true);
+  cc.getCCoriginal(1)->toWav("ccs1.wav",true);
+  cc.getCCmaterial(0,1)->toWav("ccm01.wav",true);
+  cc.getCCmaterial(1,0)->toWav("ccm10.wav",true);
 
 
-
-  // DoubleSignal ch("child-short.wav", true);
-  // DoubleSignal anv("anvil.wav", true);
-  // DoubleSignal result;
-  // alglib::corrr1d(ch, ch.length(), anv, anv.length(), result);
-
-  // SF_INFO* sfi = ch.getSFInfo();
-  // int sa,c,f,sec,seek;
-  // sa = sfi->samplerate;
-  // c = sfi->channels;
-  // f = sfi->format;
-  // sec = sfi->sections;
-  // seek = sfi->seekable;
-
-  // result.setSFInfo(result.length(), sa, c, f, sec, seek);
-
-  // result.printSFInfo();
-  // cout << endl << result.length() << endl <<endl;
-
-  // result.toWav("output.wav", true);
-
-
-
-
-  // DoubleSignal noise;
-  // noise.setcontent(20, new double[20]{0.815803, -0.538149, -0.299479, 0.498359,
-  //       0.969564, -0.667747, 0.793966, -0.957624, 0.826445, -0.255609, 0.347082,
-  //       0.080027, -0.403685, -0.058940, -0.257758, -0.569333, 0.646189,
-  //       0.084176, -0.648250, 0.709720});
-  // DoubleSignal noise_del;
-  // noise_del.setcontent(30, new double[30]());
-  // for (int i=0; i<20; ++i){
-  //   noise_del[i+10] = noise[i];
-  // }
-  // DoubleSignal result;
-
-  // // CALCULATE CROSS-CORRELATION:
-  // // at result[0] dotprod of both beginning same time
-  // // until 29, the noise is gradually delayed, 29 is the "last"
-  // // the entries 30 to 48 correspond to delays -19 to -1
-  // alglib::corrr1d(noise_del, 30, noise, 20, result);
-
-  // // print result and return program
-  // for(int i=0; i<48; i++){cout<<result(i)<<endl;}
-
-
-
-
-
-  // AHORA TENEMOS UN DoubleSignal MAS O MENOS ESTABLE.
-  // el rollo es calcular las cc, y que sean comparables entre ellas
-  // para ello tienes q aclararte como ostias funciona el autonorm en I/O.
-
-  // suponiendo q ya podamos trabajar con CCs tranquilamente,
-  // el siguiente paso es implementar la clase OPTIMIZER:
-
-  // el optimizer recibe un nombre de original, y un vector de strings de materials.
-  // tiene una adj.list m_id--> delays
-  // carga las señales en maps
-  // carga las CCS y CCM en maps
   // implementa varios metodos de optimizacion:
   //   1) INCREMENTAL: la adjlist esta vacia, y va metiendo.
   //                   para cada metida suma las ccs existentes en la adjist y busca el max
   //   2) OPTIMIZADOR: la adjlist tiene tamaño fijo. Va pillando aleatorios, y
   //                   los optimiza como el num.1
+
+
+
+
 
 
   cout << "test finished"<< endl;

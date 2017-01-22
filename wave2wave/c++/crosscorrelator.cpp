@@ -63,9 +63,6 @@ CrossCorrelator::CrossCorrelator(const string origPath,
       // configure cc->sfInfo
       cc->setSFInfo(cc->length(), sf->samplerate, sf->channels,
                     sf->format, sf->sections, sf->seekable);
-
-      //
-
     }
   }
 
@@ -107,10 +104,18 @@ vector<DoubleSignal*>* CrossCorrelator::getCCoriginals() const {
   return CCoriginals;
 }
 
+
 map<pair<int,int>, DoubleSignal*>* CrossCorrelator::getCCmaterials() const {
   return CCmaterials;
 }
 
+DoubleSignal* CrossCorrelator::getMaterial(const int i){
+  return (*materials).at(i);
+}
+
+DoubleSignal* CrossCorrelator::getCCoriginal(const int i){
+  return (*CCoriginals).at(i);
+}
 
 DoubleSignal* CrossCorrelator::getCCmaterial(const int i, const int j){
   if (i<j){
