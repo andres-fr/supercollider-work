@@ -58,7 +58,6 @@ FloatSignal::FloatSignal(string pathIn){
   if (!AUTO_NORMALIZE){
     sf_command(infile, SFC_SET_NORM_FLOAT, nullptr, SF_FALSE);
   }
-  sf_command(infile, SFC_SET_NORM_FLOAT, nullptr, SF_FALSE);
   // fit size and contents to the incoming file
   sz = sfInfo->frames;
   contents = new float[sz]();
