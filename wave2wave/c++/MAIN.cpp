@@ -15,29 +15,30 @@
 using namespace std;
 //using namespace chrono;
 
+// TODO: save raw in a more memory-efficient but less readable format?
 
-// TODO: OK for array rotation. but how to set delays?
 
 
 int main()
 
 {
 
+  string IN_DIRECTORY = "/home/afr/git/supercollider-work/wave2wave/materials/";
+  string OUT_DIRECTORY = "/home/afr/git/supercollider-work/wave2wave/output/";
+  string ORIGINAL_PATH = IN_DIRECTORY + "child-short.wav";
 
-  string ORIGINAL_PATH = "child-short.wav";
-  vector<string> MATERIAL_ADDRESSES = {"anvil[0].wav", "anvil[40].wav"};
+
+  vector<string> MATERIAL_ADDRESSES;
+  for (int i=-500; i<=500; i+=4){
+    MATERIAL_ADDRESSES.push_back(IN_DIRECTORY+"anvil["+to_string(i)+"].wav");
+  }
 
 
-  CrossCorrelator cc(ORIGINAL_PATH, MATERIAL_ADDRESSES);
+  CrossCorrelator cc(ORIGINAL_PATH, MATERIAL_ADDRESSES, OUT_DIRECTORY);
 
-  // DoubleSignal* getMaterial(const int i);
-  // DoubleSignal* getCCoriginal(const int i);
-  // DoubleSignal* getCCmaterial(const int i, const int j);
-
-  cc.getMaterial(1)->toWav("mat1.wav",true);
-  cc.getCCoriginal(1)->toWav("ccs1.wav",true);
-  cc.getCCmaterial(0,1)->toWav("ccm01.wav",true);
-  cc.getCCmaterial(1,0)->toWav("ccm10.wav",true);
+  // DoubleSignal ds(OUT_DIRECTORY+"cc_original_m7.txt");
+  // ds.setSFInfo(ds.length(), 44100, 1, 65538, 1, 1);
+  // ds.toWav("test.wav", true);
 
 
   // implementa varios metodos de optimizacion:

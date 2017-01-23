@@ -1,6 +1,8 @@
 #ifndef DOUBLESIGNAL_H
 #define DOUBLESIGNAL_H
 
+// stl includes
+
 // other libraries
 #include <sndfile.hh>
 #include "libalglib/ap.h"
@@ -18,6 +20,7 @@ class DoubleSignal : public alglib::real_1d_array {
  public:
   // constructors
   explicit DoubleSignal();
+  explicit DoubleSignal(const string txtPath);
   explicit DoubleSignal(const string wavPath, const bool as);
   // deleted copy- and assignment constructors
   DoubleSignal(const DoubleSignal& copyFrom)=delete;
@@ -38,6 +41,7 @@ class DoubleSignal : public alglib::real_1d_array {
   void printSFInfo();
   void toWav(const string pathOut, const bool normalize);
   bool checkSRateAndChans(const SF_INFO* sf2);
+  void toRaw(const string pathOut);
 };
 
 #endif

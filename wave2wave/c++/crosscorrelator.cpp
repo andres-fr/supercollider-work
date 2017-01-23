@@ -13,7 +13,8 @@
 using namespace std;
 
 CrossCorrelator::CrossCorrelator(const string origPath,
-                                 vector<string>& mPaths){
+                                 const vector<string>& mPaths,
+                                 const string outFolder){
 
   // load original
   original = new DoubleSignal(origPath, true);
@@ -37,6 +38,7 @@ CrossCorrelator::CrossCorrelator(const string origPath,
     // instantiate
     DoubleSignal* cc = new DoubleSignal;
     // compute CC[original, m] and add to DS
+    cout << "calculating CCoriginals..." << endl;
     alglib::corrr1d(*original, original->length(), *m, m->length(), *cc);
     CCoriginals->push_back(cc);
     // rotate the arr. to be in format [-(M-1) ... 0 ... (N-1)]
@@ -44,6 +46,10 @@ CrossCorrelator::CrossCorrelator(const string origPath,
     // configure cc->sfInfo
     cc->setSFInfo(cc->length(), sf->samplerate, sf->channels,
                   sf->format, sf->sections, sf->seekable);
+    // export to .txt if output path was given
+    if (!outFolder.empty()){
+      cc->toRaw(outFolder+"cc_original_m"+to_string(CCoriginals->size()-1)+".txt");
+    }
   }
 
   // instantiate and load CCmaterials
@@ -56,6 +62,7 @@ CrossCorrelator::CrossCorrelator(const string origPath,
 
       DoubleSignal* cc = new DoubleSignal;
       // compute CC[mi,mj] and add to DS
+      cout << "calculating CCmaterials..." << endl;
       alglib::corrr1d(*mi, mi->length(), *mj, mj->length(), *cc);
       (*CCmaterials)[make_pair(i,j)] = cc;
       // rotate the arr. to be in format [-(M-1) ... 0 ... (N-1)]
@@ -63,6 +70,10 @@ CrossCorrelator::CrossCorrelator(const string origPath,
       // configure cc->sfInfo
       cc->setSFInfo(cc->length(), sf->samplerate, sf->channels,
                     sf->format, sf->sections, sf->seekable);
+      // export to .txt if output path was given
+      if (!outFolder.empty()){
+        cc->toRaw(outFolder+"cc_m"+to_string(i)+"_m"+to_string(j)+".txt");
+    }
     }
   }
 
