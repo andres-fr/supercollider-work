@@ -1,2 +1,3 @@
 /wave2wave/**/*.wav
-
+/wave2wave/output/**
+/wave2wave/SETUP-BAKUP/**
