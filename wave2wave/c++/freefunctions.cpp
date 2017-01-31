@@ -33,11 +33,6 @@ void normalizeArray(double* contents, const int sz, const double mean,
   for(i=0; i<sz; i++){
     contents[i] = (contents[i]-deltamean)*deltanorm;
   }
-
-  sum = 0;
-  for(i=0; i<sz; i++){
-    sum += contents[i];
-  }
 }
 
 

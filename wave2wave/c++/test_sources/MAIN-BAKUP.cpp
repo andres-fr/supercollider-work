@@ -95,7 +95,7 @@ int main(){
   for (int i=0; i<LOOP_SIZE; i++){
     int r = distribution(gen)-1;
     // load ccs
-    DoubleSignal ccs(ANALYSIS_DIR+"cc_original_m"+to_string(r)+".wav", false);
+    DoubleSignal ccs(ANALYSIS_DIR+"cc_original_m"+to_string(r)+".txt");
     // now we loaded all required cross-correlations.
     // initialize signal: the size of the maximal CC we can get
     DoubleSignal* tempSig = new DoubleSignal(2*MAX_LEN-1);
@@ -140,6 +140,6 @@ int main(){
   }
   reconstruction.toNormalizedWav("reconstruction.wav");
 
-  cout << "program finished"<< endl;
+  cout << "test finished"<< endl;
   return 0;
 }

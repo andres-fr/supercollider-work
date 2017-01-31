@@ -4,7 +4,7 @@
 #include<vector>
 #include <map>
 // other libraries
-#include "doublesignal.h"
+#include "floatsignal.h"
 #include "libalglib/fasttransforms.h"
 // own dependencies
 #include "freefunctions.h"
@@ -17,91 +17,105 @@ CrossCorrelator::CrossCorrelator(const string origPath,
                                  const vector<string>& mPaths,
                                  const string outFolder){
   // store the max energy to normalize all CCs dividing through it
-  double max_energy = 0;
+  float max_energy = 0;
   // load original
-  original = new DoubleSignal(origPath, true);
-  max_energy = (original->energy()>max_energy)? original->energy() : max_energy;
+  original = new FloatSignal(origPath, true);
   SF_INFO* sf = original->getSFInfo();
+  float orig_energy = original->energy();
+  if (orig_energy > max_energy){
+    max_energy = orig_energy;
+  }
   // instantiate and load materials
-  materials = new vector<DoubleSignal*>;
+  materials = new vector<FloatSignal*>;
   for (string path : mPaths){
-    DoubleSignal* m = new DoubleSignal(path, true);
-    if (m->checkSRateAndChans(sf)==false){
-      SF_INFO* sfm = m->getSFInfo();
+    FloatSignal* m = new FloatSignal(path, true);
+    SF_INFO* sfm = m->getSFInfo();
+    if (sf->samplerate!=sfm->samplerate || sf->channels!=sfm->channels){
       cout << "~warning: in CrossCorrelator: incompatible srate/nChans" <<
         endl << origPath <<": ("<<  sf->samplerate <<", "<< sf->channels <<")"<<
         endl << path <<": ("<< sfm->samplerate <<", "<< sfm->channels <<")";
     }
     materials->push_back(m);
-    max_energy = (m->energy()>max_energy)? m->energy() : max_energy;
+    float m_energy = m->energy();
+    if (m_energy > max_energy){
+      max_energy = m_energy;
   }
-  // save spec file: a list of ints, whereas the int at position i represents
-  // the zero-delay index for CC[original, mi] and CC[mi, mj].
-
-
-
-  if (!outFolder.empty()){ // if some out-dir given...
-    ofstream outFile((outFolder+"METADATA.txt").c_str(), ios::out);
-    if(outFile.is_open()){
-      cout << "writing METADATA.txt file" << endl;
+  }
+  // try to save METADATA.txt if some out-dir given (if not just load in RAM)
+  if (!outFolder.empty()){
+    ofstream outFile((outFolder+METADATA_NAME).c_str(), ios::out);
+    if(outFile.is_open()){ // if the given out-dir works:
+      cout << "writing " << METADATA_NAME << endl;
       outFile << origPath <<":"<< original->length() <<":"<< original->energy();
       for(unsigned int i=0; i<materials->size(); ++i){
         outFile << endl << mPaths.at(i) << ":" << materials->at(i)->length()
                 << ":" << materials->at(i)->energy();
       }
       outFile.close();
-      cout << "wrote "<< outFolder << "METADATA.txt succesfully!" << endl;
+      cout << "succesfully wrote "<< outFolder << METADATA_NAME << endl;
+    } else{ // if the given out-dir didn_t't work
+      cout << "could't open " << outFolder << METADATA_NAME << endl;
     }
-  } else{
-    cout << "could't open " << outFolder << "METADATA.txt" << endl;
   }
+  // this datatype conversion is needed by corrr1d:
+  alglib::real_1d_array alg_orig;
+  alg_orig.setcontent(original->length(), original->data());
 
   // instantiate and load CCoriginals
-  CCoriginals = new vector<DoubleSignal*>;
-  for (DoubleSignal* m : *materials){
+  CCoriginals = new vector<FloatSignal*>;
+  for (FloatSignal* m : *materials){
+    // this datatype conversion is needed by corrr1d:
+    alglib::real_1d_array alg_m;
+    alg_m.setcontent(m->length(), m->data());
     // instantiate container for CC
-    DoubleSignal* cc = new DoubleSignal;
+    alglib::real_1d_array cc;
     // compute CC[original, m] and add to DS
     cout << "calculating CCoriginals..." << endl;
-    alglib::corrr1d(*original, original->length(), *m, m->length(), *cc);
-    CCoriginals->push_back(cc);
+    alglib::corrr1d(alg_orig, alg_orig.length(), alg_m, alg_m.length(), cc);
+    // now convert back calculated CC from real_1d_array to FloatSignal
+    FloatSignal* fs_cc = new FloatSignal(cc.length());
+    copy(cc.getcontent(), cc.getcontent()+cc.length(), fs_cc->data());
+    CCoriginals->push_back(fs_cc);
     // rotate the arr. to be in format [-(M-1) ... 0 ... (N-1)]
-    rotateArray(cc->getcontent(), cc->length(), original->length());
-    // normalize array: highest peak of all CC is 1, the rest is proportional
-    cc->multiplyBy(1.0/max_energy);
+    rotateArray(fs_cc->data(), fs_cc->length(), original->length());
+    // NORMALIZE DIVIDING BY MAX_ENERGY (to be able to efficiently store as wav)
+    fs_cc->multiplyBy(1.0/max_energy); // ***
     // configure cc->sfInfo
-    cc->setSFInfo(cc->length(), sf->samplerate, sf->channels,
+    fs_cc->setSFInfo(fs_cc->length(), sf->samplerate, sf->channels,
                   sf->format, sf->sections, sf->seekable);
-    // export to .wav if output path was given
+    // export to outFolder as wave if output path was given
     if (!outFolder.empty()){
-      cc->toWav(outFolder+"cc_original_m"+to_string(CCoriginals->size()-1)+
-                ".wav", false); // already normalized with .multiplyBy
+      fs_cc->toWav(outFolder+"cc_original_m"+to_string(CCoriginals->size()-1)+
+                   ".wav", false); // already normalized in ***
     }
   }
 
   // instantiate and load CCmaterials
   int N = materials->size(); // to save some time
-  CCmaterials = new map<pair<int,int>, DoubleSignal*>;
+  CCmaterials = new map<pair<int,int>, FloatSignal*>;
   for (int i=0; i<N; ++i){
-    DoubleSignal* mi = (*materials)[i]; // to save some ns
+    FloatSignal* mi = (*materials)[i]; // to save some ns
+    // this datatype conversion is needed by corrr1d:
+      alglib::real_1d_array alg_mi;
+      alg_mi.setcontent(mi->length(), mi->data());
     for (int j=i; j<N; ++j){
-      DoubleSignal* mj = (*materials)[j]; // not sure if this saves time
-      DoubleSignal* cc = new DoubleSignal;
+      FloatSignal* mj = (*materials)[j]; // not sure if this saves time
+
+
+
+      FloatSignal* cc = new FloatSignal;
       // compute CC[mi,mj] and add to DS
       cout << "calculating CCmaterials..." << endl;
       alglib::corrr1d(*mi, mi->length(), *mj, mj->length(), *cc);
       (*CCmaterials)[make_pair(i,j)] = cc;
-      //normalize array: highest peak of all CC is 1, the rest is proportional
-      cc->multiplyBy(1.0/max_energy);
       // rotate the arr. to be in format [-(M-1) ... 0 ... (N-1)]
       rotateArray(cc->getcontent(), cc->length(), mi->length());
       // configure cc->sfInfo
       cc->setSFInfo(cc->length(), sf->samplerate, sf->channels,
                     sf->format, sf->sections, sf->seekable);
-      // export to .wav if output path was given
+      // export to .txt if output path was given
       if (!outFolder.empty()){
-        cc->toWav(outFolder+"cc_m"+to_string(i)+"_m"+to_string(j)+
-                    ".wav", false);
+        cc->toASCII(outFolder+"cc_m"+to_string(i)+"_m"+to_string(j)+".txt");
       }
     }
   }

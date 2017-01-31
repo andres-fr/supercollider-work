@@ -72,8 +72,8 @@ DoubleSignal::DoubleSignal(const string wavPath, const bool autoNorm){
   if(infile == nullptr){
     throw invalid_argument("DoubleSignal wav constructor: Unable to open input file: "+wavPath);
   } else{ // if file opens...
-    // library default-normalizes to -1...1. Disable that!
-    sf_command (infile, SFC_SET_NORM_DOUBLE, nullptr, SF_FALSE);
+    // // library default-normalizes to -1...1. Disable that!
+    // sf_command (infile, SFC_SET_NORM_DOUBLE, nullptr, SF_FALSE);
     // get file contents and save them to array
     double* contents = new double[sfInfo->frames]();
     sf_read_double(infile, contents, sfInfo->frames);
@@ -155,6 +155,12 @@ double DoubleSignal::energy(){
   return inner_product(getcontent(), getcontent()+length(), getcontent(), 0.0);
 }
 
+void DoubleSignal::multiplyBy(const double x){
+  double* arr = getcontent();
+  for(int i=0; i<length(); ++i){
+    arr[i] *= x;
+  }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 /// exporting
@@ -195,7 +201,7 @@ void DoubleSignal::toASCII(const string pathOut){
 }
 
 
-void DoubleSignal::toNormalizedWav(const string pathOut){
+void DoubleSignal::toWav(const string pathOut, const bool norm){
   // // append _RAW if not normalizing, for clarification
   // string pathOut = path_out;
   // if (!normalize){pathOut += "_RAW";}
@@ -208,7 +214,7 @@ void DoubleSignal::toNormalizedWav(const string pathOut){
   if(outfile == nullptr){
     throw invalid_argument("toWav: Not able to open output file "+pathOut);
   } else{// if file opens...
-    if (true){ // if (normalize==true)... ***
+    if (norm){ // if (normalize==true)... ***
       // copy contents to an array, and normalize that array:
       double* normArray = new double[length()];
       double* contents = getcontent();
@@ -221,11 +227,7 @@ void DoubleSignal::toNormalizedWav(const string pathOut){
       sf_close(outfile);
       cout  << "toWav: succesfully saved to "<< pathOut << endl;
       return;
-    } else { // this never happens! see ***
-      // if NOT normalize:
-      // library default-normalizes to -1...1. Disable that!
-      sf_command (outfile, SFC_SET_NORM_DOUBLE, nullptr, SF_FALSE);
-      
+    } else { // if NOT normalize:
       // write contents to stream (disregarding delay), close, print and return
       sf_write_double(outfile, getcontent(), length());
       sf_close(outfile);

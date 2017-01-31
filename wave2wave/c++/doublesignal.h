@@ -21,7 +21,7 @@ class DoubleSignal : public alglib::real_1d_array {
   explicit DoubleSignal();
   explicit DoubleSignal(int size);
   explicit DoubleSignal(const string txtPath);
-  explicit DoubleSignal(const string wavPath, const bool as);
+  explicit DoubleSignal(const string wavPath, const bool autoNorm);
   // deleted copy- and assignment constructors
   DoubleSignal(const DoubleSignal& copyFrom)=delete;
   DoubleSignal& operator= (const DoubleSignal& copyFrom)=delete;
@@ -39,8 +39,9 @@ class DoubleSignal : public alglib::real_1d_array {
   void printSFInfo();
   bool checkSRateAndChans(const SF_INFO* sf2);
   double energy();
+  void multiplyBy(const double x);
   // export
-  void toNormalizedWav(const string pathOut);
+  void toWav(const string pathOut, const bool norm);
   void toASCII(const string pathOut);
 };
 
