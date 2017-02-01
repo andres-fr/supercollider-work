@@ -37,6 +37,7 @@ class DoubleSignal : public alglib::real_1d_array {
   double at(int idx, int del);
   // further functionality
   void printSFInfo();
+  void prettyPrint(const string header);
   bool checkSRateAndChans(const SF_INFO* sf2);
   double energy();
   void multiplyBy(const double x);

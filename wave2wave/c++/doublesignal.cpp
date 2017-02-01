@@ -33,9 +33,8 @@ DoubleSignal::DoubleSignal(int size) : alglib::real_1d_array(){
   // the -1 forces an error when calling toWav() with unconfigured sfInfo
   setSFInfo(-1,0,0,0,0,0); // ds.setSFInfo(ds.length(), 44100, 1, 65538, 1, 1);
   delIdx = 0;
-  double* d = new double[size]();
-  setcontent(size, d);
-  delete d;
+  vector<double> d(size, 0);
+  setcontent(size, &(d[0]));
 }
 
 DoubleSignal::DoubleSignal(const string txtPath){
@@ -56,7 +55,7 @@ DoubleSignal::DoubleSignal(const string txtPath){
     setSFInfo(-1,0,0,0,0,0);
     delIdx = 0;
     // print and finish
-    cout <<"DoubleSignal txt constructor: succesfully loaded "<< txtPath<< endl;
+    // cout <<"DoubleSignal txt constructor: succesfully loaded "<< txtPath<< endl;
   }
 }
 
@@ -79,11 +78,11 @@ DoubleSignal::DoubleSignal(const string wavPath, const bool autoNorm){
     sf_read_double(infile, contents, sfInfo->frames);
     setcontent(sfInfo->frames, contents);
     // optional: custom normalization
-    if (autoNorm){normalizeArray(getcontent(), length(), 0, 1);}
+    if (autoNorm){normalizeArray(getcontent(), length());}
     //close, delete, print and finish
     sf_close(infile);
     delete[] contents;
-    cout <<"DoubleSignal wav constructor: succesfully loaded "<< wavPath<< endl;
+    // cout <<"DoubleSignal wav constructor: succesfully loaded "<< wavPath<< endl;
   }
 }
 
@@ -142,7 +141,13 @@ void DoubleSignal::printSFInfo(){
        << "\rseekable: " << sfInfo->seekable << endl;
 }
 
-
+void DoubleSignal::prettyPrint(const string header){
+  cout << header << "=(";
+  for(int i=0; i<length()-1; ++i){
+    cout << (*this)[i] << ", ";
+  }
+  cout << (*this)[length()-1] << ")" << endl;
+}
 
 
 bool DoubleSignal::checkSRateAndChans(const SF_INFO* sf2){
@@ -170,7 +175,7 @@ void DoubleSignal::toASCII(const string pathOut){
   // declare and try to open outFile
   ofstream outFile(pathOut.c_str(), ios::out);
   if (!outFile.is_open()){
-    cout << "toRaw: could't open " << pathOut << endl;
+    cout << "toASCII: could't open " << pathOut << endl;
     return;
   } else{// if file opened succesfully...
     // fill a deque with contents of double* as strings
@@ -196,7 +201,7 @@ void DoubleSignal::toASCII(const string pathOut){
     // ** add v[length()-1] (without trailing \n), close stream, print, return
     outFile << v[globalIter]; 
     outFile.close();
-    cout << "toRaw: succesfully saved to " << pathOut << endl;
+    cout << "toASCII: succesfully saved to " << pathOut << endl;
   }
 }
 
@@ -219,20 +224,22 @@ void DoubleSignal::toWav(const string pathOut, const bool norm){
       double* normArray = new double[length()];
       double* contents = getcontent();
       for (int i=0; i<length(); ++i){normArray[i] = contents[i];}
-      normalizeArray(normArray, length(), 0, 1); // 0 mean, 1 abs(max)
+      normalizeArray(normArray, length()); // 0 mean, 1 abs(max)
       // write normalized contents to stream (disregarding delay)
       sf_write_double(outfile, normArray, length());
       // delete normArray, close stream, print and return 
       delete[] normArray;
       sf_close(outfile);
-      cout  << "toWav: succesfully saved to "<< pathOut << endl;
+      //cout  << "toWav: succesfully saved to "<< pathOut << endl;
       return;
     } else { // if NOT normalize:
       // write contents to stream (disregarding delay), close, print and return
       sf_write_double(outfile, getcontent(), length());
       sf_close(outfile);
-      cout  << "toWav: succesfully saved to "<< pathOut << endl;
+      //cout  << "toWav: succesfully saved to "<< pathOut << endl;
       return;
     }
   }
 }
+
+

@@ -11,13 +11,13 @@
 using namespace std;
 
 
-void normalizeArray(double* contents, const int sz, const double mean,
-                    const double maxVal);
+/* void normalizeArray(double* contents, const int sz, const double mean, */
+/*                     const double maxVal); */
 
+void normalizeArray(double* contents, const int sz);
 
 void rotateArray(double* contents, const int size, const int idxOfLowest);
 
-
-int hashTriangle(const int i, const int j, const int N);
+void array2txt(double* contents, const int size, const string pathOut);
 
 #endif
