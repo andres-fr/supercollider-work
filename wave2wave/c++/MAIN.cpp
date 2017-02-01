@@ -90,7 +90,7 @@ int main(){
   vector<d_ref> D; // d_ref {metadata meta; int m_id; int del; double k;}
 
   for (int i=0; i<LOOP_SIZE; ++i){
-    int r = 0;// distribution(gen)-1;  //*******************
+    int r = 1;// distribution(gen)-1;  //*******************
     // load ccs
     DoubleSignal ccs(OUTPUT_DIR+"cc_original_m"+to_string(r)+".wav", false);
 
@@ -99,7 +99,7 @@ int main(){
 
     // initialize containers for iteration
     DoubleSignal* tempSig = new DoubleSignal(ORIG_LEN); // zeros at beg.
-    double maxVal = - numeric_limits<double>::infinity(); // initialize at -inf
+    double maxVal = 0;//- numeric_limits<double>::infinity(); // initialize at -inf
     int maxPos = 0;
     //calculate tempSig = ccs-sum_all(ccm), in order to get maxVal and maxPos
     for(d_ref &d : D){ // wavPath, m_id, del, k
@@ -117,7 +117,7 @@ int main(){
 
 
       for(int i=0; i<tempSig->length(); ++i){
-        cout << "substracting " << (*tempSig)[i] << " minus "<< m.at(i+((METADATA[tup.first+1].size)-1), d.del) * 7.0378 * d.k << endl;
+        //cout << "substracting " << (*tempSig)[i] << " minus "<< m.at(i+((METADATA[tup.first+1].size)-1), d.del) * 7.0378 * d.k << endl; //***************
 
 
         (*tempSig)[i] -= m.at(i+((METADATA[tup.first+1].size)-1), d.del) * 7.0378 * d.k;
@@ -125,7 +125,7 @@ int main(){
     }
     for(int i=0; i<tempSig->length(); ++i){ //********
       (*tempSig)[i] += ccs.at(i+((METADATA[r+1].size)-1), 0);
-      if((*tempSig)[i]>maxVal){
+      if(abs((*tempSig)[i])>abs(maxVal)){
         maxVal = (*tempSig)[i];
         maxPos = i;
       }
@@ -171,6 +171,10 @@ int main(){
 
 
 
+  DoubleSignal original("test_orig.wav",true);
+  original.prettyPrint("original");
+  normalizeArray(reconstruction.getcontent(), reconstruction.length());
+  reconstruction.prettyPrint("reconstruction");
 
   cout << "program finished"<< endl;
   return 0;
