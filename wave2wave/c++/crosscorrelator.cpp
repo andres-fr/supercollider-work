@@ -13,9 +13,11 @@
 // namespace
 using namespace std;
 
-CrossCorrelator::CrossCorrelator(const string origPath,
-                                 const vector<string>& mPaths,
-                                 const string outFolder){
+CrossCorrelator::CrossCorrelator(const string origName,
+                                 const vector<string>& mNames,
+                                 const string workingDir){
+  // input parameter preprocessing
+  const string origPath = workingDir+"AUDIO/"+origName;
   // store the max energy to normalize all CCs dividing through it
   double max_energy = 0;
   // load original
@@ -24,36 +26,30 @@ CrossCorrelator::CrossCorrelator(const string origPath,
   SF_INFO* sf = original->getSFInfo();
   // instantiate and load materials
   materials = new vector<DoubleSignal*>;
-  for (string path : mPaths){
-    DoubleSignal* m = new DoubleSignal(path, true);
+  for (string path : mNames){
+    DoubleSignal* m = new DoubleSignal(workingDir+"AUDIO/"+path, true);
     if (m->checkSRateAndChans(sf)==false){
       SF_INFO* sfm = m->getSFInfo();
       cout << "~warning: in CrossCorrelator: incompatible srate/nChans" <<
         endl << origPath <<": ("<<  sf->samplerate <<", "<< sf->channels <<")"<<
-        endl << path <<": ("<< sfm->samplerate <<", "<< sfm->channels <<")";
+        endl << workingDir+"AUDIO/"+path <<": ("<< sfm->samplerate <<", "<<
+        sfm->channels <<")";
     }
     materials->push_back(m);
     max_energy = (m->energy()>max_energy)? m->energy() : max_energy;
   }
   // save spec file: a list of ints, whereas the int at position i represents
   // the zero-delay index for CC[original, mi] and CC[mi, mj].
-
-
-
-  if (!outFolder.empty()){ // if some out-dir given...
-    ofstream outFile((outFolder+"METADATA.txt").c_str(), ios::out);
-    if(outFile.is_open()){
-      cout << "writing METADATA.txt file" << endl;
-      outFile << origPath <<":"<< original->length() <<":"<< original->energy();
-      for(unsigned int i=0; i<materials->size(); ++i){
-        outFile << endl << mPaths.at(i) << ":" << materials->at(i)->length()
-                << ":" << materials->at(i)->energy();
-      }
-      outFile.close();
-      cout << "wrote "<< outFolder << "METADATA.txt succesfully!" << endl;
+  ofstream outFile((workingDir+"METADATA.txt").c_str(), ios::out);
+  if(outFile.is_open()){
+    cout << "writing METADATA.txt file" << endl;
+    outFile << origPath <<":"<< original->length() <<":"<< original->energy();
+    for(unsigned int i=0; i<materials->size(); ++i){
+      outFile << endl << mNames.at(i) << ":" << materials->at(i)->length()
+              << ":" << materials->at(i)->energy();
     }
-  } else{
-    cout << "could't open " << outFolder << "METADATA.txt" << endl;
+    outFile.close();
+    cout << "wrote "<< workingDir << "METADATA.txt succesfully!" << endl;
   }
 
   // instantiate and load CCoriginals
@@ -72,11 +68,9 @@ CrossCorrelator::CrossCorrelator(const string origPath,
     // configure cc->sfInfo
     cc->setSFInfo(cc->length(), sf->samplerate, sf->channels,
                   sf->format, sf->sections, sf->seekable);
-    // export to .wav if output path was given
-    if (!outFolder.empty()){
-      cc->toWav(outFolder+"cc_original_m"+to_string(CCoriginals->size()-1)+
-                ".wav", false); // already normalized with .multiplyBy
-    }
+    // export to unnormalized .wav (already normalized with .multiplyBy)
+    cc->toWav(workingDir+"ANALYSIS/"+"cc_original_m"+
+              to_string(CCoriginals->size()-1)+ ".wav", false);
   }
 
   // instantiate and load CCmaterials
@@ -98,11 +92,9 @@ CrossCorrelator::CrossCorrelator(const string origPath,
       // configure cc->sfInfo
       cc->setSFInfo(cc->length(), sf->samplerate, sf->channels,
                     sf->format, sf->sections, sf->seekable);
-      // export to .wav if output path was given
-      if (!outFolder.empty()){
-        cc->toWav(outFolder+"cc_m"+to_string(i)+"_m"+to_string(j)+
-                    ".wav", false);
-      }
+      // export to unnormalized .wav (already normalized with .multiplyBy)
+      cc->toWav(workingDir+"ANALYSIS/"+"cc_m"+to_string(i)+"_m"+to_string(j)+
+                ".wav", false);
     }
   }
 }

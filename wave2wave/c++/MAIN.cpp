@@ -38,12 +38,12 @@ struct d_ref {metadata meta; int m_id; int del; double k;};
 
 int main(){
 
-  string AUDIO_DIR = "/home/afr/git/supercollider-work/wave2wave/AUDIO/";
-  //string ANALYSIS_DIR = "/home/afr/git/supercollider-work/wave2wave/ANALYSIS/";
-  string OUTPUT_DIR = "/home/afr/git/supercollider-work/wave2wave/OUTPUT/";
-  string METADATA_ADDRESS = OUTPUT_DIR+"METADATA.txt";
+  string WORKING_DIR = "/home/afr/git/supercollider-work/wave2wave/SETUP_DELTA/";
+  string AUDIO_DIR = WORKING_DIR+"AUDIO/";
+  string ANALYSIS_DIR = WORKING_DIR+"ANALYSIS/";
+  string METADATA_ADDRESS = WORKING_DIR+"METADATA.txt";
 
-  //CrossCorrelator cc("test_orig.wav", vector<string>{"test_m1.wav", "test_m2.wav"}, OUTPUT_DIR);
+  CrossCorrelator cc("test_orig.wav", vector<string>{"test_m1.wav", "test_m2.wav"}, WORKING_DIR);
 
 
 
@@ -90,9 +90,9 @@ int main(){
   vector<d_ref> D; // d_ref {metadata meta; int m_id; int del; double k;}
 
   for (int i=0; i<LOOP_SIZE; ++i){
-    int r = 1;// distribution(gen)-1;  //*******************
+    int r = 0;// distribution(gen)-1;  //*******************
     // load ccs
-    DoubleSignal ccs(OUTPUT_DIR+"cc_original_m"+to_string(r)+".wav", false);
+    DoubleSignal ccs(ANALYSIS_DIR+"cc_original_m"+to_string(r)+".wav", false);
 
     ccs.prettyPrint("CCS_"+to_string(r));//********************
 
@@ -112,7 +112,7 @@ int main(){
         tup.second = d.m_id;
       }
       string ccName = "cc_m"+to_string(tup.first)+"_m"+to_string(tup.second)+".wav";
-      DoubleSignal m(OUTPUT_DIR+ccName, false);
+      DoubleSignal m(ANALYSIS_DIR+ccName, false);
 
 
 
@@ -130,7 +130,7 @@ int main(){
         maxPos = i;
       }
     }
-    tempSig->prettyPrint("tempSig: ");//********************
+    //tempSig->prettyPrint("tempSig: ");//********************
 
 
     // maxpos has the "ith" position: adapt it to current d
@@ -156,25 +156,16 @@ int main(){
       reconstruction[i] += (ds.at(i, d.del))*d.k;
     }
 
-    DoubleSignal original("test_orig.wav",true); //****
+    // DoubleSignal original("test_orig.wav",true); //****
 
-    original.multiplyBy(1/original.energy());
+    // original.multiplyBy(1/original.energy());
 
-    for (int i=0; i<reconstruction.length(); ++i){
-      original[i] -= reconstruction[i];
-    }
-
-
-    cout << "residual energy: " << original.energy() << endl; //****
+    // for (int i=0; i<reconstruction.length(); ++i){
+    //   original[i] -= reconstruction[i];
+    // }
+    // cout << "residual energy: " << original.energy() << endl; //****
   }
   reconstruction.toWav("reconstruction.wav", true);
-
-
-
-  DoubleSignal original("test_orig.wav",true);
-  original.prettyPrint("original");
-  normalizeArray(reconstruction.getcontent(), reconstruction.length());
-  reconstruction.prettyPrint("reconstruction");
 
   cout << "program finished"<< endl;
   return 0;
