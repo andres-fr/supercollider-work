@@ -87,7 +87,7 @@ int main(){
   vector<d_ref> D; // d_ref {metadata meta; int m_id; int del; double k;}
   // the reconstruction placeholder
   DoubleSignal reconstruction(ORIG_LEN);
-  reconstruction.setSFInfo(ORIG_LEN, 44100, 1, 65538, 1, 1);
+  reconstruction.setSFInfo(reconstruction.length(), 44100, 1, 65538, 1, 1);
 
 
   // prepare random generation:
@@ -111,7 +111,7 @@ int main(){
     DoubleSignal ccs(ANALYSIS_DIR+"cc_original_m"+to_string(r)+".wav", false);
 
     // initialize local containers for iteration
-    DoubleSignal* tempSig = new DoubleSignal(ORIG_LEN); // zeros at beg.
+    DoubleSignal* tempSig = new DoubleSignal(2*MAX_LEN-1); // zeros at beg.
     double maxVal = 0;//- numeric_limits<double>::infinity(); // initialize at -inf
     int maxPos = 0;
 
@@ -131,7 +131,7 @@ int main(){
       // instantiate the CCM and substract it to tempSig
       DoubleSignal m(ANALYSIS_DIR+ccName, false);
       for(int i=0; i<tempSig->length(); ++i){
-        (*tempSig)[i] -= m.at(i+((METADATA[tup.first+1].size)-1), d.del) * d.k;
+        (*tempSig)[i] -= m.at((i-MAX_LEN)+METADATA[tup.first+1].size, d.del) * d.k;
       }
 
       //tempSig->prettyPrint("tempSig update");
@@ -139,10 +139,10 @@ int main(){
 
     // now get the CCS and add it to tempSig
     for(int i=0; i<tempSig->length(); ++i){ //********
-      (*tempSig)[i] += ccs.at(i+((METADATA[r+1].size)-1), 0);
+      (*tempSig)[i] += ccs.at((i-MAX_LEN)+METADATA[r+1].size, 0);
       if(abs((*tempSig)[i])>abs(maxVal)){
         maxVal = (*tempSig)[i];
-        maxPos = i;
+        maxPos = i-(MAX_LEN-1);
       }
     }
 
@@ -151,8 +151,6 @@ int main(){
     // cout << endl;
 
     // find maximum in tempSig, and add result to D
-    // the max*MAX_ENERGY returns the real dotProd between both signals at maxIdx!
-    // this is useful, because...???
     double k_factor = maxVal * MAX_ENERGY / (METADATA[r+1].energy); //******************
     D.push_back(d_ref{METADATA[r+1], r, maxPos, k_factor});
     cout << i+1 << "/" << LOOP_SIZE << ") "<< "added signal " << r <<
@@ -187,10 +185,10 @@ int main(){
     }
     cout << "residual energy: " << original.energy() << endl; //****
   }
-  // normalize reconstruction:
-  //normalizeArray(reconstruction.getcontent(), reconstruction.length());
-
   reconstruction.toWav(OUTPUT_DIR+"reconstruction.wav", true);
+
+  //normalize reconstruction:
+  normalizeArray(reconstruction.getcontent(), reconstruction.length());
   reconstruction.prettyPrint("reconstruction end");
 
 

@@ -43,18 +43,23 @@ void normalizeArray(double* contents, const int sz){
   int i=0;
   double sum = 0;
   double max = 0;
+  double min = 0;
   // calculate mean into accum and get absolute maximum
   for(i=0; i<sz; i++){
     sum += contents[i];
-    if (abs(contents[i]) > abs(max)){
+    if (contents[i] > max){
       max = contents[i];
+    } else if (contents[i] < min){
+      min = contents[i];
     }
   }
   double mean = sum/sz;
-  double deltanorm = abs(max-mean);
   if (max==mean){
     cout << "normalizeArray: normalization not possible when max==mean" << endl;
   } else {
+    max -= mean;
+    min -= mean;
+    double deltanorm = (abs(max)>abs(min))? abs(max) : abs(min);
     // substract accum to each sample, and renormalize
     for(i=0; i<sz; i++){
       contents[i] = (contents[i]-mean)/deltanorm;
