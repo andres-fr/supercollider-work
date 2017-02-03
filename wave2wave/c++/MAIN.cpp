@@ -106,58 +106,63 @@ int main(){
   /// LOOP
   //////////////////////////////////////////////////////////////////////////////
   for (int i=0; i<LOOP_SIZE; ++i){
-    int r = 3;//distribution(gen)-1;  //*******************
+  //for (int r : {2, 0}){
+    int r = distribution(gen)-1;
     // load ccs
-    DoubleSignal ccs(ANALYSIS_DIR+"cc_original_m"+to_string(r)+".wav", false);
+    string ccs_name = ANALYSIS_DIR+"cc_original_m"+to_string(r)+".wav";
+    DoubleSignal ccs(ccs_name, false);
+    if(ccs.length()> 2*ORIG_LEN-1){
+      cout <<"ignoring "<< ccs_name <<": material longer than original!"<< endl;
+    } else { // if chosen material isn't longer than original...
 
-    // initialize local containers for iteration
-    DoubleSignal* tempSig = new DoubleSignal(2*MAX_LEN-1); // zeros at beg.
-    double maxVal = 0;//- numeric_limits<double>::infinity(); // initialize at -inf
-    int maxPos = 0;
+      // initialize local containers for iteration
+      DoubleSignal* tempSig = new DoubleSignal(2*MAX_LEN-1); // zeros at beg.
 
-    // for each material in D...
-    for(d_ref &d : D){ // wavPath, m_id, del, k
-      // get the name of the corresponding CCMs
-      pair<int, int> tup;
-      if (d.m_id<r){
-        tup.first = d.m_id;
-        tup.second = r;
-      } else {
-        tup.first = r;
-        tup.second = d.m_id;
+      double maxVal = 0;//- numeric_limits<double>::infinity(); // initialize at -inf
+      int maxPos = 0;
+
+      // for each material in D...
+      for(d_ref &d : D){ // wavPath, m_id, del, k
+        // get the name of the corresponding CCMs
+        pair<int, int> tup;
+        if (d.m_id<r){
+          tup.first = d.m_id; //*** SI LA Q BUSCAS ES LA MENOR, TIENES Q INVERTIR LA CC
+          tup.second = r;
+        } else {
+          tup.first = r;
+          tup.second = d.m_id;
+        }
+        string ccName = "cc_m"+to_string(tup.first)+"_m"+to_string(tup.second)+".wav";
+
+        // instantiate the CCM and substract it to tempSig
+        DoubleSignal m(ANALYSIS_DIR+ccName, false);
+        if(r<d.m_id){m.reverse();} // ensure that our r is always the "shifting" sig
+        //
+        for(int i=0; i<tempSig->length(); ++i){
+          (*tempSig)[i] -= m.at((i-MAX_LEN)+METADATA[tup.first+1].size, d.del) * d.k;
+        }
+        //tempSig->prettyPrint("tempSig after substracting "+ccName);
       }
-      string ccName = "cc_m"+to_string(tup.first)+"_m"+to_string(tup.second)+".wav";
 
-      // instantiate the CCM and substract it to tempSig
-      DoubleSignal m(ANALYSIS_DIR+ccName, false);
-      for(int i=0; i<tempSig->length(); ++i){
-        (*tempSig)[i] -= m.at((i-MAX_LEN)+METADATA[tup.first+1].size, d.del) * d.k;
+      // now get the CCS and add it to tempSig
+      for(int i=0; i<tempSig->length(); ++i){ //********
+        (*tempSig)[i] += ccs.at((i-MAX_LEN)+METADATA[r+1].size, 0);
+        if(abs((*tempSig)[i])>abs(maxVal)){
+          maxVal = (*tempSig)[i];
+          maxPos = i-(MAX_LEN-1);
+        }
       }
 
-      //tempSig->prettyPrint("tempSig update");
+
+      // find maximum in tempSig, and add result to D
+      double k_factor = maxVal * MAX_ENERGY / (METADATA[r+1].energy); //******************
+      D.push_back(d_ref{METADATA[r+1], r, maxPos, k_factor});
+      // cout << i+1 << "/" << LOOP_SIZE << ") "<< "added signal " << r <<
+      //   " with delay "  << maxPos << " and norm " << k_factor << endl << endl;
+      // delete instantiated signals before finishing iteration
+      delete tempSig;
+
     }
-
-    // now get the CCS and add it to tempSig
-    for(int i=0; i<tempSig->length(); ++i){ //********
-      (*tempSig)[i] += ccs.at((i-MAX_LEN)+METADATA[r+1].size, 0);
-      if(abs((*tempSig)[i])>abs(maxVal)){
-        maxVal = (*tempSig)[i];
-        maxPos = i-(MAX_LEN-1);
-      }
-    }
-
-
-    // tempSig->prettyPrint("tempSig: ");//********************
-    // cout << endl;
-
-    // find maximum in tempSig, and add result to D
-    double k_factor = maxVal * MAX_ENERGY / (METADATA[r+1].energy); //******************
-    D.push_back(d_ref{METADATA[r+1], r, maxPos, k_factor});
-    cout << i+1 << "/" << LOOP_SIZE << ") "<< "added signal " << r <<
-      " with delay "  << maxPos << " and norm " << k_factor << endl << endl;
-    // delete instantiated signals before finishing iteration
-    delete tempSig;
-
   }
 
 
@@ -173,7 +178,9 @@ int main(){
 
 
   // RECONSTRUCT SIGNAL (inefficient: better do it with inverse CCs!!)
+  int counter = 0;
   for (d_ref d : D){ //d_ref meta, m_id, del, k // metadata: wPath, size, energy
+    counter++;
     DoubleSignal ds(d.meta.wavPath, true); // ds is a material, NORMALIZED
     for (int i=0; i<reconstruction.length(); ++i){
       reconstruction[i] += (ds.at(i, d.del))*d.k;
@@ -183,8 +190,11 @@ int main(){
     for (int i=0; i<reconstruction.length(); ++i){
       original[i] -= reconstruction[i];
     }
-    cout << "residual energy: " << original.energy() << endl; //****
+    cout << counter << "/" << LOOP_SIZE << ") "<< "added signal " << d.m_id <<
+      " with delay "  << d.del << " and norm " << d.k << endl;
+    cout << "residual energy: " << original.energy() << endl << endl;
   }
+
   reconstruction.toWav(OUTPUT_DIR+"reconstruction.wav", true);
 
   //normalize reconstruction:

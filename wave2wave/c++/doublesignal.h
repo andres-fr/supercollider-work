@@ -41,6 +41,7 @@ class DoubleSignal : public alglib::real_1d_array {
   bool checkSRateAndChans(const SF_INFO* sf2);
   double energy();
   void multiplyBy(const double x);
+  void reverse();
   // export
   void toWav(const string pathOut, const bool norm);
   void toASCII(const string pathOut);
