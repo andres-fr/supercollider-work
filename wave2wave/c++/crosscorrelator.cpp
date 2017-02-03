@@ -45,8 +45,8 @@ CrossCorrelator::CrossCorrelator(const string origName,
     cout << "writing METADATA.txt file" << endl;
     outFile << origPath <<":"<< original->length() <<":"<< original->energy();
     for(unsigned int i=0; i<materials->size(); ++i){
-      outFile << endl << mNames.at(i) << ":" << materials->at(i)->length()
-              << ":" << materials->at(i)->energy();
+      outFile << endl << workingDir << "AUDIO/" << mNames.at(i) << ":" <<
+        materials->at(i)->length() << ":" << materials->at(i)->energy();
     }
     outFile.close();
     cout << "wrote "<< workingDir << "METADATA.txt succesfully!" << endl;

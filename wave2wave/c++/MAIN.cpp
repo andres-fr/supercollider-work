@@ -18,6 +18,11 @@ using namespace std;
 //using namespace chrono;
 
 
+// problem/bug: if material is longer than original, dividing by mat.energy will
+// make k TOO SMALL, because the m.samples that lie outside the range (as well
+// as their energy) are disregarded. Possible fix: divide by the energy of the
+// subsignal that lies within the valid range only.
+
 // DEBUGGING:
 //  1) print energy of residual signal: check that it effectively decreases on each iteration
 //  2) run this: multiple bugs: the delta seems to substract perfectly only in the first step. why??
@@ -33,6 +38,7 @@ using namespace std;
 
 // check that energy of metadata was calculated after normalization(0, 1)
 
+
 struct metadata {string wavPath; int size; double energy;};
 struct d_ref {metadata meta; int m_id; int del; double k;};
 
@@ -41,12 +47,11 @@ int main(){
   string WORKING_DIR = "/home/afr/git/supercollider-work/wave2wave/SETUP_DELTA/";
   string AUDIO_DIR = WORKING_DIR+"AUDIO/";
   string ANALYSIS_DIR = WORKING_DIR+"ANALYSIS/";
+  string OUTPUT_DIR = WORKING_DIR+"OUTPUT/";
   string METADATA_ADDRESS = WORKING_DIR+"METADATA.txt";
-
-  CrossCorrelator cc("test_orig.wav", vector<string>{"test_m1.wav", "test_m2.wav"}, WORKING_DIR);
-
-
-
+  string ORIGINAL_NAME = "test_orig.wav";
+  string ORIGINAL_PATH = AUDIO_DIR+ORIGINAL_NAME;
+  vector<string> MATERIAL_PATHS{"test_m1.wav", "test_m2.wav", "test_orig.wav", "31line.wav"};
 
   int LOOP_SIZE = 0;
   cout << "type number of iterations: ";
@@ -56,6 +61,7 @@ int main(){
 
   // declare and load METADATA: idx 0 is original, rest are materials
   int MAX_LEN = 0; // the size in samples of the biggest CC file
+  double MAX_ENERGY = 0;
   vector<metadata> METADATA; // (wavPath, size, energy)
   ifstream inSpecs(METADATA_ADDRESS.c_str());
   if(inSpecs.is_open()==false){
@@ -71,10 +77,17 @@ int main(){
       double energy = stod(rest.substr(sepPos+1));
       METADATA.push_back(metadata{wavpath, len, energy});
       MAX_LEN = (len>MAX_LEN)? len : MAX_LEN;
+      MAX_ENERGY = (energy>MAX_ENERGY)? energy : MAX_ENERGY;
     }
   }
 
+  // some variables outside of the for-loop
   int ORIG_LEN = METADATA[0].size;
+  // the wav2wav vector to be filled
+  vector<d_ref> D; // d_ref {metadata meta; int m_id; int del; double k;}
+  // the reconstruction placeholder
+  DoubleSignal reconstruction(ORIG_LEN);
+  reconstruction.setSFInfo(ORIG_LEN, 44100, 1, 65538, 1, 1);
 
 
   // prepare random generation:
@@ -86,23 +99,25 @@ int main(){
   uniform_int_distribution<> distribution(1, METADATA.size()-1);
 
 
-  // the wav2wav vector to be filled
-  vector<d_ref> D; // d_ref {metadata meta; int m_id; int del; double k;}
 
+
+
+  //////////////////////////////////////////////////////////////////////////////
+  /// LOOP
+  //////////////////////////////////////////////////////////////////////////////
   for (int i=0; i<LOOP_SIZE; ++i){
-    int r = 0;// distribution(gen)-1;  //*******************
+    int r = 3;//distribution(gen)-1;  //*******************
     // load ccs
     DoubleSignal ccs(ANALYSIS_DIR+"cc_original_m"+to_string(r)+".wav", false);
 
-    ccs.prettyPrint("CCS_"+to_string(r));//********************
-
-
-    // initialize containers for iteration
+    // initialize local containers for iteration
     DoubleSignal* tempSig = new DoubleSignal(ORIG_LEN); // zeros at beg.
     double maxVal = 0;//- numeric_limits<double>::infinity(); // initialize at -inf
     int maxPos = 0;
-    //calculate tempSig = ccs-sum_all(ccm), in order to get maxVal and maxPos
+
+    // for each material in D...
     for(d_ref &d : D){ // wavPath, m_id, del, k
+      // get the name of the corresponding CCMs
       pair<int, int> tup;
       if (d.m_id<r){
         tup.first = d.m_id;
@@ -112,17 +127,17 @@ int main(){
         tup.second = d.m_id;
       }
       string ccName = "cc_m"+to_string(tup.first)+"_m"+to_string(tup.second)+".wav";
+
+      // instantiate the CCM and substract it to tempSig
       DoubleSignal m(ANALYSIS_DIR+ccName, false);
-
-
-
       for(int i=0; i<tempSig->length(); ++i){
-        //cout << "substracting " << (*tempSig)[i] << " minus "<< m.at(i+((METADATA[tup.first+1].size)-1), d.del) * 7.0378 * d.k << endl; //***************
-
-
-        (*tempSig)[i] -= m.at(i+((METADATA[tup.first+1].size)-1), d.del) * 7.0378 * d.k;
+        (*tempSig)[i] -= m.at(i+((METADATA[tup.first+1].size)-1), d.del) * d.k;
       }
+
+      //tempSig->prettyPrint("tempSig update");
     }
+
+    // now get the CCS and add it to tempSig
     for(int i=0; i<tempSig->length(); ++i){ //********
       (*tempSig)[i] += ccs.at(i+((METADATA[r+1].size)-1), 0);
       if(abs((*tempSig)[i])>abs(maxVal)){
@@ -130,43 +145,63 @@ int main(){
         maxPos = i;
       }
     }
-    //tempSig->prettyPrint("tempSig: ");//********************
 
 
-    // maxpos has the "ith" position: adapt it to current d
-    //maxPos = maxPos-MAX_LEN+(METADATA[r+1].size);
-    // add result to D and print
-    double k_factor = maxVal/(METADATA[r+1].energy);
+    // tempSig->prettyPrint("tempSig: ");//********************
+    // cout << endl;
+
+    // find maximum in tempSig, and add result to D
+    // the max*MAX_ENERGY returns the real dotProd between both signals at maxIdx!
+    // this is useful, because...???
+    double k_factor = maxVal * MAX_ENERGY / (METADATA[r+1].energy); //******************
     D.push_back(d_ref{METADATA[r+1], r, maxPos, k_factor});
-    cout << "added signal " << r << " with delay "  << maxPos << " and norm "
-         << k_factor << endl << endl;
+    cout << i+1 << "/" << LOOP_SIZE << ") "<< "added signal " << r <<
+      " with delay "  << maxPos << " and norm " << k_factor << endl << endl;
     // delete instantiated signals before finishing iteration
     delete tempSig;
 
-
-
   }
 
+
+
+  //////////////////////////////////////////////////////////////////////////////
+  /// END LOOP
+  //////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
   // RECONSTRUCT SIGNAL (inefficient: better do it with inverse CCs!!)
-  DoubleSignal reconstruction(ORIG_LEN);
-  reconstruction.setSFInfo(ORIG_LEN, 44100, 1, 65538, 1, 1);
   for (d_ref d : D){ //d_ref meta, m_id, del, k // metadata: wPath, size, energy
-    DoubleSignal ds(d.meta.wavPath, true); // ds is a material
+    DoubleSignal ds(d.meta.wavPath, true); // ds is a material, NORMALIZED
     for (int i=0; i<reconstruction.length(); ++i){
       reconstruction[i] += (ds.at(i, d.del))*d.k;
     }
 
-    // DoubleSignal original("test_orig.wav",true); //****
-
-    // original.multiplyBy(1/original.energy());
-
-    // for (int i=0; i<reconstruction.length(); ++i){
-    //   original[i] -= reconstruction[i];
-    // }
-    // cout << "residual energy: " << original.energy() << endl; //****
+    DoubleSignal original(ORIGINAL_PATH,true); // original, NORMALIZED
+    for (int i=0; i<reconstruction.length(); ++i){
+      original[i] -= reconstruction[i];
+    }
+    cout << "residual energy: " << original.energy() << endl; //****
   }
-  reconstruction.toWav("reconstruction.wav", true);
+  // normalize reconstruction:
+  //normalizeArray(reconstruction.getcontent(), reconstruction.length());
+
+  reconstruction.toWav(OUTPUT_DIR+"reconstruction.wav", true);
+  reconstruction.prettyPrint("reconstruction end");
+
+
+
+
+
+
+
+
 
   cout << "program finished"<< endl;
   return 0;
+
 }
