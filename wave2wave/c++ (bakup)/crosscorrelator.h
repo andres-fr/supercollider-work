@@ -22,8 +22,8 @@ class CrossCorrelator {
   map<pair<int,int>, DoubleSignal*>* CCmaterials;
  public:
   // constructors
-  explicit CrossCorrelator(const string origPath, const vector<string>& mPaths,
-                           const string outFolder="");
+  explicit CrossCorrelator(const string origName, const vector<string>& mNames,
+                           const string workingDir);
   // deleted copy- and assignment constructors
   CrossCorrelator(const CrossCorrelator& copyFrom)=delete;
   CrossCorrelator& operator= (const CrossCorrelator& copyFrom)=delete;

@@ -13,44 +13,43 @@
 // namespace
 using namespace std;
 
-CrossCorrelator::CrossCorrelator(const string origPath,
-                                 const vector<string>& mPaths,
-                                 const string outFolder){
-
+CrossCorrelator::CrossCorrelator(const string origName,
+                                 const vector<string>& mNames,
+                                 const string workingDir){
+  // input parameter preprocessing
+  const string origPath = workingDir+"AUDIO/"+origName;
+  // store the max energy to normalize all CCs dividing through it
+  double max_energy = 0;
   // load original
   original = new DoubleSignal(origPath, true);
+  max_energy = (original->energy()>max_energy)? original->energy() : max_energy;
   SF_INFO* sf = original->getSFInfo();
   // instantiate and load materials
   materials = new vector<DoubleSignal*>;
-  for (string path : mPaths){
-    DoubleSignal* m = new DoubleSignal(path, true);
+  for (string path : mNames){
+    DoubleSignal* m = new DoubleSignal(workingDir+"AUDIO/"+path, true);
     if (m->checkSRateAndChans(sf)==false){
       SF_INFO* sfm = m->getSFInfo();
       cout << "~warning: in CrossCorrelator: incompatible srate/nChans" <<
         endl << origPath <<": ("<<  sf->samplerate <<", "<< sf->channels <<")"<<
-        endl << path <<": ("<< sfm->samplerate <<", "<< sfm->channels <<")";
+        endl << workingDir+"AUDIO/"+path <<": ("<< sfm->samplerate <<", "<<
+        sfm->channels <<")";
     }
     materials->push_back(m);
+    max_energy = (m->energy()>max_energy)? m->energy() : max_energy;
   }
   // save spec file: a list of ints, whereas the int at position i represents
   // the zero-delay index for CC[original, mi] and CC[mi, mj].
-
-
-
-  if (!outFolder.empty()){ // if some out-dir given...
-    ofstream outFile((outFolder+"METADATA.txt").c_str(), ios::out);
-    if(outFile.is_open()){
-      cout << "writing METADATA.txt file" << endl;
-      outFile << origPath <<":"<< original->length() <<":"<< original->energy();
-      for(unsigned int i=0; i<materials->size(); ++i){
-        outFile << endl << mPaths.at(i) << ":" << materials->at(i)->length()
-                << ":" << materials->at(i)->energy();
-      }
-      outFile.close();
-      cout << "wrote "<< outFolder << "METADATA.txt succesfully!" << endl;
+  ofstream outFile((workingDir+"METADATA.txt").c_str(), ios::out);
+  if(outFile.is_open()){
+    cout << "writing METADATA.txt file" << endl;
+    outFile << origPath <<":"<< original->length() <<":"<< original->energy();
+    for(unsigned int i=0; i<materials->size(); ++i){
+      outFile << endl << workingDir << "AUDIO/" << mNames.at(i) << ":" <<
+        materials->at(i)->length() << ":" << materials->at(i)->energy();
     }
-  } else{
-    cout << "could't open " << outFolder << "METADATA.txt" << endl;
+    outFile.close();
+    cout << "wrote "<< workingDir << "METADATA.txt succesfully!" << endl;
   }
 
   // instantiate and load CCoriginals
@@ -64,13 +63,14 @@ CrossCorrelator::CrossCorrelator(const string origPath,
     CCoriginals->push_back(cc);
     // rotate the arr. to be in format [-(M-1) ... 0 ... (N-1)]
     rotateArray(cc->getcontent(), cc->length(), original->length());
+    // normalize array: highest peak of all CC is 1, the rest is proportional
+    cc->multiplyBy(1.0/max_energy);
     // configure cc->sfInfo
     cc->setSFInfo(cc->length(), sf->samplerate, sf->channels,
                   sf->format, sf->sections, sf->seekable);
-    // export to .txt if output path was given
-    if (!outFolder.empty()){
-      cc->toASCII(outFolder+"cc_original_m"+to_string(CCoriginals->size()-1)+".txt");
-    }
+    // export to unnormalized .wav (already normalized with .multiplyBy)
+    cc->toWav(workingDir+"ANALYSIS/"+"cc_original_m"+
+              to_string(CCoriginals->size()-1)+ ".wav", false);
   }
 
   // instantiate and load CCmaterials
@@ -80,21 +80,21 @@ CrossCorrelator::CrossCorrelator(const string origPath,
     DoubleSignal* mi = (*materials)[i]; // to save some ns
     for (int j=i; j<N; ++j){
       DoubleSignal* mj = (*materials)[j]; // not sure if this saves time
-
       DoubleSignal* cc = new DoubleSignal;
       // compute CC[mi,mj] and add to DS
       cout << "calculating CCmaterials..." << endl;
       alglib::corrr1d(*mi, mi->length(), *mj, mj->length(), *cc);
       (*CCmaterials)[make_pair(i,j)] = cc;
+      //normalize array: highest peak of all CC is 1, the rest is proportional
+      cc->multiplyBy(1.0/max_energy);
       // rotate the arr. to be in format [-(M-1) ... 0 ... (N-1)]
       rotateArray(cc->getcontent(), cc->length(), mi->length());
       // configure cc->sfInfo
       cc->setSFInfo(cc->length(), sf->samplerate, sf->channels,
                     sf->format, sf->sections, sf->seekable);
-      // export to .txt if output path was given
-      if (!outFolder.empty()){
-        cc->toASCII(outFolder+"cc_m"+to_string(i)+"_m"+to_string(j)+".txt");
-      }
+      // export to unnormalized .wav (already normalized with .multiplyBy)
+      cc->toWav(workingDir+"ANALYSIS/"+"cc_m"+to_string(i)+"_m"+to_string(j)+
+                ".wav", false);
     }
   }
 }
