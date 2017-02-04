@@ -55,10 +55,10 @@ int main(){
   string WAVOUT_PATH = OUTPUT_DIR+"reconstruction.wav";
   vector<string> MATERIAL_PATHS;//{"test_m1.wav", "test_m2.wav", "test_orig.wav", "31line.wav"};
 
-  for(int i=-500; i<=500; i+=4){
-    MATERIAL_PATHS.push_back("anvil["+to_string(i)+"].wav");
-  }
-  CrossCorrelator cc(ORIGINAL_NAME, MATERIAL_PATHS, WORKING_DIR);
+  // for(int i=-500; i<=500; i+=4){
+  //   MATERIAL_PATHS.push_back("anvil["+to_string(i)+"].wav");
+  // }
+  // CrossCorrelator cc(ORIGINAL_NAME, MATERIAL_PATHS, WORKING_DIR);
 
 
 
@@ -121,7 +121,7 @@ int main(){
     counter++;
   //for (int r : {1,2,0,0,1}){
 
-    int r = 3;//distribution(gen)-1;
+    int r = distribution(gen)-1;
     // load ccs
     string ccs_name = ANALYSIS_DIR+"cc_original_m"+to_string(r)+".wav";
     DoubleSignal ccs(ccs_name, false);
