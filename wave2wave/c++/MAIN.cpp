@@ -49,9 +49,16 @@ int main(){
   string ANALYSIS_DIR = WORKING_DIR+"ANALYSIS/";
   string OUTPUT_DIR = WORKING_DIR+"OUTPUT/";
   string METADATA_ADDRESS = WORKING_DIR+"METADATA.txt";
-  string ORIGINAL_NAME = "test_orig.wav";
+  string ORIGINAL_NAME = "test_orig.wav";// "child-short.wav";
   string ORIGINAL_PATH = AUDIO_DIR+ORIGINAL_NAME;
   vector<string> MATERIAL_PATHS{"test_m1.wav", "test_m2.wav", "test_orig.wav", "31line.wav"};
+
+  // for(int i=-500; i<=500; i+=4){
+  //   MATERIAL_PATHS.push_back("anvil["+to_string(i)+"].wav");
+  // }
+
+
+  CrossCorrelator cc(ORIGINAL_NAME, MATERIAL_PATHS, WORKING_DIR);
 
   int LOOP_SIZE = 0;
   cout << "type number of iterations: ";
@@ -105,9 +112,13 @@ int main(){
   //////////////////////////////////////////////////////////////////////////////
   /// LOOP
   //////////////////////////////////////////////////////////////////////////////
-  for (int i=0; i<LOOP_SIZE; ++i){
-  //for (int r : {2, 0}){
-    int r = distribution(gen)-1;
+  int counter = 0;
+  // for (int i=0; i<LOOP_SIZE; ++i){
+  //   cout << "processing " << counter << "/" << LOOP_SIZE << endl;
+  //   counter++;
+  for (int r : {1,2,0,0,1}){
+
+    //  int r = distribution(gen)-1;
     // load ccs
     string ccs_name = ANALYSIS_DIR+"cc_original_m"+to_string(r)+".wav";
     DoubleSignal ccs(ccs_name, false);
@@ -126,22 +137,22 @@ int main(){
         // get the name of the corresponding CCMs
         pair<int, int> tup;
         if (d.m_id<r){
-          tup.first = d.m_id; //*** SI LA Q BUSCAS ES LA MENOR, TIENES Q INVERTIR LA CC
+          tup.first = d.m_id;
           tup.second = r;
         } else {
           tup.first = r;
           tup.second = d.m_id;
         }
         string ccName = "cc_m"+to_string(tup.first)+"_m"+to_string(tup.second)+".wav";
-
-        // instantiate the CCM and substract it to tempSig
         DoubleSignal m(ANALYSIS_DIR+ccName, false);
         if(r<d.m_id){m.reverse();} // ensure that our r is always the "shifting" sig
-        //
-        for(int i=0; i<tempSig->length(); ++i){
-          (*tempSig)[i] -= m.at((i-MAX_LEN)+METADATA[tup.first+1].size, d.del) * d.k;
+        for(int i=0; i<m.length(); ++i){
+          tempSig->decrementAt(i+MAX_LEN+d.del-METADATA[r+1].size, m[i]*d.k);
         }
-        //tempSig->prettyPrint("tempSig after substracting "+ccName);
+        tempSig->prettyPrint("tempSig after substracting "+ccName);
+
+
+
       }
 
       // now get the CCS and add it to tempSig
@@ -152,6 +163,8 @@ int main(){
           maxPos = i-(MAX_LEN-1);
         }
       }
+
+      tempSig->prettyPrint("tempSig after adding CCS "+to_string(r));
 
 
       // find maximum in tempSig, and add result to D
@@ -178,7 +191,7 @@ int main(){
 
 
   // RECONSTRUCT SIGNAL (inefficient: better do it with inverse CCs!!)
-  int counter = 0;
+  counter = 0;
   for (d_ref d : D){ //d_ref meta, m_id, del, k // metadata: wPath, size, energy
     counter++;
     DoubleSignal ds(d.meta.wavPath, true); // ds is a material, NORMALIZED

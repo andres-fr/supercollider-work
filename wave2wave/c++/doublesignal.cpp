@@ -110,6 +110,12 @@ void DoubleSignal::setSFInfo(const sf_count_t fr, const int sr,
   sfInfo->seekable = seek;
 }
 
+void DoubleSignal::decrementAt(const int idx, const double val){
+  if(idx>=0 && idx <length()){
+    (*this)[idx] -= val;
+  }
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /// getters
@@ -221,7 +227,7 @@ void DoubleSignal::toWav(const string pathOut, const bool norm){
   // declare and try to open outfile
   SNDFILE* outfile = sf_open(pathOut.c_str(), SFM_WRITE, sfInfo);
   if(outfile == nullptr){
-    throw invalid_argument("toWav: Not able to open output file "+pathOut);
+    throw invalid_argument("toWav: unable to open output file "+pathOut);
   } else{// if file opens...
     if (norm){ // if (normalize==true)... ***
       // copy contents to an array, and normalize that array:

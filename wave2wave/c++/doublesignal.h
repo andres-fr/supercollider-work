@@ -31,6 +31,7 @@ class DoubleSignal : public alglib::real_1d_array {
   void setSFInfo(const sf_count_t fr, const int sr,
                const int chans, const int formt,
                  const int sect, const int seek);
+  void decrementAt(const int idx, const double val);
   // getters
   SF_INFO* getSFInfo() const;
   // special getter (returns contents[idx-delay], never throws error)
