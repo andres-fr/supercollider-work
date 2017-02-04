@@ -113,12 +113,12 @@ int main(){
   /// LOOP
   //////////////////////////////////////////////////////////////////////////////
   int counter = 0;
-  // for (int i=0; i<LOOP_SIZE; ++i){
-  //   cout << "processing " << counter << "/" << LOOP_SIZE << endl;
-  //   counter++;
-  for (int r : {1,2,0,0,1}){
+  for (int i=0; i<LOOP_SIZE; ++i){
+    cout << "processing " << counter << "/" << LOOP_SIZE << endl;
+    counter++;
+  //for (int r : {1,2,0,0,1}){
 
-    //  int r = distribution(gen)-1;
+    int r = distribution(gen)-1;
     // load ccs
     string ccs_name = ANALYSIS_DIR+"cc_original_m"+to_string(r)+".wav";
     DoubleSignal ccs(ccs_name, false);
@@ -149,10 +149,7 @@ int main(){
         for(int i=0; i<m.length(); ++i){
           tempSig->decrementAt(i+MAX_LEN+d.del-METADATA[r+1].size, m[i]*d.k);
         }
-        tempSig->prettyPrint("tempSig after substracting "+ccName);
-
-
-
+        //tempSig->prettyPrint("tempSig after substracting "+ccName);
       }
 
       // now get the CCS and add it to tempSig
@@ -163,10 +160,6 @@ int main(){
           maxPos = i-(MAX_LEN-1);
         }
       }
-
-      tempSig->prettyPrint("tempSig after adding CCS "+to_string(r));
-
-
       // find maximum in tempSig, and add result to D
       double k_factor = maxVal * MAX_ENERGY / (METADATA[r+1].energy); //******************
       D.push_back(d_ref{METADATA[r+1], r, maxPos, k_factor});
@@ -192,6 +185,8 @@ int main(){
 
   // RECONSTRUCT SIGNAL (inefficient: better do it with inverse CCs!!)
   counter = 0;
+  double last_residual = numeric_limits<double>::infinity();
+  double current_residual = 0;
   for (d_ref d : D){ //d_ref meta, m_id, del, k // metadata: wPath, size, energy
     counter++;
     DoubleSignal ds(d.meta.wavPath, true); // ds is a material, NORMALIZED
@@ -205,14 +200,22 @@ int main(){
     }
     cout << counter << "/" << LOOP_SIZE << ") "<< "added signal " << d.m_id <<
       " with delay "  << d.del << " and norm " << d.k << endl;
-    cout << "residual energy: " << original.energy() << endl << endl;
+    current_residual = original.energy();
+    cout << "residual energy: " << current_residual << endl;
+    if (current_residual> last_residual){
+      cout << "WARNING: residual energy raised: " <<
+        last_residual << "===>" << current_residual << endl <<
+        "this should be a very small increment, affecting samples that are " <<
+        "partly positioned out of the borders." << endl << endl;
+    }
+    last_residual = current_residual;
   }
 
   reconstruction.toWav(OUTPUT_DIR+"reconstruction.wav", true);
 
   //normalize reconstruction:
   normalizeArray(reconstruction.getcontent(), reconstruction.length());
-  reconstruction.prettyPrint("reconstruction end");
+  //reconstruction.prettyPrint("reconstruction end");
 
 
 
