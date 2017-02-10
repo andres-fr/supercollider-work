@@ -5,3 +5,5 @@
 /wave2wave/cc-bakup-txt/**
 /wave2wave/cc-child-short-bakup/**
 /wave2wave/SETUP*
+#unignore everything in showoff
+!/wave2wave/showoff/*

@@ -1,0 +1,94 @@
+sox cc_m0_m0.wav -n stat
+orig_size = 154350
+m_size = 29081
+initial energy 3220
+
+
+r,   s/r,   m/r     s%r, m%r  incremented?     worked?                  ccs_size   ccm_size
+(1, 154350, 29081)---(0, 0)-------0,0----------yess                     183430     58161
+(2, 77175, 14540)----(0, 1)-------0,1----------yess                     91715      29081
+(3, 51450, 9693)-----(0, 2)-------0,1------------punctual warnings      61144      19387
+(4, 38587, 7270)-----(2, 1)-------1,1----------yess                     45858      14541
+(5, 30870, 5816)-----(0, 1)-------0,1----------yess                     36686      11633
+(6, 25725, 4846)-----(0, 5)-------0,1------------NO 22k energy          30572      9694
+(7, 22050, 4154)-----(0, 3)-------0,1------------some are very wrong    26205      8309
+(8, 19293, 3635)-----(6, 1)-------1,1----------yess                     22929      7271
+(9, 17150, 3231)-----(0, 2)-------0,1------------some errors            20382      6463
+(10, 15435, 2908)----(0, 1)-------0,1----------yess                     18343       5817
+(11, 14031, 2643)----(9, 8)-------1,1------------NO                     16676       5288
+(12, 12862, 2423)----(6, 5)-------1,1------------NO                     15286       4847
+
+(13, 11873, 2237)----(1, 0)-------1,0------------less exaggerated       14110       4474
+
+(14, 11025, 2077)----(0, 3)-------0,1------------less exag.still shit   13103       4155
+(15, 10290, 1938)----(0, 11)----- 0,1------------very bad               12229       3878
+(16, 9646, 1817)-----(14, 9)----- 1,1------------awfl                   11465       3636
+(17, 9079, 1710)-----(7, 11)----- 1,1------------NO                     10790       3422
+(18, 8575, 1615)-----(0, 11)----- 0,1------------NO                     10191       3232
+(19, 8123, 1530)-----(13, 11)-----1,1------------NO                     9655        3062
+(20, 7717, 1454)-----(10, 1)----- 1,1----------yess                     9172        2909
+(21, 7350, 1384)-----(0, 17)----- 0,1------------so la la               8735        2770
+(22, 7015, 1321)-----(20, 19)-----1,1------------NO                     8338        2644
+(30, 5145, 969)------(0, 11)----- 0,1------------NO                     6115        1939
+
+## cual es la mayor cc? es downsample(2*maxlen-1)
+## que es lo q calculo? calculo 2*(downsample(maxlen)-1
+### es lo mismo? NO!!!! pues ya esta pavo
+
+13:
+#uncompressed audios
+orig_size = 154350
+m_size = 29081
+#compressed WHAT IS THIS???? DO I NEED THIS??? seems to be downsample(orig_size, 13) but for what??
+MAX_LEN= 11874
+m_len = 2237
+
+ccs_len = 14110
+ccm_len = 4474
+tempSig.length() = 2*MAX_LEN-1 =  23747
+
+for(int i=0; i<ccm.length(); ++i){
+  tempSig->decrementAt(i+MAX_LEN+d.del-m_length, ccm[i]*d.k); // question: is d.del clean?? 
+}
+
+
+--------------------------------------------
+
+(downrate, orig_size%downrate, m_size%downrate) works?
+(1, 0, 0) yess
+(2, 0, 1) yess
+(3, 0, 2) punctual warnings
+(4, 2, 1) yess
+(5, 0, 1) yess
+(6, 0, 5) NO 22k energy
+(7, 0, 3) kind of, some are very wrong
+(8, 6, 1) yess
+(9, 0, 2) some errors
+(10, 0, 1) yess
+(11, 9, 8) NO
+(12, 6, 5) NO
+(13, 1, 0) less exaggerated
+(14, 0, 3) even less exag. but still shit
+(15, 0, 11) very bad
+(16, 14, 9) awfl
+(17, 7, 11) NO
+(18, 0, 11) NO
+(19, 13, 11) NO
+(20, 10, 1) yess
+(21, 0, 17) so la la
+(22, 20, 19) NO
+
+(30, 0, 11) NO
+
+working:         not working:
+1      0 0       0 2 some errors
+2      0 1       0 3 some are very wrong -- even less exag. but still shit
+4      2 1       0 5 very wrong
+5      0 1       1 0 less exagerated
+8      6 1       0 17 so la la (doesnt work!!)
+10     0 1
+20    10 1       9-8,  6-5, 0-11, 14-9, 7-11, 0-11, 13-11, 20-19 very bad
+
+
+
+

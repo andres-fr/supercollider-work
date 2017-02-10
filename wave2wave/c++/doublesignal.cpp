@@ -231,13 +231,12 @@ void DoubleSignal::toWav(const string pathOut, const bool norm,
   } else{// if file opens...
     double* outArray = new double[outLength]();
     double* contents = getcontent();// speedup reducing method calls in loop
-    // int offset = length()%downSampleRatio-1;               ////////////////******************
-    // offset = (offset<0)? 0 : offset;                       ////////////////******************
-    // for (unsigned int i=0; i<outLength; i++){              ////////////////******************
-    //   outArray[i]=contents[(i*downSampleRatio)+offset];    ////////////////******************
+    // for (unsigned int i=0; i<outLength; i++){
+    //   outArray[i]=contents[(i*downSampleRatio)];
     // }
-    for (unsigned int i=0; i<outLength; i++){
-      outArray[i]=contents[(i*downSampleRatio)];
+    int offset = (length()-1)%downSampleRatio;
+    for (unsigned int i=0; i<outLength; i+=downSampleRatio){
+      outArray[i]=contents[i+offset];
     }
     if(norm){normalizeArray(outArray, outLength);};
     sf_write_double(outFile, outArray, outLength);

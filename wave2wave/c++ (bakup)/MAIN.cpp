@@ -18,18 +18,6 @@ using namespace std;
 //using namespace chrono;
 
 
-// problem/bug: if material is longer than original, dividing by mat.energy will
-// make k TOO SMALL, because the m.samples that lie outside the range (as well
-// as their energy) are disregarded. Possible fix: divide by the energy of the
-// subsignal that lies within the valid range only.
-
-// DEBUGGING:
-//  1) print energy of residual signal: check that it effectively decreases on each iteration
-//  2) run this: multiple bugs: the delta seems to substract perfectly only in the first step. why??
-//  also, when all become negative, the zero becomes the maximum and its "optimized down" further,
-//  WE DONT WANT THE MAXIMUM PER SE, BUT THE MAXIMUM ABSOLUTE??
-
-
 // TWEAKING:
 // 1) calculate mean and stddev of the maxima of all CCSs, and discard the ones whose
 //    maximum is below mean-stddev
@@ -44,13 +32,15 @@ struct d_ref {metadata meta; int m_id; int del; double k;};
 
 int main(){
 
-  string WORKING_DIR = "/home/afr/git/supercollider-work/wave2wave/SETUP_FLEXATONE/";
+  string WORKING_DIR = "/home/afr/git/supercollider-work/wave2wave/SETUP_CHILD_SAMPLEDOWN/";
   string AUDIO_DIR = WORKING_DIR+"AUDIO/";
   string ANALYSIS_DIR = WORKING_DIR+"ANALYSIS/";
   string OUTPUT_DIR = WORKING_DIR+"OUTPUT/";
   string METADATA_ADDRESS = WORKING_DIR+"METADATA.txt";
-  string ORIGINAL_NAME = "flexatone-short.wav";// "child-short.wav";
+  string ORIGINAL_NAME = "child-short.wav";
   string ORIGINAL_PATH = AUDIO_DIR+ORIGINAL_NAME;
+  string WAV2WAV_PATH = OUTPUT_DIR+"wa2wav.txt";
+  string WAVOUT_PATH = OUTPUT_DIR+"reconstruction.wav";
   vector<string> MATERIAL_PATHS;//{"test_m1.wav", "test_m2.wav", "test_orig.wav", "31line.wav"};
 
   // for(int i=-500; i<=500; i+=4){
@@ -179,6 +169,17 @@ int main(){
   //////////////////////////////////////////////////////////////////////////////
 
 
+  // SAVE D TO TXT FILE
+  ofstream outFile(WAV2WAV_PATH, ios::out);
+  if(outFile.is_open()){
+    cout << "writing " << WAV2WAV_PATH << endl;
+    for(d_ref d : D){
+      outFile << "material:" << d.meta.wavPath << " delay:" << d.del <<
+        " normFactor:" << d.k << endl;
+    }
+    outFile.close();
+    cout << "wrote "<< WAV2WAV_PATH << " succesfully!" << endl;
+  }
 
 
 
@@ -188,7 +189,7 @@ int main(){
   counter = 0;
   double last_residual = numeric_limits<double>::infinity();
   double current_residual = 0;
-  for (d_ref d : D){ //d_ref meta, m_id, del, k // metadata: wPath, size, energy
+  for (d_ref d : D){ //d_ref meta, m_id, del, k // metadata: wavPath, size, energy
     counter++;
     DoubleSignal ds(d.meta.wavPath, true); // ds is a material, NORMALIZED
     for (int i=0; i<reconstruction.length(); ++i){
@@ -212,23 +213,9 @@ int main(){
     last_residual = current_residual;
   }
 
-  reconstruction.toWav(OUTPUT_DIR+"reconstruction.wav", true);
-
-  //normalize reconstruction:
-  normalizeArray(reconstruction.getcontent(), reconstruction.length());
-  //reconstruction.prettyPrint("reconstruction end");
-
-
-
-
-
-
-
-
-
+  reconstruction.toWav(WAVOUT_PATH, true);
   cout << "program finished"<< endl;
   return 0;
-
 }
 
 
