@@ -29,7 +29,7 @@ struct d_ref {metadata meta; int m_id; int del; double k;};
 
 int main(){
 
-  cout << "version changed..." << endl;
+  cout << "version changed ..." << endl;
 
   string WORKING_DIR = "/home/afr/git/supercollider-work/wave2wave/SETUP_CHILD_SAMPLEDOWN_16/";
   string AUDIO_DIR = WORKING_DIR+"AUDIO/";
@@ -41,25 +41,29 @@ int main(){
   string WAV2WAV_PATH = OUTPUT_DIR+"wav2wav.txt";
   string WAVOUT_PATH = OUTPUT_DIR+"reconstruction.wav";
   vector<string> MATERIAL_PATHS;//{"test_m1.wav", "test_m2.wav", "test_orig.wav", "31line.wav"};
-  unsigned int SAMPLEDOWN_RATIO = 5;
+  // unsigned int SAMPLEDOWN_RATIO = 2;
 
+  // cout << "type 'yes' if you wish to calculate all cross-correlations: ";
+  // string yn;
+  // cin >> yn;
+  // if (yn=="yes"){
+  //   for(int i=-100; i<=100; i+=4){
+  //     MATERIAL_PATHS.push_back("anvil["+to_string(i)+"].wav");
+  //   }
+  //   CrossCorrelator cc(ORIGINAL_NAME,MATERIAL_PATHS,WORKING_DIR,SAMPLEDOWN_RATIO);
+  // }
+  // int LOOP_SIZE = 0;
+  // cout << "type number of iterations: ";
+  // cin >> LOOP_SIZE;
 
-  cout << "type 'yes' if you wish to calculate all cross-correlations: ";
-  string yn;
-  cin >> yn;
-  if (yn=="yes"){
-    for(int i=-100; i<=100; i+=4){
-      MATERIAL_PATHS.push_back("anvil["+to_string(i)+"].wav");
-    }
-    CrossCorrelator cc(ORIGINAL_NAME,MATERIAL_PATHS,WORKING_DIR,SAMPLEDOWN_RATIO);
+  unsigned int SAMPLEDOWN_RATIO;
+  cout << "type int for sampledown ratio: ";
+  cin >> SAMPLEDOWN_RATIO;
+  int LOOP_SIZE = 200;
+  for(int i=-100; i<=100; i+=4){
+    MATERIAL_PATHS.push_back("anvil["+to_string(i)+"].wav");
   }
-
-
-  int LOOP_SIZE = 0;
-  cout << "type number of iterations: ";
-  cin >> LOOP_SIZE;
-
-
+  CrossCorrelator cc(ORIGINAL_NAME,MATERIAL_PATHS,WORKING_DIR,SAMPLEDOWN_RATIO);
 
   // declare and load METADATA: idx 0 is original, rest are materials
   unsigned int MAX_LEN = 0; // the size in samples of the biggest CC file
@@ -146,7 +150,7 @@ int main(){
         if(r<d.m_id){ccm.reverse();} // ensure that our r is always the "shifting" sig
         const unsigned int mshift_len = ccm.length()-downsamplingLength(d.meta.size, SAMPLEDOWN_RATIO);
         for(int i=0; i<ccm.length(); ++i){
-          tempSig->decrementAt(i+(MAX_LEN-1)+d.del-mshift_len, ccm[i]*d.k);
+          tempSig->decrementAt(i+MAX_LEN+d.del-mshift_len, ccm[i]*d.k);
         }
         //tempSig->prettyPrint("tempSig after substracting "+ccName);
       }
@@ -160,9 +164,10 @@ int main(){
         (*tempSig)[i] += ccs.at((i-MAX_LEN)+mshift_len, 0);
         if(abs((*tempSig)[i])>abs(maxVal)){
           maxVal = (*tempSig)[i];
-          maxPos = i-(MAX_LEN-1);
+          maxPos = i-MAX_LEN;
         }
       }
+      //tempSig->prettyPrint("tempSig after adding ccs");
 
 
       // // now get the CCS and add it to tempSig
@@ -180,7 +185,7 @@ int main(){
 
       // find maximum in tempSig, and add result to D
       double k_factor = maxVal * MAX_ENERGY / (METADATA[r+1].energy); //******************
-      D.push_back(d_ref{METADATA[r+1], r, maxPos, k_factor});
+      D.push_back(d_ref{METADATA[r+1], r, maxPos,k_factor});// maxPos, k_factor});
       // cout << i+1 << "/" << LOOP_SIZE << ") "<< "added signal " << r <<
       //   " with delay "  << maxPos << " and norm " << k_factor << endl << endl;
       // delete instantiated signals before finishing iteration
