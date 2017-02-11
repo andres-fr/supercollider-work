@@ -45,7 +45,8 @@ class DoubleSignal : public alglib::real_1d_array {
   void reverse();
   // export
   void toWav(const string pathOut, const bool norm,
-             const unsigned int downSampleRatio=1);
+             const unsigned int downSampleRatio=1,
+             const unsigned int offset=0);
   void toASCII(const string pathOut);
 };
 

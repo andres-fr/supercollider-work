@@ -29,6 +29,8 @@ struct d_ref {metadata meta; int m_id; int del; double k;};
 
 int main(){
 
+  cout << "version changed..." << endl;
+
   string WORKING_DIR = "/home/afr/git/supercollider-work/wave2wave/SETUP_CHILD_SAMPLEDOWN_16/";
   string AUDIO_DIR = WORKING_DIR+"AUDIO/";
   string ANALYSIS_DIR = WORKING_DIR+"ANALYSIS/";
@@ -39,7 +41,7 @@ int main(){
   string WAV2WAV_PATH = OUTPUT_DIR+"wav2wav.txt";
   string WAVOUT_PATH = OUTPUT_DIR+"reconstruction.wav";
   vector<string> MATERIAL_PATHS;//{"test_m1.wav", "test_m2.wav", "test_orig.wav", "31line.wav"};
-  unsigned int SAMPLEDOWN_RATIO = 17;
+  unsigned int SAMPLEDOWN_RATIO = 5;
 
 
   cout << "type 'yes' if you wish to calculate all cross-correlations: ";
@@ -102,9 +104,9 @@ int main(){
 
   // readapt MAX_LEN to the current downsampling settings
   unsigned int ORIG_LEN_DOWNSAMPLED = downsamplingLength(ORIG_LEN, SAMPLEDOWN_RATIO);
-  unsigned int TEMPSIG_LEN = downsamplingLength(2*MAX_LEN-1, SAMPLEDOWN_RATIO); //********
+  //unsigned int TEMPSIG_LEN = downsamplingLength(2*MAX_LEN-1, SAMPLEDOWN_RATIO); //********
   MAX_LEN = downsamplingLength(MAX_LEN, SAMPLEDOWN_RATIO);
-  //unsigned int TEMPSIG_LEN = 2*MAX_LEN;
+  unsigned int TEMPSIG_LEN = 2*MAX_LEN; // so now we know zero is at tempSig[MAX_LEN]
 
 
   //////////////////////////////////////////////////////////////////////////////
@@ -153,9 +155,9 @@ int main(){
       // now get the CCS and add it to tempSig
       string ccs_name = ANALYSIS_DIR+"cc_original_m"+to_string(r)+".wav";
       DoubleSignal ccs(ccs_name, false);
-      const unsigned int m_len = ccs.length()-ORIG_LEN_DOWNSAMPLED;
+      const unsigned int mshift_len = ccs.length()-ORIG_LEN_DOWNSAMPLED;
       for(int i=0; i<tempSig->length(); ++i){ //********
-        (*tempSig)[i] += ccs.at((i-(MAX_LEN-1))+m_len, 0);
+        (*tempSig)[i] += ccs.at((i-MAX_LEN)+mshift_len, 0);
         if(abs((*tempSig)[i])>abs(maxVal)){
           maxVal = (*tempSig)[i];
           maxPos = i-(MAX_LEN-1);

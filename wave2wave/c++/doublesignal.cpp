@@ -217,7 +217,8 @@ void DoubleSignal::toASCII(const string pathOut){
 
 
 void DoubleSignal::toWav(const string pathOut, const bool norm,
-                         const unsigned int downSampleRatio){
+                         const unsigned int downSampleRatio,
+                         const unsigned int offset){
   // calculate length of the downsampled output:
   unsigned int outLength = downsamplingLength(length(), downSampleRatio);
   // check that SF_INFO was configured
@@ -231,12 +232,8 @@ void DoubleSignal::toWav(const string pathOut, const bool norm,
   } else{// if file opens...
     double* outArray = new double[outLength]();
     double* contents = getcontent();// speedup reducing method calls in loop
-    // for (unsigned int i=0; i<outLength; i++){
-    //   outArray[i]=contents[(i*downSampleRatio)];
-    // }
-    int offset = (length()-1)%downSampleRatio;
-    for (unsigned int i=0; i<outLength; i+=downSampleRatio){
-      outArray[i]=contents[i+offset];
+    for (unsigned int i=0; i<outLength; ++i){
+      outArray[i]=contents[i*downSampleRatio+offset];
     }
     if(norm){normalizeArray(outArray, outLength);};
     sf_write_double(outFile, outArray, outLength);
