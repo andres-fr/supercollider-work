@@ -148,7 +148,8 @@ int main(){
         string ccName = "cc_m"+to_string(tup.first)+"_m"+to_string(tup.second)+".wav";
         DoubleSignal ccm(ANALYSIS_DIR+ccName, false);
         if(r<d.m_id){ccm.reverse();} // ensure that our r is always the "shifting" sig
-        const unsigned int mshift_len = ccm.length()-downsamplingLength(d.meta.size, SAMPLEDOWN_RATIO);
+        // const unsigned int mshift_len = ccm.length()-downsamplingLength(d.meta.size, SAMPLEDOWN_RATIO);
+        const unsigned int mshift_len = (METADATA[r+1].size-1)/SAMPLEDOWN_RATIO;
         for(int i=0; i<ccm.length(); ++i){
           tempSig->decrementAt(i+MAX_LEN+d.del-mshift_len, ccm[i]*d.k);
         }
@@ -159,7 +160,8 @@ int main(){
       // now get the CCS and add it to tempSig
       string ccs_name = ANALYSIS_DIR+"cc_original_m"+to_string(r)+".wav";
       DoubleSignal ccs(ccs_name, false);
-      const unsigned int mshift_len = ccs.length()-ORIG_LEN_DOWNSAMPLED;
+      // const unsigned int mshift_len = ccs.length()-ORIG_LEN_DOWNSAMPLED;
+      const unsigned int mshift_len = (METADATA[r+1].size-1)/SAMPLEDOWN_RATIO;
       for(int i=0; i<tempSig->length(); ++i){ //********
         (*tempSig)[i] += ccs.at((i-MAX_LEN)+mshift_len, 0);
         if(abs((*tempSig)[i])>abs(maxVal)){
