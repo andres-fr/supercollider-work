@@ -116,6 +116,13 @@ void DoubleSignal::decrementAt(const int idx, const double val){
   }
 }
 
+void DoubleSignal::incrementAt(const int idx, const double val){
+  if(idx>=0 && idx <length()){
+    (*this)[idx] += val;
+  }
+}
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /// getters

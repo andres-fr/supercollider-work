@@ -29,7 +29,7 @@ struct d_ref {metadata meta; int m_id; int del; double k;};
 
 int main(){
 
-  cout << "version changed xx..." << endl;
+  cout << "version changeds..." << endl;
 
   string WORKING_DIR = "/home/afr/git/supercollider-work/wave2wave/SETUP_CHILD_SAMPLEDOWN_16/";
   string AUDIO_DIR = WORKING_DIR+"AUDIO/";
@@ -157,6 +157,7 @@ int main(){
         }
       }
       //tempSig->prettyPrint("tempSig after adding ccs");
+
 
       // find maximum in tempSig, and add result to D
       double k_factor = maxVal * MAX_ENERGY / (METADATA[r+1].energy); //******************
