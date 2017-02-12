@@ -41,29 +41,24 @@ int main(){
   string WAV2WAV_PATH = OUTPUT_DIR+"wav2wav.txt";
   string WAVOUT_PATH = OUTPUT_DIR+"reconstruction.wav";
   vector<string> MATERIAL_PATHS;//{"test_m1.wav", "test_m2.wav", "test_orig.wav", "31line.wav"};
-  // unsigned int SAMPLEDOWN_RATIO = 2;
 
-  // cout << "type 'yes' if you wish to calculate all cross-correlations: ";
-  // string yn;
-  // cin >> yn;
-  // if (yn=="yes"){
-  //   for(int i=-100; i<=100; i+=4){
-  //     MATERIAL_PATHS.push_back("anvil["+to_string(i)+"].wav");
-  //   }
-  //   CrossCorrelator cc(ORIGINAL_NAME,MATERIAL_PATHS,WORKING_DIR,SAMPLEDOWN_RATIO);
-  // }
-  // int LOOP_SIZE = 0;
-  // cout << "type number of iterations: ";
-  // cin >> LOOP_SIZE;
-
-  unsigned int SAMPLEDOWN_RATIO;
-  cout << "type int for sampledown ratio: ";
+  unsigned int SAMPLEDOWN_RATIO {1};
+  cout << "type sampledown ratio: ";
   cin >> SAMPLEDOWN_RATIO;
-  int LOOP_SIZE = 300;
-  for(int i=-80; i<=80; i+=4){
-    MATERIAL_PATHS.push_back("anvil["+to_string(i)+"].wav");
+
+  cout << "type 'yes' if you wish to calculate all cross-correlations "
+       << "(needed if sampledown ratio has changed): ";
+  string yn;
+  cin >> yn;
+  if (yn=="yes"){
+    for(int i=-100; i<=100; i+=4){
+      MATERIAL_PATHS.push_back("anvil["+to_string(i)+"].wav");
+    }
+    CrossCorrelator cc(ORIGINAL_NAME,MATERIAL_PATHS,WORKING_DIR,SAMPLEDOWN_RATIO);
   }
-  CrossCorrelator cc(ORIGINAL_NAME,MATERIAL_PATHS,WORKING_DIR,SAMPLEDOWN_RATIO);
+  int LOOP_SIZE = 0;
+  cout << "type number of iterations: ";
+  cin >> LOOP_SIZE;
 
   // declare and load METADATA: idx 0 is original, rest are materials
   unsigned int MAX_LEN = 0; // the size in samples of the biggest CC file
@@ -104,11 +99,6 @@ int main(){
   mt19937 gen(static_cast<mt19937::result_type>(time(nullptr)));
   uniform_int_distribution<> distribution(1, METADATA.size()-1);
 
-
-
-  // readapt MAX_LEN to the current downsampling settings
-  unsigned int ORIG_LEN_DOWNSAMPLED = downsamplingLength(ORIG_LEN, SAMPLEDOWN_RATIO);
-  //unsigned int TEMPSIG_LEN = downsamplingLength(2*MAX_LEN-1, SAMPLEDOWN_RATIO); //********
   MAX_LEN = downsamplingLength(MAX_LEN, SAMPLEDOWN_RATIO);
   unsigned int TEMPSIG_LEN = 2*MAX_LEN; // so now we know zero is at tempSig[MAX_LEN]
 
@@ -124,6 +114,7 @@ int main(){
 
     const int r = distribution(gen)-1;
     const unsigned int m_size = METADATA[r+1].size;
+    const unsigned int mshift_len = (m_size-1)/SAMPLEDOWN_RATIO;
     // CALCULATE DOWNSAMPLED LENGTH
     if(m_size>ORIG_LEN){
       cout <<"ignoring "<< METADATA[r+1].wavPath <<": material longer than original!"<< endl;
@@ -149,25 +140,16 @@ int main(){
         string ccName = "cc_m"+to_string(tup.first)+"_m"+to_string(tup.second)+".wav";
         DoubleSignal ccm(ANALYSIS_DIR+ccName, false);
         if(r<d.m_id){ccm.reverse();} // ensure that our r is always the "shifting" sig
-        //const unsigned int mshift_len = ccm.length()-downsamplingLength(d.meta.size, SAMPLEDOWN_RATIO);
-        //const unsigned int mshift_len = (m_size-((m_size-1)%SAMPLEDOWN_RATIO))/SAMPLEDOWN_RATIO;
-        const unsigned int mshift_len = (METADATA[r+1].size-1)/SAMPLEDOWN_RATIO;
-        //int mshift_len = (METADATA[r+1].size-1)+1;
         for(int i=0; i<ccm.length(); ++i){
           tempSig->decrementAt(i+MAX_LEN+d.del-mshift_len, ccm[i]*d.k);
         }
         //tempSig->prettyPrint("tempSig after substracting "+ccName);
       }
 
-
       // now get the CCS and add it to tempSig
       string ccs_name = ANALYSIS_DIR+"cc_original_m"+to_string(r)+".wav";
       DoubleSignal ccs(ccs_name, false);
-      //const unsigned int mshift_len = ccs.length()-ORIG_LEN_DOWNSAMPLED;
-      const unsigned int mshift_len = (METADATA[r+1].size-1)/SAMPLEDOWN_RATIO;
-      // const unsigned int mshift_len = (m_size-((m_size-1)%SAMPLEDOWN_RATIO))/SAMPLEDOWN_RATIO;
-      //int mshift_len = (METADATA[r+1].size-1);
-      for(int i=0; i<tempSig->length(); ++i){ //********
+      for(int i=0; i<tempSig->length(); ++i){
         (*tempSig)[i] += ccs.at((i-MAX_LEN)+mshift_len, 0);
         if(abs((*tempSig)[i])>abs(maxVal)){
           maxVal = (*tempSig)[i];
@@ -175,20 +157,6 @@ int main(){
         }
       }
       //tempSig->prettyPrint("tempSig after adding ccs");
-
-
-      // // now get the CCS and add it to tempSig
-      // string ccs_name = ANALYSIS_DIR+"cc_original_m"+to_string(r)+".wav";
-      // DoubleSignal ccs(ccs_name, false);
-      // for(int i=0; i<tempSig->length(); ++i){ //********
-      //   (*tempSig)[i] += ccs.at((i-MAX_LEN)+m_length, 0);
-      //   if(abs((*tempSig)[i])>abs(maxVal)){
-      //     maxVal = (*tempSig)[i];
-      //     maxPos = i-(MAX_LEN-1);
-      //   }
-      // }
-
-
 
       // find maximum in tempSig, and add result to D
       double k_factor = maxVal * MAX_ENERGY / (METADATA[r+1].energy); //******************

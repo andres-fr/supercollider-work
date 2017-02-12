@@ -27,8 +27,18 @@ mshiftratio = 29081/6= 4846
 
 
 
+python script
+RATIO s m
+down(s) down(m)
 
+ccs ccm
 
+offset = (m-1)%ratio
+mshift_len = ( m - ((m-1)%ratio) ) / ratio
+
+def down(len,rat):
+   x = 0 if len%rat==0 else 1
+   return len/rat + x
 
 
 ########################################
