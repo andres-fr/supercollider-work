@@ -221,6 +221,8 @@ void DoubleSignal::toWav(const string pathOut, const bool norm,
                          const unsigned int offset){
   // calculate length of the downsampled output:
   unsigned int outLength = downsamplingLength(length(), downSampleRatio); // BUG: imagine length=11 (6+6-1). For a downsampleratio=6, outLength=2, but actually offset=(6-1)%6=5, so the real output would only have 1 elt at idx = 5 (would be 0*6+5, because 1*6+5=11 is INDEX OUT OF BOUNDS. I am actually surprised that this doesn't crash...)
+  // how to identify that this will happen, and what would be the outcome/solution?
+  // 
   // check that SF_INFO was configured
   if(sfInfo->frames == -1){
     throw invalid_argument("toWav: sfInfo not configured");
@@ -233,7 +235,7 @@ void DoubleSignal::toWav(const string pathOut, const bool norm,
     double* outArray = new double[outLength]();
     double* contents = getcontent();// speedup reducing method calls in loop
     for (unsigned int i=0; i<outLength; ++i){
-      outArray[i]=contents[i*downSampleRatio+offset];
+      outArray[i]= contents[i*downSampleRatio+offset];
     }
     if(norm){normalizeArray(outArray, outLength);};
     sf_write_double(outFile, outArray, outLength);

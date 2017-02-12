@@ -29,7 +29,7 @@ struct d_ref {metadata meta; int m_id; int del; double k;};
 
 int main(){
 
-  cout << "version changed ..." << endl;
+  cout << "version changed xx..." << endl;
 
   string WORKING_DIR = "/home/afr/git/supercollider-work/wave2wave/SETUP_CHILD_SAMPLEDOWN_16/";
   string AUDIO_DIR = WORKING_DIR+"AUDIO/";
@@ -122,9 +122,10 @@ int main(){
     counter++;
   //for (int r : {1,2,0,0,1}){
 
-    int r = distribution(gen)-1;
+    const int r = distribution(gen)-1;
+    const unsigned int m_size = METADATA[r+1].size;
     // CALCULATE DOWNSAMPLED LENGTH
-    if(METADATA[r+1].size>ORIG_LEN){
+    if(m_size>ORIG_LEN){
       cout <<"ignoring "<< METADATA[r+1].wavPath <<": material longer than original!"<< endl;
     } else { // if chosen material isn't longer than original...
       // initialize local containers for iteration
@@ -148,8 +149,10 @@ int main(){
         string ccName = "cc_m"+to_string(tup.first)+"_m"+to_string(tup.second)+".wav";
         DoubleSignal ccm(ANALYSIS_DIR+ccName, false);
         if(r<d.m_id){ccm.reverse();} // ensure that our r is always the "shifting" sig
-        // const unsigned int mshift_len = ccm.length()-downsamplingLength(d.meta.size, SAMPLEDOWN_RATIO);
-        const unsigned int mshift_len = (METADATA[r+1].size-1)/SAMPLEDOWN_RATIO;
+        //const unsigned int mshift_len = ccm.length()-downsamplingLength(d.meta.size, SAMPLEDOWN_RATIO);
+        const unsigned int mshift_len = (m_size-((m_size-1)%SAMPLEDOWN_RATIO))/SAMPLEDOWN_RATIO;
+        //const unsigned int mshift_len = (METADATA[r+1].size-1)/SAMPLEDOWN_RATIO;
+        //int mshift_len = (METADATA[r+1].size-1)+1;
         for(int i=0; i<ccm.length(); ++i){
           tempSig->decrementAt(i+MAX_LEN+d.del-mshift_len, ccm[i]*d.k);
         }
@@ -160,8 +163,10 @@ int main(){
       // now get the CCS and add it to tempSig
       string ccs_name = ANALYSIS_DIR+"cc_original_m"+to_string(r)+".wav";
       DoubleSignal ccs(ccs_name, false);
-      // const unsigned int mshift_len = ccs.length()-ORIG_LEN_DOWNSAMPLED;
-      const unsigned int mshift_len = (METADATA[r+1].size-1)/SAMPLEDOWN_RATIO;
+      //const unsigned int mshift_len = ccs.length()-ORIG_LEN_DOWNSAMPLED;
+      //const unsigned int mshift_len = (METADATA[r+1].size-1)/SAMPLEDOWN_RATIO;
+      const unsigned int mshift_len = (m_size-((m_size-1)%SAMPLEDOWN_RATIO))/SAMPLEDOWN_RATIO;
+      //int mshift_len = (METADATA[r+1].size-1)+1;
       for(int i=0; i<tempSig->length(); ++i){ //********
         (*tempSig)[i] += ccs.at((i-MAX_LEN)+mshift_len, 0);
         if(abs((*tempSig)[i])>abs(maxVal)){

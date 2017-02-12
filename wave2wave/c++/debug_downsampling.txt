@@ -4,6 +4,34 @@ m_size = 29081
 initial energy 3220
 
 
+############## DEBUGGING RATIO=6
+s+m = 183431    =  30571*6+5 ---> cual de estos es cero y pq deberia variar?
+
+zero is at: ccs[m-1] = ccs[29080], the position 29081
+we added (m-1)%6=4 to each of the 30751 samples of the ccs, to have the zero. where is it?
+i*6+4=m-1 ==> i = (m-1-4)/6 = (29080-4)/6 =4846!!!!!!!!!
+
+m+m = 58162     =  9693*6+4
+zero is at ccm[m-1] = ccm[29080] where is it??
+i*6+4=29080   ==> i = (29080-4)/6 = 4846 !!!!! ALSO!! WHERE IS THE PROB THEN?
+
+
+ccs = 30572
+ccm = 9694
+
+down(orig) = 25725*6 + 0
+down(m) = 4846*6 + 5
+
+mshiftratio = 29081/6= 4846
+4846*2
+
+
+
+
+
+
+
+########################################
 r,   s/r,   m/r     s%r, m%r  incremented?     worked?                  ccs_size   ccm_size
 (1, 154350, 29081)---(0, 0)-------0,0----------yess                     183430     58161
 (2, 77175, 14540)----(0, 1)-------0,1----------yess                     91715      29081
@@ -31,9 +59,6 @@ r,   s/r,   m/r     s%r, m%r  incremented?     worked?                  ccs_size
 (22, 7015, 1321)-----(20, 19)-----1,1------------NO                     8338        2644
 (30, 5145, 969)------(0, 11)----- 0,1------------NO                     6115        1939
 
-## cual es la mayor cc? es downsample(2*maxlen-1)
-## que es lo q calculo? calculo 2*(downsample(maxlen)-1
-### es lo mismo? NO!!!! pues ya esta pavo
 
 13:
 #uncompressed audios
