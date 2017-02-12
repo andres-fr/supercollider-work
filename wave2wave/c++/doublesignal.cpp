@@ -220,7 +220,9 @@ void DoubleSignal::toWav(const string pathOut, const bool norm,
                          const unsigned int downSampleRatio,
                          const unsigned int offset){
   // calculate length of the downsampled output:
-  unsigned int outLength = downsamplingLength(length(), downSampleRatio); // BUG: imagine length=11 (6+6-1). For a downsampleratio=6, outLength=2, but actually offset=(6-1)%6=5, so the real output would only have 1 elt at idx = 5 (would be 0*6+5, because 1*6+5=11 is INDEX OUT OF BOUNDS. I am actually surprised that this doesn't crash...)
+  unsigned int outLength = downsamplingLength(length(), downSampleRatio); 
+  //unsigned int outLength = length() / downSampleRatio;
+  
   // how to identify that this will happen, and what would be the outcome/solution?
   // 
   // check that SF_INFO was configured
@@ -232,14 +234,16 @@ void DoubleSignal::toWav(const string pathOut, const bool norm,
   if(outFile == nullptr){ // if file doesn't open...
     throw invalid_argument("toWav: unable to open output file "+pathOut);
   } else{// if file opens...
-    double* outArray = new double[outLength]();
+    //double* outArray = new double[outLength]();
+    vector<double> outArray;
     double* contents = getcontent();// speedup reducing method calls in loop
-    for (unsigned int i=0; i<outLength; ++i){
-      outArray[i]= contents[i*downSampleRatio+offset];
+    for (unsigned int i=offset; i<length(); i+=downSampleRatio){
+      //outArray[i]= contents[i*downSampleRatio+offset];
+      outArray.push_back(contents[i]);
     }
-    if(norm){normalizeArray(outArray, outLength);};
-    sf_write_double(outFile, outArray, outLength);
-    delete[] outArray;
+    if(norm){normalizeArray(&outArray[0], outArray.size());};
+    sf_write_double(outFile, &outArray[0], outArray.size()); // instead of outLength
+    //delete[] outArray;
     sf_close(outFile);
     //cout  << "toWav: succesfully saved to "<< pathOut << endl;
   }

@@ -59,8 +59,8 @@ int main(){
   unsigned int SAMPLEDOWN_RATIO;
   cout << "type int for sampledown ratio: ";
   cin >> SAMPLEDOWN_RATIO;
-  int LOOP_SIZE = 200;
-  for(int i=-100; i<=100; i+=4){
+  int LOOP_SIZE = 300;
+  for(int i=-80; i<=80; i+=4){
     MATERIAL_PATHS.push_back("anvil["+to_string(i)+"].wav");
   }
   CrossCorrelator cc(ORIGINAL_NAME,MATERIAL_PATHS,WORKING_DIR,SAMPLEDOWN_RATIO);
@@ -150,8 +150,8 @@ int main(){
         DoubleSignal ccm(ANALYSIS_DIR+ccName, false);
         if(r<d.m_id){ccm.reverse();} // ensure that our r is always the "shifting" sig
         //const unsigned int mshift_len = ccm.length()-downsamplingLength(d.meta.size, SAMPLEDOWN_RATIO);
-        const unsigned int mshift_len = (m_size-((m_size-1)%SAMPLEDOWN_RATIO))/SAMPLEDOWN_RATIO;
-        //const unsigned int mshift_len = (METADATA[r+1].size-1)/SAMPLEDOWN_RATIO;
+        //const unsigned int mshift_len = (m_size-((m_size-1)%SAMPLEDOWN_RATIO))/SAMPLEDOWN_RATIO;
+        const unsigned int mshift_len = (METADATA[r+1].size-1)/SAMPLEDOWN_RATIO;
         //int mshift_len = (METADATA[r+1].size-1)+1;
         for(int i=0; i<ccm.length(); ++i){
           tempSig->decrementAt(i+MAX_LEN+d.del-mshift_len, ccm[i]*d.k);
@@ -164,9 +164,9 @@ int main(){
       string ccs_name = ANALYSIS_DIR+"cc_original_m"+to_string(r)+".wav";
       DoubleSignal ccs(ccs_name, false);
       //const unsigned int mshift_len = ccs.length()-ORIG_LEN_DOWNSAMPLED;
-      //const unsigned int mshift_len = (METADATA[r+1].size-1)/SAMPLEDOWN_RATIO;
-      const unsigned int mshift_len = (m_size-((m_size-1)%SAMPLEDOWN_RATIO))/SAMPLEDOWN_RATIO;
-      //int mshift_len = (METADATA[r+1].size-1)+1;
+      const unsigned int mshift_len = (METADATA[r+1].size-1)/SAMPLEDOWN_RATIO;
+      // const unsigned int mshift_len = (m_size-((m_size-1)%SAMPLEDOWN_RATIO))/SAMPLEDOWN_RATIO;
+      //int mshift_len = (METADATA[r+1].size-1);
       for(int i=0; i<tempSig->length(); ++i){ //********
         (*tempSig)[i] += ccs.at((i-MAX_LEN)+mshift_len, 0);
         if(abs((*tempSig)[i])>abs(maxVal)){
