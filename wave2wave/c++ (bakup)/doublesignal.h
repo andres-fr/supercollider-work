@@ -32,6 +32,7 @@ class DoubleSignal : public alglib::real_1d_array {
                const int chans, const int formt,
                  const int sect, const int seek);
   void decrementAt(const int idx, const double val);
+  void incrementAt(const int idx, const double val);
   // getters
   SF_INFO* getSFInfo() const;
   // special getter (returns contents[idx-delay], never throws error)
@@ -44,7 +45,9 @@ class DoubleSignal : public alglib::real_1d_array {
   void multiplyBy(const double x);
   void reverse();
   // export
-  void toWav(const string pathOut, const bool norm);
+  void toWav(const string pathOut, const bool norm,
+             const unsigned int downSampleRatio=1,
+             const unsigned int offset=0);
   void toASCII(const string pathOut);
 };
 

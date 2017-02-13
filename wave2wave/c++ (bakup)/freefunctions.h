@@ -20,4 +20,7 @@ void rotateArray(double* contents, const int size, const int idxOfLowest);
 
 void array2txt(double* contents, const int size, const string pathOut);
 
+unsigned int downsamplingLength(const unsigned int origLength,
+                                const unsigned int downSampleRatio);
+
 #endif

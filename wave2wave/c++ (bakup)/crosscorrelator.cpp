@@ -15,7 +15,10 @@ using namespace std;
 
 CrossCorrelator::CrossCorrelator(const string origName,
                                  const vector<string>& mNames,
-                                 const string workingDir){
+                                 const string workingDir,
+                                 const unsigned int downSampleRatio){
+  //
+  const string METADATA_NAME = "METADATA.txt";
   // input parameter preprocessing
   const string origPath = workingDir+"AUDIO/"+origName;
   // store the max energy to normalize all CCs dividing through it
@@ -38,18 +41,17 @@ CrossCorrelator::CrossCorrelator(const string origName,
     materials->push_back(m);
     max_energy = (m->energy()>max_energy)? m->energy() : max_energy;
   }
-  // save spec file: a list of ints, whereas the int at position i represents
-  // the zero-delay index for CC[original, mi] and CC[mi, mj].
-  ofstream outFile((workingDir+"METADATA.txt").c_str(), ios::out);
+  // save METADATA: wavPath, length, energy
+  ofstream outFile((workingDir+METADATA_NAME).c_str(), ios::out);
   if(outFile.is_open()){
-    cout << "writing METADATA.txt file" << endl;
+    cout << "writing "<< METADATA_NAME <<" file" << endl;
     outFile << origPath <<":"<< original->length() <<":"<< original->energy();
     for(unsigned int i=0; i<materials->size(); ++i){
       outFile << endl << workingDir << "AUDIO/" << mNames.at(i) << ":" <<
         materials->at(i)->length() << ":" << materials->at(i)->energy();
     }
     outFile.close();
-    cout << "wrote "<< workingDir << "METADATA.txt succesfully!" << endl;
+    cout << "wrote "<< workingDir << METADATA_NAME <<" succesfully!" << endl;
   }
 
   // instantiate and load CCoriginals
@@ -69,16 +71,19 @@ CrossCorrelator::CrossCorrelator(const string origName,
     cc->setSFInfo(cc->length(), sf->samplerate, sf->channels,
                   sf->format, sf->sections, sf->seekable);
     // export to unnormalized .wav (already normalized with .multiplyBy)
+    unsigned int offset = (m->length()-1)%downSampleRatio; // this enables the zero-idx to be always present
     cc->toWav(workingDir+"ANALYSIS/"+"cc_original_m"+
-              to_string(CCoriginals->size()-1)+ ".wav", false);
+              to_string(CCoriginals->size()-1)+ ".wav",false,
+              downSampleRatio, offset);
   }
 
   // instantiate and load CCmaterials
   int N = materials->size(); // to save some time
   CCmaterials = new map<pair<int,int>, DoubleSignal*>;
-  for (int i=0; i<N; ++i){
+  for (int i=0; i<N; ++i){ // "static"
     DoubleSignal* mi = (*materials)[i]; // to save some ns
-    for (int j=i; j<N; ++j){
+    unsigned int offset = (mi->length()-1)%downSampleRatio; // this enables the zero-idx to be always present
+    for (int j=i; j<N; ++j){ // "shifter"
       DoubleSignal* mj = (*materials)[j]; // not sure if this saves time
       DoubleSignal* cc = new DoubleSignal;
       // compute CC[mi,mj] and add to DS
@@ -94,7 +99,7 @@ CrossCorrelator::CrossCorrelator(const string origName,
                     sf->format, sf->sections, sf->seekable);
       // export to unnormalized .wav (already normalized with .multiplyBy)
       cc->toWav(workingDir+"ANALYSIS/"+"cc_m"+to_string(i)+"_m"+to_string(j)+
-                ".wav", false);
+                ".wav", false, downSampleRatio, offset);
     }
   }
 }

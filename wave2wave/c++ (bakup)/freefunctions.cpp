@@ -100,3 +100,25 @@ void array2txt(double* contents, const int size, const string pathOut){
     cout << "array2txt: succesfully saved to " << pathOut << endl;
   }
 }
+
+
+unsigned int downsamplingLength(const unsigned int origLength,
+                                const unsigned int downSampleRatio){
+  if (downSampleRatio==1){ // in case no downsampling
+    return origLength;
+  } else if (downSampleRatio>1){ // in case valid downsampling
+      unsigned int result = origLength/downSampleRatio;
+      if (origLength%downSampleRatio > 0){
+        return origLength/downSampleRatio+1;
+      }
+      else {
+        return origLength/downSampleRatio;
+      }
+      return result;
+  }
+  else { // in case invalid downsampling
+    cout << "downsamplingLength ERROR: ratio must be positive integer and was"
+         <<  downSampleRatio << endl;
+    return 0;
+  }
+}

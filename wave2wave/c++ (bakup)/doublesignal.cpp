@@ -116,6 +116,13 @@ void DoubleSignal::decrementAt(const int idx, const double val){
   }
 }
 
+void DoubleSignal::incrementAt(const int idx, const double val){
+  if(idx>=0 && idx <length()){
+    (*this)[idx] += val;
+  }
+}
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /// getters
@@ -216,39 +223,27 @@ void DoubleSignal::toASCII(const string pathOut){
 }
 
 
-void DoubleSignal::toWav(const string pathOut, const bool norm){
-  // // append _RAW if not normalizing, for clarification
-  // string pathOut = path_out;
-  // if (!normalize){pathOut += "_RAW";}
+void DoubleSignal::toWav(const string pathOut, const bool norm,
+                         const unsigned int downSampleRatio,
+                         const unsigned int offset){
   // check that SF_INFO was configured
   if(sfInfo->frames == -1){
     throw invalid_argument("toWav: sfInfo not configured");
   }
   // declare and try to open outfile
-  SNDFILE* outfile = sf_open(pathOut.c_str(), SFM_WRITE, sfInfo);
-  if(outfile == nullptr){
+  SNDFILE* outFile = sf_open(pathOut.c_str(), SFM_WRITE, sfInfo);
+  if(outFile == nullptr){ // if file doesn't open...
     throw invalid_argument("toWav: unable to open output file "+pathOut);
   } else{// if file opens...
-    if (norm){ // if (normalize==true)... ***
-      // copy contents to an array, and normalize that array:
-      double* normArray = new double[length()];
-      double* contents = getcontent();
-      for (int i=0; i<length(); ++i){normArray[i] = contents[i];}
-      normalizeArray(normArray, length()); // 0 mean, 1 abs(max)
-      // write normalized contents to stream (disregarding delay)
-      sf_write_double(outfile, normArray, length());
-      // delete normArray, close stream, print and return 
-      delete[] normArray;
-      sf_close(outfile);
-      //cout  << "toWav: succesfully saved to "<< pathOut << endl;
-      return;
-    } else { // if NOT normalize:
-      // write contents to stream (disregarding delay), close, print and return
-      sf_write_double(outfile, getcontent(), length());
-      sf_close(outfile);
-      //cout  << "toWav: succesfully saved to "<< pathOut << endl;
-      return;
+    vector<double> outArray;
+    double* contents = getcontent();// speedup reducing method calls in loop
+    for (unsigned int i=offset; i<length(); i+=downSampleRatio){
+      outArray.push_back(contents[i]);
     }
+    if(norm){normalizeArray(&outArray[0], outArray.size());};
+    sf_write_double(outFile, &outArray[0], outArray.size());
+    sf_close(outFile);
+    //cout  << "toWav: succesfully saved to "<< pathOut << endl;
   }
 }
 
