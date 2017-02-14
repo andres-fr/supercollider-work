@@ -17,7 +17,7 @@ class CrossCorrelator {
  private:
   // private containers
   string workspaceDir;
-  string ccDir;
+  string projectDir;
   DoubleSignal* original;
   vector<DoubleSignal*>* materials;
   double maxEnergy;
@@ -26,7 +26,15 @@ class CrossCorrelator {
   map<pair<int,int>, DoubleSignal*>* CCmaterials;
  public:
   // constructors
-  explicit CrossCorrelator(const string workspaceDir, const string ccDir);
+  explicit CrossCorrelator(// initialization values
+                           const string wsDir,
+                           const string ccd,
+                           // needed by loadAudios()
+                           const string origPath,
+                           const vector<string>& matPaths,
+                           const string metadata_name,
+                           // needed by calculateCCs()
+                           const unsigned int downSampleRatio);
   // deleted copy- and assignment constructors
   CrossCorrelator(const CrossCorrelator& copyFrom)=delete;
   CrossCorrelator& operator= (const CrossCorrelator& copyFrom)=delete;
@@ -41,8 +49,11 @@ class CrossCorrelator {
   DoubleSignal* getCCoriginal(const int i);
   DoubleSignal* getCCmaterial(const int i, const int j);
   // other functionality
-  void loadAudios(const string origPath, const vector<string>& matPaths, const string metadata_name);
-  void calculateCCs(unsigned int downSampleRatio);
+  void loadAudiosSaveMetadata(const string origPath,
+                              const vector<string>& matPaths,
+                              const string metadata_name,
+                              const unsigned int downSampleRatio);
+  void calculateCCs(const unsigned int downSampleRatio);
 };
 
 #endif

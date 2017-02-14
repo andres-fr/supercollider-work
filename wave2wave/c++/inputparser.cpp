@@ -8,8 +8,9 @@
 // namespace
 using namespace std;
 
-InputParser::InputParser (int &argc, char **argv, string workingDir)
-  : action(""), originalPath(""), sampledownRatio(0), iterations(0), outputPath(workingDir){
+InputParser::InputParser (int &argc, char **argv, string workspaceDir)
+  : action(""), originalPath(""), sampledownRatio(0), iterations(0),
+    projectPath(""), dListName(""){
   string current_flag;
   for (int i=1; i < argc; ++i){
     string token = string(argv[i]);
@@ -27,14 +28,16 @@ InputParser::InputParser (int &argc, char **argv, string workingDir)
         sampledownRatio = stoi(token);
       } else if (!current_flag.compare("-i")){
         iterations = stoi(token);
-      } else if (!current_flag.compare("-o")){
-        outputPath = workingDir+token + "/";
+      } else if (!current_flag.compare("-d")){
+        dListName = token;
+      } else if (!current_flag.compare("-p")){
+        projectPath = workspaceDir+token + "/";
       } else {
         cout << "InputParser: malformed argument list " << current_flag << endl;
       }
     }
   }
-  prettyPrint();
+  //prettyPrint();
 }
 
 void InputParser::prettyPrint(){
@@ -47,7 +50,7 @@ void InputParser::prettyPrint(){
   cout << ")" << endl;
   cout << "sampledownRatio=" << sampledownRatio << endl;
   cout << "iterations=" << iterations << endl;
-  cout << "outputPath=" << outputPath << endl;
+  cout << "projectPath=" << projectPath << endl;
 }
 
 
@@ -72,6 +75,11 @@ unsigned int InputParser::getSampledownRatio() const{
 unsigned int InputParser::getIterations() const{
   return iterations;
 }
-string InputParser::getOutputPath() const{
-  return outputPath;
+
+string InputParser::getDListName() const{
+  return dListName;
+}
+
+string InputParser::getProjectPath() const{
+  return projectPath;
 }

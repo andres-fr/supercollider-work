@@ -13,8 +13,21 @@
 // namespace
 using namespace std;
 
-CrossCorrelator::CrossCorrelator(const string wsDir, const string ccd)
-  : workspaceDir(wsDir), ccDir(ccd), maxEnergy(0){}
+CrossCorrelator::CrossCorrelator(
+                                 // initialization values
+                                 const string wsDir,
+                                 const string pDir,
+                                 // needed by loadAudiosSaveMetadata()
+                                 const string origPath,
+                                 const vector<string>& matPaths,
+                                 const string metadata_name,
+                                 // needed by calculateCCs()
+                                 const unsigned int downSampleRatio
+                                 )
+  : workspaceDir(wsDir), projectDir(pDir), maxEnergy(0){
+  loadAudiosSaveMetadata(origPath, matPaths, metadata_name, downSampleRatio);
+  calculateCCs(downSampleRatio);
+}
 
 CrossCorrelator::~CrossCorrelator(){
 
@@ -78,9 +91,10 @@ DoubleSignal* CrossCorrelator::getCCmaterial(const int i, const int j){
 //// OTHER FUNCTIONALITY
 ////////////////////////////////////////////////////////////////////////////////
 
-void CrossCorrelator::loadAudios(const string origPath,
-                                 const vector<string>& matPaths,
-                                 const string metadata_name){
+void CrossCorrelator::loadAudiosSaveMetadata(const string origPath,
+                                             const vector<string>& matPaths,
+                                             const string metadata_name,
+                                             const unsigned int downSampleRatio){
   // load original
   original = new DoubleSignal(origPath, true);
   maxEnergy = (original->energy()>maxEnergy)? original->energy() : maxEnergy;
@@ -100,16 +114,21 @@ void CrossCorrelator::loadAudios(const string origPath,
     maxEnergy = (m->energy()>maxEnergy)? m->energy() : maxEnergy;
   }
   // save METADATA: wavPath, length, energy
-  ofstream outFile((workspaceDir+metadata_name).c_str(), ios::out);
+  string metadata_path = projectDir+metadata_name;
+  ofstream outFile(metadata_path.c_str(), ios::out);
   if(outFile.is_open()){
     cout << "writing "<< metadata_name <<" file" << endl;
+    // write downSampleRatio:
+    outFile << "downSampleRatio:"<<downSampleRatio << endl;
+    // write metadata for original signal
     outFile << origPath <<":"<< original->length() <<":"<< original->energy();
+    // write metadata for materials
     for(unsigned int i=0; i<materials->size(); ++i){
-      outFile << endl << workspaceDir << "AUDIO/" << matPaths.at(i) << ":" <<
+      outFile << endl <<  matPaths.at(i) << ":" <<
         materials->at(i)->length() << ":" << materials->at(i)->energy();
     }
     outFile.close();
-    cout << "wrote "<< workspaceDir << metadata_name <<" succesfully!" << endl;
+    cout << "wrote "<< metadata_path <<" succesfully!" << endl;
   }
 
 
@@ -117,7 +136,7 @@ void CrossCorrelator::loadAudios(const string origPath,
 }
 
 
-void CrossCorrelator::calculateCCs(unsigned int downSampleRatio){
+void CrossCorrelator::calculateCCs(const unsigned int downSampleRatio){
 
   // instantiate and load CCoriginals
   CCoriginals = new vector<DoubleSignal*>;
@@ -137,7 +156,7 @@ void CrossCorrelator::calculateCCs(unsigned int downSampleRatio){
                   sf_orig->format, sf_orig->sections, sf_orig->seekable);
     // export to unnormalized .wav (already normalized with .multiplyBy)
     unsigned int offset = (m->length()-1)%downSampleRatio; // this enables the zero-idx to be always present
-    cc->toWav(ccDir+"ANALYSIS/cc_original_m"+
+    cc->toWav(projectDir+"ANALYSIS/cc_original_m"+
               to_string(CCoriginals->size()-1)+ ".wav",false,
               downSampleRatio, offset);
   }
@@ -163,7 +182,7 @@ void CrossCorrelator::calculateCCs(unsigned int downSampleRatio){
       cc->setSFInfo(cc->length(), sf_orig->samplerate, sf_orig->channels,
                     sf_orig->format, sf_orig->sections, sf_orig->seekable);
       // export to unnormalized .wav (already normalized with .multiplyBy)
-      cc->toWav(ccDir+"ANALYSIS/cc_m"+to_string(i)+"_m"+to_string(j)+
+      cc->toWav(projectDir+"ANALYSIS/cc_m"+to_string(i)+"_m"+to_string(j)+
                 ".wav", false, downSampleRatio, offset);
     }
   }
