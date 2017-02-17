@@ -17,7 +17,7 @@ class InputParser{
   string dListName;
  public:
   // constructor (parser-setter)
-  InputParser(int &argc, char **argv, string workspaceDir);
+  InputParser(int &argc, char **argv);
   // getters
   string getAction() const;
   string getOriginalPath() const;

@@ -1,16 +1,21 @@
-// g++ -O3 -std=c++14 -Wall -Wextra -pedantic MAIN.cpp doublesignal.cpp crosscorrelator.cpp freefunctions.cpp -o MAIN -lsndfile -lalglib && valgrind --leak-check=yes ./MAIN
+// g++ -O4 -std=c++14 -Wall -Wextra -pedantic MAIN.cpp doublesignal.cpp crosscorrelator.cpp freefunctions.cpp inputparser.cpp -o MAIN -lsndfile -lalglib && valgrind --leak-check=yes ./MAIN
+
+// EXAMPLE OF COMPILING PROGRAM
+// g++ -O4 -std=c++14 -Wall -Wextra -pedantic MAIN.cpp doublesignal.cpp crosscorrelator.cpp freefunctions.cpp inputparser.cpp -o MAIN -lsndfile -lalglib
 
 // EXAMPLE OF GENERATING CCS
-// g++ -O4 -std=c++14 -Wall -Wextra -pedantic MAIN.cpp doublesignal.cpp crosscorrelator.cpp freefunctions.cpp inputparser.cpp -o MAIN -lsndfile -lalglib && ./MAIN -a preprocess -s /home/afr/IMPULS/WORKSPACE/AUDIO/child-short.wav -m /home/afr/IMPULS/WORKSPACE/AUDIO/anvil[0].wav /home/afr/IMPULS/WORKSPACE/AUDIO/anvil[40].wav /home/afr/IMPULS/WORKSPACE/AUDIO/anvil[-40].wav -r 2 -p test_child
+// ./MAIN -a preprocess -s /home/afr/IMPULS/WORKSPACE/AUDIO/child-short.wav -m /home/afr/IMPULS/WORKSPACE/AUDIO/anvil[0].wav /home/afr/IMPULS/WORKSPACE/AUDIO/anvil[100].wav /home/afr/IMPULS/WORKSPACE/AUDIO/anvil[-100].wav -r 60 -p /home/afr/IMPULS/WORKSPACE/test_child
+
 
 // EXAMPLE OF GENERATING D-LIST
-// g++ -O4 -std=c++14 -Wall -Wextra -pedantic MAIN.cpp doublesignal.cpp crosscorrelator.cpp freefunctions.cpp inputparser.cpp -o MAIN -lsndfile -lalglib && ./MAIN -a generate_list -p test_child -i 100
+// ./MAIN -a generate_list -p /home/afr/IMPULS/WORKSPACE/test_child -i 300
 
 
 // EXAMPLE OF GENERATING WAV
-// ./MAIN -a generate_wav -p test_child -d reconstruction_1000iterations_2ratio.txt
+// ./MAIN -a generate_wav -p /home/afr/IMPULS/WORKSPACE/test_child -d reconstruction_300iterations_60ratio.txt
 
-//#include <sndfile.hh>
+
+
 
 #include <iostream>
 #include <fstream>
@@ -57,9 +62,8 @@ struct metadata {string wavPath; unsigned int size; double energy;};
 struct d_ref {metadata meta; int m_id; int del; double k;};
 
 int main(int argc, char **argv){
-  const string WORKSPACE_DIR = "/home/afr/IMPULS/WORKSPACE/";
   const string METADATA_NAME = "METADATA.txt";
-  InputParser input(argc, argv, WORKSPACE_DIR);
+  InputParser input(argc, argv);
 
 
   // GENERATE CROSS-CORRELATIONS. needs:
@@ -81,7 +85,7 @@ int main(int argc, char **argv){
       return 1;  // RETURN 1: COULDN'T MAKE DIRECTORIES
     } else{ // if folders could be created
       // make METADATA and CCs
-      CrossCorrelator cc(WORKSPACE_DIR, p,
+      CrossCorrelator cc(p,
                          input.getOriginalPath(), input.getMaterialPaths(), METADATA_NAME,
                          input.getSampledownRatio());
       return 0; 
@@ -115,6 +119,8 @@ int main(int argc, char **argv){
     const string ORIGINAL_PATH = s.substr(0, sepPos);
     string rest = s.substr(sepPos+1);
     sepPos = rest.find_first_of(':');
+
+    
     const unsigned int ORIG_LEN = stoi(rest.substr(0, sepPos));
     inMeta.close();
     
@@ -125,7 +131,7 @@ int main(int argc, char **argv){
     
     // load the D-list and write to reconstruction
     const string dlist_path = input.getProjectPath()+input.getDListName();
-    vector<tuple<string, unsigned int, double>> D;
+    vector<tuple<string, int, double>> D;
     ifstream inList(dlist_path.c_str());
     if(inList.is_open()==false){
       cout << "aborting: couldn't open " << dlist_path << endl;
@@ -136,27 +142,21 @@ int main(int argc, char **argv){
       string wavpath = s.substr(0, sepPos);
       string rest = s.substr(sepPos+1);
       sepPos = rest.find_first_of(':');
-      unsigned int del = stoi(rest.substr(0, sepPos));
+      int del = stoi(rest.substr(0, sepPos));
       double norm = stod(rest.substr(sepPos+1));
       DoubleSignal ds(wavpath, true); // ds is a material, NORMALIZED
       for (int i=0; i<reconstruction.length(); ++i){
-        reconstruction[i] += ds.at(i, del)*norm;// del*SAMPLEDOWN_RATIO)*norm; //******************
+        reconstruction[i] += ds.at(i, del)*norm; // del*SAMPLEDOWN_RATIO)*norm;
         //cout << "reconstruction: " << reconstruction[10000] << endl;
       }
     }
     inList.close();
     reconstruction.toWav(dlist_path+".wav", true);
+    cout  << "toWav: succesfully saved to "<< dlist_path << ".wav!" << endl;
     return 0;
   }
 
     
-
-
-
-
-
-
-
   
   // GENERATE D-LIST. needs:
   // -a action
@@ -167,7 +167,7 @@ int main(int argc, char **argv){
     // load metadata and extract important features
     const string metadata_path = input.getProjectPath()+METADATA_NAME;
     const string ANALYSIS_DIR = input.getProjectPath()+"ANALYSIS/";
-    unsigned int SAMPLEDOWN_RATIO = 0;
+    long int SAMPLEDOWN_RATIO = 0;
     unsigned int MAX_LEN = 0; // the size in samples of the biggest CC file
     double MAX_ENERGY = 0;
     vector<metadata> METADATA; // (wavPath, size, energy)
@@ -266,7 +266,6 @@ int main(int argc, char **argv){
           }
         }
         //tempSig->prettyPrint("tempSig after adding ccs");
-
 
         // find maximum in tempSig, and add result to D
         double k_factor = maxVal * MAX_ENERGY / (METADATA[r+1].energy); //******************

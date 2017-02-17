@@ -27,7 +27,6 @@ class CrossCorrelator {
  public:
   // constructors
   explicit CrossCorrelator(// initialization values
-                           const string wsDir,
                            const string ccd,
                            // needed by loadAudios()
                            const string origPath,

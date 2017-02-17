@@ -15,7 +15,6 @@ using namespace std;
 
 CrossCorrelator::CrossCorrelator(
                                  // initialization values
-                                 const string wsDir,
                                  const string pDir,
                                  // needed by loadAudiosSaveMetadata()
                                  const string origPath,
@@ -24,7 +23,7 @@ CrossCorrelator::CrossCorrelator(
                                  // needed by calculateCCs()
                                  const unsigned int downSampleRatio
                                  )
-  : workspaceDir(wsDir), projectDir(pDir), maxEnergy(0){
+  : projectDir(pDir), maxEnergy(0){
   loadAudiosSaveMetadata(origPath, matPaths, metadata_name, downSampleRatio);
   calculateCCs(downSampleRatio);
 }
@@ -107,8 +106,7 @@ void CrossCorrelator::loadAudiosSaveMetadata(const string origPath,
       SF_INFO* sfm = m->getSFInfo();
       cout << "~warning: in CrossCorrelator: incompatible srate/nChans" <<
         endl << origPath <<": ("<<  sf_orig->samplerate <<", "<< sf_orig->channels <<")"<<
-        endl << workspaceDir+"AUDIO/"+path <<": ("<< sfm->samplerate <<", "<<
-        sfm->channels <<")";
+        endl << path <<": ("<< sfm->samplerate <<", "<< sfm->channels <<")";
     }
     materials->push_back(m);
     maxEnergy = (m->energy()>maxEnergy)? m->energy() : maxEnergy;

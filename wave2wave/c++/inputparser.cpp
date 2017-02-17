@@ -8,7 +8,7 @@
 // namespace
 using namespace std;
 
-InputParser::InputParser (int &argc, char **argv, string workspaceDir)
+InputParser::InputParser (int &argc, char **argv)
   : action(""), originalPath(""), sampledownRatio(0), iterations(0),
     projectPath(""), dListName(""){
   string current_flag;
@@ -31,7 +31,7 @@ InputParser::InputParser (int &argc, char **argv, string workspaceDir)
       } else if (!current_flag.compare("-d")){
         dListName = token;
       } else if (!current_flag.compare("-p")){
-        projectPath = workspaceDir+token + "/";
+        projectPath = token + "/";
       } else {
         cout << "InputParser: malformed argument list " << current_flag << endl;
       }
