@@ -10,7 +10,7 @@ using namespace std;
 
 InputParser::InputParser (int &argc, char **argv)
   : action(""), originalPath(""), sampledownRatio(0), iterations(0),
-    projectPath(""), dListName(""){
+    optListName(""), pickListName(""){
   string current_flag;
   for (int i=1; i < argc; ++i){
     string token = string(argv[i]);
@@ -29,30 +29,15 @@ InputParser::InputParser (int &argc, char **argv)
       } else if (!current_flag.compare("-i")){
         iterations = stoi(token);
       } else if (!current_flag.compare("-d")){
-        dListName = token;
+        optListName = token;
       } else if (!current_flag.compare("-p")){
-        projectPath = token + "/";
+        pickListName = token;
       } else {
         cout << "InputParser: malformed argument list " << current_flag << endl;
       }
     }
   }
-  //prettyPrint();
 }
-
-void InputParser::prettyPrint(){
-  cout << "action=" << action << endl;
-  cout << "originalPath=" << originalPath << endl;
-  cout << "materialPaths=(" << endl;
-  for (auto i = materialPaths.begin(); i != materialPaths.end(); ++i){
-    cout << "     " << *i << endl;
-  }
-  cout << ")" << endl;
-  cout << "sampledownRatio=" << sampledownRatio << endl;
-  cout << "iterations=" << iterations << endl;
-  cout << "projectPath=" << projectPath << endl;
-}
-
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -76,10 +61,10 @@ unsigned int InputParser::getIterations() const{
   return iterations;
 }
 
-string InputParser::getDListName() const{
-  return dListName;
+string InputParser::getOptListName() const{
+  return optListName;
 }
 
-string InputParser::getProjectPath() const{
-  return projectPath;
+string InputParser::getPickListName() const{
+  return pickListName;
 }

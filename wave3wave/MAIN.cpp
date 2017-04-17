@@ -1,9 +1,8 @@
 // EXAMPLE OF COMPILING AND RUNNING PROGRAM
-// g++ -O3 -Wall -Wextra -pedantic -std=c++14  MAIN.cpp inputparser.cpp floatsignal.cpp wavsequence.cpp -o MAIN -Wl,-rpath,opencv-3.1.0  -lopencv_core -lopencv_imgproc -lopencv_ml -lsndfile && valgrind --leak-check=full -v ./MAIN -a test_cv -i 10 -r 20
+// g++ -O3 -Wall -Wextra -pedantic -std=c++14  MAIN.cpp inputparser.cpp floatsignal.cpp wavsequence.cpp -o MAIN -Wl,-rpath,opencv-3.1.0  -lopencv_core -lopencv_imgproc -lopencv_ml -lsndfile && valgrind --leak-check=full -v ./MAIN -a test_cv -i 1000 -r 20
 
 
-
-
+// std libs
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -14,15 +13,14 @@
 // #include <cmath>
 // #include <random>
 // #include <chrono>
+// 3rd party libs
 #include "sndfile.hh"
+#include <opencv2/opencv.hpp>
+// own dependencies
 #include "inputparser.h"
 #include "floatsignal.h"
 #include "wavsequence.h"
-#include <opencv2/opencv.hpp>
-// own dependencies
-
-// own header
-
+#include "wavselector.h"
 // namespacing
 using namespace std;
 //using namespace chrono;
@@ -31,8 +29,14 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /// TODO
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-// D-list should work... finish integration with the app, add functionality (load&continue list...)
-// implement some different optimization heuristic (split file into parts?)
+// IMPLEMENT PICK METHOD IN WAVSELECTOR
+// add method to wavselector to load all wav files in a folder
+// change g++ to load all cpp files
+// add inputparser flag to load wavselector list
+
+
+
+// implement some different optimization heuristic (split file into parts?) (wavselectorlist generator?)
 
 
 
@@ -45,8 +49,8 @@ using namespace std;
 // -m mat1 mat2 ... WHOLE PATHS
 // -r sampledown ratio
 // -i iterations
-// -p project name
-// -d the D-list
+// -d optimum list name
+// -p pick list name
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -76,9 +80,6 @@ float* cv_crosscorrelate(float* orig, int origLen, float* mat, int matLen){
 
 double energy(float* arr, int size){return inner_product(arr, arr+size, arr, 0.0);}
 
-
-
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /// MAIN ROUTINE
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -89,6 +90,22 @@ int PRINT_FREQ = 100;
 int main(int argc, char **argv){
   InputParser input(argc, argv);
 
+  // if (input.getAction()=="asdf"){
+  //   WavSelector w("|", "#");
+  //   w.add("anvil.wav", 1);
+  //   w.add("anvil[-160].wav", 10);
+  //   w.normalize();
+  //   for (int i=0; i<50; ++i){
+  //     w.pick() << endl;
+  //   }
+    
+  //   // w.normalize();
+  //   // w.normalize();
+  //   // w.toFile("anodatest.txt");
+  //   // cout << w.asString() << endl;
+  //   return 0;
+  // }
+
   
   if (input.getAction() == "test_cv"){
     // check that all needed parameters are present
@@ -97,47 +114,55 @@ int main(int argc, char **argv){
            << "and -r <M> sampledown ratio" << endl;
       return -1;
     }
-    // globals
-    if (!input.getDListName().empty()){
-      WavSequence optList(input.getDListName(), "|", "#");
-    } else {WavSequence optList("|", "#");}
-    //vector<d_entry> optList();
+    // load the rest of input parameters, parse optList and load original signal
     const int DS_RATIO = input.getSampledownRatio();
-    // variables involving "original" (the signal to be reconstructed)
+    WavSequence optList(input.getOptListName(), "|", "#");
+    WavSelector pickList(input.getPickListName(), "|", "#");
     string origPath = "child-short.wav";
     FloatSignal original(origPath);
     float* origContent = original.getContent();
     SF_INFO* origInfo = original.getSFInfo();
     int origSize = original.getSize();
+    // add contents of optList to original and downsample it before starting optimization
+    for (wavsequence_entry s : optList.getContent()){
+      FloatSignal mat(s.wavPath);
+      float* matContent = mat.getContent();
+      for (int i=0; i<mat.getSize(); ++i){
+        int delIdx = i+s.delay;
+        if(delIdx<0 || delIdx >= origSize){continue;}
+        else{origContent[delIdx] -= matContent[i]*s.k;}
+      }
+    }
+    // now the original can be downsampled for further optimization    
     int origDownSize = original.getSize()/DS_RATIO;
     float* origDownContent = original.getDownsampledCopy(DS_RATIO);
-    // MAIN LOOP
+    // MAIN OPTIMIZATION LOOP
     for (unsigned int i=0; i<input.getIterations(); ++i){
       bool printFlag = i%PRINT_FREQ==0;
       if(printFlag){
         cout << "==iteration " << i << "/"<< input.getIterations() << "==" << endl;
       }
       // load the "material" and declare related variables
-      string matPath = "anvil.wav";
+      string matPath = pickList.pick();
       FloatSignal material(matPath);
       float* matContent = material.getContent();
       SF_INFO* matInfo = material.getSFInfo();
       int matSize = material.getSize();
       // check that the material is adequate
       if (matSize>origSize){
-        cout << "WARNING: material cannot be bigger than original (" << origSize <<
-          ") and was " << matPath << "=" << matSize << ". Skipping" << endl;
+        cout << "WARNING: material " << matPath <<" is bigger than original "
+             << origPath << ". Skipping" << endl;
         continue;
       }
       if (origInfo->samplerate!=matInfo->samplerate){
-        cout << "ERROR: incompatible sample rates: " << origInfo->samplerate << ", " <<
-          matInfo->samplerate << ". Aborting" << endl;
-        return -1;
+        cout << "WARNING: material " << matPath <<" must have same samplerate as original "
+             << origPath << ". Skipping" << endl;
+        continue;
       }
       if (origInfo->channels!=matInfo->channels){
-        cout << "ERROR: incompatible number of channels: " << origInfo->channels << ", " <<
-          matInfo->channels << ". Aborting" << endl;
-        return -1;
+        cout << "WARNING: material " << matPath <<" must have same number of channels as original "
+             << origPath << ". Skipping" << endl;
+        continue;
       }
       // if material is OK, prepare for CC
       int matDownSize = matSize/DS_RATIO;
@@ -149,7 +174,7 @@ int main(int argc, char **argv){
       int optPos_dw = ((abs(*minmax.first) > abs(*minmax.second))? minmax.first : minmax.second)-cc;
       int optPos = optPos_dw*DS_RATIO;
       double norm_factor_approx = cc[optPos_dw] / matDownEnergy;
-      //optList.push_back(d_entry{matPath, optPos, norm_factor_approx});
+      optList.add(optPos, norm_factor_approx, matPath);
       // update result & optimization references by substracting the optimized material
       for (int i=0; i<matSize; ++i){
         int delIdx = i+optPos;
@@ -170,14 +195,18 @@ int main(int argc, char **argv){
     }
     // once the optimization loop is done, export optList and reconstruction
     delete[] origDownContent; // this was needed only for optimization
-    string outPath = "test.wav";
-    cout << "Optimization done. Saving to " << outPath << endl;
+    string outName = "output";
+    cout << "Optimization done. Saving .txt and .wav to " << outName << endl;
     FloatSignal reconstruction(origPath);
     float* reconsContent= reconstruction.getContent();
-    for (int i=0; i<origSize; ++i){// ORIG - (ORIG-RECONSTRUCTION) = RECONSTRUCTION 
+    int reconsSize = reconstruction.getSize();
+    cout << "original energy is " << energy(reconsContent, reconsSize) << endl;
+    for (int i=0; i<reconsSize; ++i){// ORIG - (ORIG-RECONSTRUCTION) = RECONSTRUCTION 
       reconsContent[i] -= origContent[i];
     }
-    reconstruction.toWav("test.wav", true);
+    cout << "result energy is " << energy(reconsContent, reconsSize) << endl;
+    reconstruction.toWav(outName+".wav", true);
+    optList.toFile(outName+"_sequence.txt");
     return 0;
   }
 
@@ -192,304 +221,5 @@ int main(int argc, char **argv){
   cout << "aborting: action not understood! " << input.getAction() << endl;
   return -1;
 
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  // // GENERATE D-LIST. needs:
-  // // -a action
-  // // -p project name
-  // // -i iterations
-  // if (input.getAction() == "generate_list"){
-
-  //   // load metadata and extract important features
-  //   const string metadata_path = input.getProjectPath()+METADATA_NAME;
-  //   const string ANALYSIS_DIR = input.getProjectPath()+"ANALYSIS/";
-  //   long int SAMPLEDOWN_RATIO = 0;
-  //   unsigned int MAX_LEN = 0; // the size in samples of the biggest CC file
-  //   double MAX_ENERGY = 0;
-  //   vector<metadata> METADATA; // (wavPath, size, energy)
-  //   ifstream inMeta(metadata_path.c_str());
-  //   if(inMeta.is_open()==false){
-  //     cout << "aborting: couldnt open " << metadata_path << endl;
-  //     return 2; // RETURN 2: COULDN'T OPEN METADATA
-  //   } else{
-  //     string s;
-  //     // load sampledown ratio (first line)
-  //     inMeta>>s;
-  //     int sepPos = s.find_first_of(":");
-  //     SAMPLEDOWN_RATIO = stoi(s.substr(sepPos+1));
-  //     while(inMeta >>s){
-  //       int sepPos = s.find_first_of(':');
-  //       string wavpath = s.substr(0, sepPos);
-  //       string rest = s.substr(sepPos+1);
-  //       sepPos = rest.find_first_of(':');
-  //       unsigned int len = stoi(rest.substr(0, sepPos));
-  //       double energy = stod(rest.substr(sepPos+1));
-  //       METADATA.push_back(metadata{wavpath, len, energy});
-  //       MAX_LEN = (len>MAX_LEN)? len : MAX_LEN;
-  //       MAX_ENERGY = (energy>MAX_ENERGY)? energy : MAX_ENERGY;
-  //     }
-  //   }
-  //   inMeta.close();
-    
-  //   // the wav2wav vector to be filled
-  //   vector<d_ref> D; // d_ref {metadata meta; int m_id; int del; double k;}
-    
-  //   // prepare random generation:
-  //   // a call to distribution(gen) should generate unif. ints between the second
-  //   // and last idx of metadata (corresponding to the materials)
-  //   // WARNING: idx 1 corresponds to m0!
-  //   random_device rd;
-  //   mt19937 gen(static_cast<mt19937::result_type>(time(nullptr)));
-  //   uniform_int_distribution<> distribution(1, METADATA.size()-1);
-
-  //   MAX_LEN = downsamplingLength(MAX_LEN, SAMPLEDOWN_RATIO);
-  //   unsigned int TEMPSIG_LEN = 2*MAX_LEN; // so now we know zero is at tempSig[MAX_LEN]
-
-
-
-
-  //   //////////////////////////////////////////////////////////////////////////////
-  //   /// LOOP
-  //   //////////////////////////////////////////////////////////////////////////////
-  //   int counter = 0;
-  //   for (unsigned int i=0; i<input.getIterations(); ++i){
-  //     cout << "processing " << counter << "/" << input.getIterations() << endl;
-  //     counter++;
-  //     //for (int r : {1,2,0,0,1}){
-
-  //     const int r = distribution(gen)-1;
-  //     const unsigned int m_size = METADATA[r+1].size;
-  //     const unsigned int mshift_len = (m_size-1)/SAMPLEDOWN_RATIO;
-  //     // CALCULATE DOWNSAMPLED LENGTH
-  //     if(m_size>METADATA[0].size){
-  //       cout <<"ignoring "<< METADATA[r+1].wavPath <<": material longer than original!"<< endl;
-  //     } else { // if chosen material isn't longer than original...
-  //       // initialize local containers for iteration
-  //       DoubleSignal* tempSig = new DoubleSignal(TEMPSIG_LEN); // zeros at beg.
-
-  //       double maxVal = 0;//- numeric_limits<double>::infinity(); // initialize at -inf
-  //       int maxPos = 0;
-
-
-  //       // for each material in D...
-  //       for(d_ref &d : D){ // wavPath, m_id, del, k
-  //         // get the name of the corresponding CCMs
-  //         pair<int, int> tup;
-  //         if (d.m_id<r){
-  //           tup.first = d.m_id;
-  //           tup.second = r;
-  //         } else {
-  //           tup.first = r;
-  //           tup.second = d.m_id;
-  //         }
-  //         string ccName = "cc_m"+to_string(tup.first)+"_m"+to_string(tup.second)+".wav";
-  //         DoubleSignal ccm(ANALYSIS_DIR+ccName, false);
-  //         if(r<d.m_id){ccm.reverse();} // ensure that our r is always the "shifting" sig
-  //         for(int i=0; i<ccm.length(); ++i){
-  //           tempSig->decrementAt(i+MAX_LEN+d.del-mshift_len, ccm[i]*d.k);
-  //         }
-  //         //tempSig->prettyPrint("tempSig after substracting "+ccName);
-  //       }
-
-  //       // now get the CCS and add it to tempSig
-  //       string ccs_name = ANALYSIS_DIR+"cc_original_m"+to_string(r)+".wav";
-  //       DoubleSignal ccs(ccs_name, false);
-  //       for(int i=0; i<tempSig->length(); ++i){
-  //         (*tempSig)[i] += ccs.at((i-MAX_LEN)+mshift_len, 0);
-  //         if(abs((*tempSig)[i])>abs(maxVal)){
-  //           maxVal = (*tempSig)[i];
-  //           maxPos = i-MAX_LEN;
-  //         }
-  //       }
-  //       //tempSig->prettyPrint("tempSig after adding ccs");
-
-  //       // find maximum in tempSig, and add result to D
-  //       double k_factor = maxVal * MAX_ENERGY / (METADATA[r+1].energy); //******************
-  //       D.push_back(d_ref{METADATA[r+1], r, maxPos,k_factor});// maxPos, k_factor});
-  //       // cout << i+1 << "/" << input.getIterations() << ") "<< "added signal " << r <<
-  //       //   " with delay "  << maxPos << " and norm " << k_factor << endl << endl;
-  //       // delete instantiated signals before finishing iteration
-  //       delete tempSig;
-  //     }
-  //   }
-
-  //   // SAVE D TO TXT FILE
-  //   const string list_path = input.getProjectPath()+"reconstruction_"+
-  //     to_string(input.getIterations()) + "iterations_" +
-  //     to_string(SAMPLEDOWN_RATIO) + "ratio.txt";
-  //   ofstream outFile(list_path, ios::out);
-  //   if(!outFile.is_open()){
-  //     cout << "aborting: couldnt open " << list_path << endl;
-  //     return 3; // RETURN 3: COULDN'T MAKE D_LIST
-  //   } else { // if able to open d_list
-  //     cout << "writing " << list_path << endl;
-  //     for(d_ref d : D){
-  //       outFile << d.meta.wavPath << ":" << d.del*SAMPLEDOWN_RATIO << ":"
-  //               << d.k << endl;
-  //     }
-  //     outFile.close();
-  //     cout << "wrote "<< list_path << " succesfully!" << endl;
-  //     return 0;
-  //   }
-  // }
- 
-
-
-
-
-
-
-
-
-
-
-
-
   
-  // // GENERATE WAV FILE FROM D-LIST. needs:
-  // // -a action
-  // // -p project name
-  // // -d name of the d-list
-  // if (input.getAction() == "generate_wav"){
-    
-  //   // this chunk is just to get the sampledownRatio and the original's metadata
-  //   const string metadata_path = input.getProjectPath()+METADATA_NAME;
-  //   // unsigned int SAMPLEDOWN_RATIO = 0;
-  //   ifstream inMeta(metadata_path.c_str());
-  //   if(inMeta.is_open()==false){
-  //     cout << "aborting: couldnt open " << metadata_path << endl;
-  //     return 2; // RETURN 2: COULDN'T OPEN METADATA
-  //   }
-  //   string s;
-  //   // load the downsample ratio
-  //   inMeta>>s; //do not comment out this! first line is sampledown, not original
-  //   // int sepPos = s.find_first_of(":");
-  //   // SAMPLEDOWN_RATIO = stoi(s.substr(sepPos+1));
-  //   // now load the specs for the original
-  //   inMeta >> s;
-  //   int sepPos = s.find_first_of(':');
-  //   const string ORIGINAL_PATH = s.substr(0, sepPos);
-  //   string rest = s.substr(sepPos+1);
-  //   sepPos = rest.find_first_of(':');
-
-    
-  //   const unsigned int ORIG_LEN = stoi(rest.substr(0, sepPos));
-  //   inMeta.close();
-    
-  //   //
-  //   DoubleSignal reconstruction(ORIG_LEN);
-  //   reconstruction.setSFInfo(reconstruction.length(), 44100, 1, 65538, 1, 1);
-
-    
-  //   // load the D-list and write to reconstruction
-  //   const string dlist_path = input.getProjectPath()+input.getDListName();
-  //   vector<tuple<string, int, double>> D;
-  //   ifstream inList(dlist_path.c_str());
-  //   if(inList.is_open()==false){
-  //     cout << "aborting: couldn't open " << dlist_path << endl;
-  //     return 4; // RETURN 4: COULDN'T LOAD DLIST FILE
-  //   }
-  //   while(inList >>s){
-  //     sepPos = s.find_first_of(':');
-  //     string wavpath = s.substr(0, sepPos);
-  //     string rest = s.substr(sepPos+1);
-  //     sepPos = rest.find_first_of(':');
-  //     int del = stoi(rest.substr(0, sepPos));
-  //     double norm = stod(rest.substr(sepPos+1));
-  //     DoubleSignal ds(wavpath, true); // ds is a material, NORMALIZED
-  //     for (int i=0; i<reconstruction.length(); ++i){
-  //       reconstruction[i] += ds.at(i, del)*norm; // del*SAMPLEDOWN_RATIO)*norm;
-  //       //cout << "reconstruction: " << reconstruction[10000] << endl;
-  //     }
-  //   }
-  //   inList.close();
-  //   reconstruction.toWav(dlist_path+".wav", true);
-  //   cout  << "toWav: succesfully saved to "<< dlist_path << ".wav!" << endl;
-  //   return 0;
-  // }
-
-
-
-  //   // GENERATE CROSS-CORRELATIONS. needs:
-  // // -a action
-  // // -s originalName, WHOLE PATH
-  // // -m mat1 mat2 ... WHOLE PATHS
-  // // -r sampledown ratio
-  // // -p project name
-  // if (input.getAction() == "preprocess"){
-  //   string p = input.getProjectPath();
-  //   string cmd1 = "rm -rf "+p;
-  //   string cmd2 = "mkdir "+p;
-  //   string cmd3 = "mkdir "+p+"ANALYSIS";
-  //   int response1 = system(cmd1.c_str());
-  //   int response2 = system(cmd2.c_str());
-  //   int response3 = system(cmd3.c_str());
-  //   if (response1+response2+response3!=0){
-  //     cout << "aborting: couldn't make directories" << p << endl;
-  //     return 1;  // RETURN 1: COULDN'T MAKE DIRECTORIES
-  //   } else{ // if folders could be created
-  //     // make METADATA and CCs
-  //     CrossCorrelator cc(p,
-  //                        input.getOriginalPath(), input.getMaterialPaths(), METADATA_NAME,
-  //                        input.getSampledownRatio());
-  //     return 0; 
-  //   }
-  // }
-
-
-
-
-//       cv::Mat testvec = cv::Mat(1, matSize, CV_32F, matContent);//(matContent);
-
-
-
-
-  // if (input.getAction() == "test_d"){
-  //   WavSequence ws("test.txt", "|", "##");
-  //   cout << ws.asString() << endl;
-  //   ws.add( 123, 3.14, "last one serious!!");
-  //   ws.toFile("test.txt");
-  //   return 0;
-  // }
+}

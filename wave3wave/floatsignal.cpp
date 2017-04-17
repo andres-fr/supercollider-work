@@ -44,6 +44,9 @@ SF_INFO* FloatSignal::getSFInfo() const {return sfInfo;}
 int FloatSignal::getSize() const {return size;}
 float* FloatSignal::getContent(){return content;}
 
+////////////////////////////////////////////////////////////////////////////////
+/// further functionality
+////////////////////////////////////////////////////////////////////////////////
 float* FloatSignal::getDownsampledCopy(const int ratio){
     float* dwn = new float[size/ratio]();
     for (int i=0; i<(size/ratio); ++i){
@@ -53,9 +56,7 @@ float* FloatSignal::getDownsampledCopy(const int ratio){
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
-/// further functionality
-////////////////////////////////////////////////////////////////////////////////
+
 void FloatSignal::toWav(const string pathOut, const bool norm){
   // check that SF_INFO was configured
   if(sfInfo->frames == -1){
@@ -74,6 +75,7 @@ void FloatSignal::toWav(const string pathOut, const bool norm){
 }
 
 
+// private
 void FloatSignal::normalize(){
   //cout << "normalizing"<< endl;
   int i=0;
