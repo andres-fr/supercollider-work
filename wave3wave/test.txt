@@ -1,0 +1,8 @@
+## Content: <DELAY_IN_SAMPLES> | <NORMALIZATION_FACTOR> | <PATH_TO_WAV_FILE>
+## fields are separated by '|'
+## Lines starting with '##' (comments) will be ignored
+123|3.14|hello
+321|6.18|bye
+4321234|10|Andres~was~here
+123|3.14|last one!!
+123|3.14|last one serious!!

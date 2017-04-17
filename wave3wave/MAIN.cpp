@@ -1,5 +1,8 @@
 // EXAMPLE OF COMPILING AND RUNNING PROGRAM
-//  g++ -O3 -Wall -Wextra -pedantic -std=c++14  MAIN.cpp inputparser.cpp floatsignal.cpp -o MAIN -Wl,-rpath,opencv-3.1.0  -lopencv_core -lopencv_imgproc -lopencv_ml -lsndfile && valgrind --leak-check=full -v ./MAIN -a test_cv -i 4
+// g++ -O3 -Wall -Wextra -pedantic -std=c++14  MAIN.cpp inputparser.cpp floatsignal.cpp wavsequence.cpp -o MAIN -Wl,-rpath,opencv-3.1.0  -lopencv_core -lopencv_imgproc -lopencv_ml -lsndfile && valgrind --leak-check=full -v ./MAIN -a test_cv -i 10 -r 20
+
+
+
 
 #include <iostream>
 #include <fstream>
@@ -14,7 +17,7 @@
 #include "sndfile.hh"
 #include "inputparser.h"
 #include "floatsignal.h"
-
+#include "wavsequence.h"
 #include <opencv2/opencv.hpp>
 // own dependencies
 
@@ -28,9 +31,8 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /// TODO
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-// implement sampledown
+// D-list should work... finish integration with the app, add functionality (load&continue list...)
 // implement some different optimization heuristic (split file into parts?)
-// export D-list (parser?), allow continuating session list
 
 
 
@@ -47,13 +49,9 @@ using namespace std;
 // -d the D-list
 
 
-
-
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /// HELPING DS AND FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-struct d_entry{string wavPath; int delay; double k;};
 
 float* cv_crosscorrelate(float* orig, int origLen, float* mat, int matLen){
   // declare original
@@ -62,24 +60,21 @@ float* cv_crosscorrelate(float* orig, int origLen, float* mat, int matLen){
   // declare material
   IplImage* matCV = cvCreateImage(cvSize(matLen, 1), IPL_DEPTH_32F, 1);
   memcpy((float*)matCV->imageData, mat, matLen*sizeof(float));
-  // declare result container
-  // create array for the result
+  // declare result
   int ccLen = origLen-matLen+1;
   IplImage* ccCV = cvCreateImage(cvSize(ccLen,1), IPL_DEPTH_32F, 1);
   // perform CC and copy result to float array
   cvMatchTemplate(origCV, matCV, ccCV, CV_TM_CCORR);
   float* cc = new float[ccLen]();
   memcpy(cc, (float*)ccCV->imageData, ccLen*sizeof(float));
-  // release allocated memory
+  // release allocated memory and return
   cvReleaseImage(&origCV);
   cvReleaseImage(&matCV);
   cvReleaseImage(&ccCV);
   return cc;
 }
 
-double energy(float* arr, int size){
-  return inner_product(arr, arr+size, arr, 0.0);
-}
+double energy(float* arr, int size){return inner_product(arr, arr+size, arr, 0.0);}
 
 
 
@@ -87,18 +82,28 @@ double energy(float* arr, int size){
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /// MAIN ROUTINE
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+int PRINT_FREQ = 100;
+
+
+
 int main(int argc, char **argv){
   InputParser input(argc, argv);
 
+  
   if (input.getAction() == "test_cv"){
+    // check that all needed parameters are present
     if (!input.getIterations() || !input.getSampledownRatio()){
       cout << "aborting: action " << input.getAction() << " requires -i <N> iterations, "
            << "and -r <M> sampledown ratio" << endl;
       return -1;
     }
-    vector<d_entry> D;
+    // globals
+    if (!input.getDListName().empty()){
+      WavSequence optList(input.getDListName(), "|", "#");
+    } else {WavSequence optList("|", "#");}
+    //vector<d_entry> optList();
     const int DS_RATIO = input.getSampledownRatio();
-    //
+    // variables involving "original" (the signal to be reconstructed)
     string origPath = "child-short.wav";
     FloatSignal original(origPath);
     float* origContent = original.getContent();
@@ -106,21 +111,24 @@ int main(int argc, char **argv){
     int origSize = original.getSize();
     int origDownSize = original.getSize()/DS_RATIO;
     float* origDownContent = original.getDownsampledCopy(DS_RATIO);
-
-
-    //
+    // MAIN LOOP
     for (unsigned int i=0; i<input.getIterations(); ++i){
-      cout << endl << "LOOP " << i << endl;
+      bool printFlag = i%PRINT_FREQ==0;
+      if(printFlag){
+        cout << "==iteration " << i << "/"<< input.getIterations() << "==" << endl;
+      }
+      // load the "material" and declare related variables
       string matPath = "anvil.wav";
-      cout << "pick and load " << matPath << endl;    
       FloatSignal material(matPath);
       float* matContent = material.getContent();
-      float* matDownContent = material.getDownsampledCopy(DS_RATIO);
       SF_INFO* matInfo = material.getSFInfo();
       int matSize = material.getSize();
-      int matDownSize = material.getSize()/DS_RATIO;
-      //double matEnergy = energy(matContent, matSize);
-      double matDownEnergy = energy(matDownContent, matDownSize);
+      // check that the material is adequate
+      if (matSize>origSize){
+        cout << "WARNING: material cannot be bigger than original (" << origSize <<
+          ") and was " << matPath << "=" << matSize << ". Skipping" << endl;
+        continue;
+      }
       if (origInfo->samplerate!=matInfo->samplerate){
         cout << "ERROR: incompatible sample rates: " << origInfo->samplerate << ", " <<
           matInfo->samplerate << ". Aborting" << endl;
@@ -131,61 +139,51 @@ int main(int argc, char **argv){
           matInfo->channels << ". Aborting" << endl;
         return -1;
       }
-      cout << "calculate cc and optimization parameters" << endl;
+      // if material is OK, prepare for CC
+      int matDownSize = matSize/DS_RATIO;
+      float* matDownContent = material.getDownsampledCopy(DS_RATIO);
+      double matDownEnergy = energy(matDownContent, matDownSize);
+      // calculate CC, extract optimization values and add them to optList
       float* cc = cv_crosscorrelate(origDownContent, origDownSize, matDownContent, matDownSize);
       auto minmax = minmax_element(cc, cc+origDownSize-matDownSize+1);
       int optPos_dw = ((abs(*minmax.first) > abs(*minmax.second))? minmax.first : minmax.second)-cc;
-      double k_factor_approx = cc[optPos_dw] / matDownEnergy; // downsampling introduces considerable error
-
-
-      //
-      cout << "add opt to d-list and subtract from original" << endl;
       int optPos = optPos_dw*DS_RATIO;
-
-      // float* cc2 = cv_crosscorrelate(origContent, origSize, matContent, matSize);
-      // auto mm2 = minmax_element(cc2, cc2+origSize-matSize+1);
-      // int max2 = ((abs(*mm2.first) > abs(*mm2.second))? mm2.first : mm2.second)-cc2;
-      // double korig = cc2[max2]/matEnergy;
-
-      
-      // cout << ">>>>>>cc_orig:" << cc2[max2] << "  cc down: " << cc[maxPos_dw] << endl;
-      // cout <<">>>>>>>>>k: " << korig << "    k down: " << k_factor_approx << endl;
-
-      
-      D.push_back(d_entry{matPath, optPos, k_factor_approx});
+      double norm_factor_approx = cc[optPos_dw] / matDownEnergy;
+      //optList.push_back(d_entry{matPath, optPos, norm_factor_approx});
+      // update result & optimization references by substracting the optimized material
       for (int i=0; i<matSize; ++i){
         int delIdx = i+optPos;
         if(delIdx<0 || delIdx >= origSize){continue;}
-        else{
-          origContent[delIdx] -= matContent[i]*k_factor_approx;
-          // if (i%DS_RATIO==0){
-          //   origDownContent[(i/DS_RATIO)+optPos_dw] -= matDownContent[i/DS_RATIO]*k_factor_approx;
-          // }
+        else{ // subtract from the original array (will be useful at reconstruction)
+          origContent[delIdx] -= matContent[i]*norm_factor_approx;
+          if (i%DS_RATIO==0){ // subtract from the downsampled array (for further optimizations)
+            int newI = i/DS_RATIO; // I hope this if guards are faster than a separate for loop
+            if(newI<matDownSize){
+              origDownContent[newI+optPos_dw] -= matDownContent[newI]*norm_factor_approx;
+            }
+          }
         }
       }
-
-      for (int i=0; i<matDownSize; ++i){
-        int delIdx = i+optPos_dw;
-        if(delIdx<0 || delIdx >= origDownSize){continue;}
-        else{origDownContent[delIdx] -= matDownContent[i]* k_factor_approx;}
-      }
-      
+      // this arrays were valid just for one iteration, so delete them
       delete[] cc;
       delete[] matDownContent;
     }
-
-    cout << "reconstructing and saving to wav..." << endl;
+    // once the optimization loop is done, export optList and reconstruction
+    delete[] origDownContent; // this was needed only for optimization
+    string outPath = "test.wav";
+    cout << "Optimization done. Saving to " << outPath << endl;
     FloatSignal reconstruction(origPath);
     float* reconsContent= reconstruction.getContent();
-    for (int i=0; i<origSize; ++i){
+    for (int i=0; i<origSize; ++i){// ORIG - (ORIG-RECONSTRUCTION) = RECONSTRUCTION 
       reconsContent[i] -= origContent[i];
     }
     reconstruction.toWav("test.wav", true);
-
-    delete[] origDownContent;
     return 0;
   }
 
+
+
+  
   // FINAL CASES
   if (input.getAction() == ""){
     cout << "aborting: no action specified?"<< endl;
@@ -484,3 +482,14 @@ int main(int argc, char **argv){
 
 
 //       cv::Mat testvec = cv::Mat(1, matSize, CV_32F, matContent);//(matContent);
+
+
+
+
+  // if (input.getAction() == "test_d"){
+  //   WavSequence ws("test.txt", "|", "##");
+  //   cout << ws.asString() << endl;
+  //   ws.add( 123, 3.14, "last one serious!!");
+  //   ws.toFile("test.txt");
+  //   return 0;
+  // }
