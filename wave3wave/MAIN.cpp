@@ -1,6 +1,5 @@
 // EXAMPLE OF COMPILING AND RUNNING PROGRAM
-// g++ -O4 -Wall -Wextra -pedantic -std=c++14  MAIN.cpp inputparser.cpp floatsignal.cpp -o MAIN -Wl,-rpath,opencv-3.1.0  -lopencv_core -lopencv_imgproc -lopencv_ml -lsndfile && valgrind --leak-check=full -v ./MAIN -a test_cv -i 10
-
+//  g++ -O3 -Wall -Wextra -pedantic -std=c++14  MAIN.cpp inputparser.cpp floatsignal.cpp -o MAIN -Wl,-rpath,opencv-3.1.0  -lopencv_core -lopencv_imgproc -lopencv_ml -lsndfile && valgrind --leak-check=full -v ./MAIN -a test_cv -i 4
 
 #include <iostream>
 #include <fstream>
@@ -18,43 +17,43 @@
 
 #include <opencv2/opencv.hpp>
 // own dependencies
-// #include "freefunctions.h"
+
 // own header
 
-
+// namespacing
 using namespace std;
 //using namespace chrono;
 
 
-void normalizeArray(float* contents, const int sz){
-  //cout << "normalizing"<< endl;
-  int i=0;
-  float sum = 0;
-  float max = 0;
-  float min = 0;
-  // calculate mean into accum and get absolute maximum
-  for(i=0; i<sz; i++){
-    sum += contents[i];
-    if (contents[i] > max){
-      max = contents[i];
-    } else if (contents[i] < min){
-      min = contents[i];
-    }
-  }
-  float mean = sum/sz;
-  if (max==mean){
-    cout << "normalizeArray: normalization not possible when max==mean" << endl;
-  } else {
-    max -= mean;
-    min -= mean;
-    float deltanorm = (abs(max)>abs(min))? abs(max) : abs(min);
-    // substract accum to each sample, and renormalize
-    for(i=0; i<sz; i++){
-      contents[i] = (contents[i]-mean)/deltanorm;
-    }
-  }
-}
+////////////////////////////////////////////////////////////////////////////////////////////////////
+/// TODO
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// implement sampledown
+// implement some different optimization heuristic (split file into parts?)
+// export D-list (parser?), allow continuating session list
 
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+/// CLI
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// -a action
+// -s originalName, WHOLE PATH
+// -m mat1 mat2 ... WHOLE PATHS
+// -r sampledown ratio
+// -i iterations
+// -p project name
+// -d the D-list
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+/// HELPING DS AND FUNCTIONS
+////////////////////////////////////////////////////////////////////////////////////////////////////
+struct d_entry{string wavPath; int delay; double k;};
 
 float* cv_crosscorrelate(float* orig, int origLen, float* mat, int matLen){
   // declare original
@@ -78,56 +77,50 @@ float* cv_crosscorrelate(float* orig, int origLen, float* mat, int matLen){
   return cc;
 }
 
-// REPORT:
-// talk about the command-line interface of the program
-// report some real-case profiling
-// play example: record stuff as materials
-
-
-// PROFILING:
-// develop heuristic to split a file in parts? (sitting in a room f.e.)
+double energy(float* arr, int size){
+  return inner_product(arr, arr+size, arr, 0.0);
+}
 
 
 
 
-// -a action
-// -s originalName, WHOLE PATH
-// -m mat1 mat2 ... WHOLE PATHS
-// -r sampledown ratio
-// -i iterations
-// -p project name
-// -d the D-list
-
-
-
-struct test_d{string wavPath; int delay; double k;};
-
+////////////////////////////////////////////////////////////////////////////////////////////////////
+/// MAIN ROUTINE
+////////////////////////////////////////////////////////////////////////////////////////////////////
 int main(int argc, char **argv){
   InputParser input(argc, argv);
 
-
   if (input.getAction() == "test_cv"){
-    if (!input.getIterations()){
-      cout << "aborting: action " << input.getAction() << " requires -i <N> iterations" << endl;
+    if (!input.getIterations() || !input.getSampledownRatio()){
+      cout << "aborting: action " << input.getAction() << " requires -i <N> iterations, "
+           << "and -r <M> sampledown ratio" << endl;
       return -1;
     }
-    vector<test_d> D;
+    vector<d_entry> D;
+    const int DS_RATIO = input.getSampledownRatio();
     //
     string origPath = "child-short.wav";
-    FloatSignal original(origPath, true);
+    FloatSignal original(origPath);
     float* origContent = original.getContent();
     SF_INFO* origInfo = original.getSFInfo();
     int origSize = original.getSize();
+    int origDownSize = original.getSize()/DS_RATIO;
+    float* origDownContent = original.getDownsampledCopy(DS_RATIO);
+
+
     //
     for (unsigned int i=0; i<input.getIterations(); ++i){
       cout << endl << "LOOP " << i << endl;
       string matPath = "anvil.wav";
       cout << "pick and load " << matPath << endl;    
-      FloatSignal material(matPath, true);
+      FloatSignal material(matPath);
       float* matContent = material.getContent();
+      float* matDownContent = material.getDownsampledCopy(DS_RATIO);
       SF_INFO* matInfo = material.getSFInfo();
       int matSize = material.getSize();
-      double matEnergy = inner_product(matContent, matContent+matSize, matContent, 0.0);
+      int matDownSize = material.getSize()/DS_RATIO;
+      //double matEnergy = energy(matContent, matSize);
+      double matDownEnergy = energy(matDownContent, matDownSize);
       if (origInfo->samplerate!=matInfo->samplerate){
         cout << "ERROR: incompatible sample rates: " << origInfo->samplerate << ", " <<
           matInfo->samplerate << ". Aborting" << endl;
@@ -138,30 +131,58 @@ int main(int argc, char **argv){
           matInfo->channels << ". Aborting" << endl;
         return -1;
       }
-      cout << "calculate cc... and extract optimization parameters" << endl;
-      float* cc = cv_crosscorrelate(origContent, origSize, matContent, matSize);
-      auto minmax = minmax_element(cc, cc+origSize-matSize+1);
-      int maxPos = ((abs(*minmax.first) > abs(*minmax.second))? minmax.first : minmax.second)-cc;
-      double maxVal = cc[maxPos];
-      double k_factor = maxVal / matEnergy;
-      D.push_back(test_d{matPath, maxPos, k_factor});
-      delete[] cc;
-    
-      cout << "subtracting from original..." << endl;
+      cout << "calculate cc and optimization parameters" << endl;
+      float* cc = cv_crosscorrelate(origDownContent, origDownSize, matDownContent, matDownSize);
+      auto minmax = minmax_element(cc, cc+origDownSize-matDownSize+1);
+      int optPos_dw = ((abs(*minmax.first) > abs(*minmax.second))? minmax.first : minmax.second)-cc;
+      double k_factor_approx = cc[optPos_dw] / matDownEnergy; // downsampling introduces considerable error
+
+
+      //
+      cout << "add opt to d-list and subtract from original" << endl;
+      int optPos = optPos_dw*DS_RATIO;
+
+      // float* cc2 = cv_crosscorrelate(origContent, origSize, matContent, matSize);
+      // auto mm2 = minmax_element(cc2, cc2+origSize-matSize+1);
+      // int max2 = ((abs(*mm2.first) > abs(*mm2.second))? mm2.first : mm2.second)-cc2;
+      // double korig = cc2[max2]/matEnergy;
+
+      
+      // cout << ">>>>>>cc_orig:" << cc2[max2] << "  cc down: " << cc[maxPos_dw] << endl;
+      // cout <<">>>>>>>>>k: " << korig << "    k down: " << k_factor_approx << endl;
+
+      
+      D.push_back(d_entry{matPath, optPos, k_factor_approx});
       for (int i=0; i<matSize; ++i){
-        int delIdx = i+maxPos;
+        int delIdx = i+optPos;
         if(delIdx<0 || delIdx >= origSize){continue;}
-        else{origContent[delIdx] -= matContent[i]*k_factor;}
+        else{
+          origContent[delIdx] -= matContent[i]*k_factor_approx;
+          // if (i%DS_RATIO==0){
+          //   origDownContent[(i/DS_RATIO)+optPos_dw] -= matDownContent[i/DS_RATIO]*k_factor_approx;
+          // }
+        }
       }
+
+      for (int i=0; i<matDownSize; ++i){
+        int delIdx = i+optPos_dw;
+        if(delIdx<0 || delIdx >= origDownSize){continue;}
+        else{origDownContent[delIdx] -= matDownContent[i]* k_factor_approx;}
+      }
+      
+      delete[] cc;
+      delete[] matDownContent;
     }
 
     cout << "reconstructing and saving to wav..." << endl;
-    FloatSignal xx(origPath, true);
-    float* yy = xx.getContent();
+    FloatSignal reconstruction(origPath);
+    float* reconsContent= reconstruction.getContent();
     for (int i=0; i<origSize; ++i){
-      yy[i] -= origContent[i];
+      reconsContent[i] -= origContent[i];
     }
-    xx.toWav("test.wav", true);
+    reconstruction.toWav("test.wav", true);
+
+    delete[] origDownContent;
     return 0;
   }
 
@@ -461,3 +482,5 @@ int main(int argc, char **argv){
 
 
 
+
+//       cv::Mat testvec = cv::Mat(1, matSize, CV_32F, matContent);//(matContent);

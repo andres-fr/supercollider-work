@@ -19,7 +19,7 @@ class FloatSignal {
   void normalize();
  public:
   // constructors
-  explicit FloatSignal(const string wavPath, const bool norm);
+  explicit FloatSignal(const string wavPath, const bool norm=true);
   // deleted copy- and assignment constructors
   FloatSignal(const FloatSignal& copyFrom)=delete;
   FloatSignal& operator= (const FloatSignal& copyFrom)=delete;
@@ -34,6 +34,7 @@ class FloatSignal {
   // getters
   SF_INFO* getSFInfo() const;
   float* getContent();
+  float* getDownsampledCopy(const int ratio);
   int getSize() const;
   // // special getter (returns contents[idx-delay], never throws error)
   // double at(int idx, int del);

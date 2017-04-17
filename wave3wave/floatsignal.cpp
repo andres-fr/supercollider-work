@@ -9,6 +9,8 @@
 // namespaces
 using namespace std;
 
+
+
 ////////////////////////////////////////////////////////////////////////////////
 /// constructor&destructor
 ////////////////////////////////////////////////////////////////////////////////
@@ -22,7 +24,7 @@ FloatSignal::FloatSignal(const string wavPath, const bool norm){
     throw invalid_argument("FloatSignal: Unable to open input file: "+wavPath);
   } else { // if file opens...
     size = sfInfo->frames;
-    this->content = new float[size]();
+    content = new float[size]();
     sf_read_float(infile, content, size);
     if(norm){normalize();}
     sf_close(infile);
@@ -41,6 +43,14 @@ FloatSignal::~FloatSignal(){
 SF_INFO* FloatSignal::getSFInfo() const {return sfInfo;}
 int FloatSignal::getSize() const {return size;}
 float* FloatSignal::getContent(){return content;}
+
+float* FloatSignal::getDownsampledCopy(const int ratio){
+    float* dwn = new float[size/ratio]();
+    for (int i=0; i<(size/ratio); ++i){
+      dwn[i] = content[i*ratio];
+    }
+    return dwn;
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////
