@@ -18,9 +18,11 @@ class WavSelector {
   string commentMarker;
  public:
   // constructors
+  explicit WavSelector();
   explicit WavSelector(const string pathIn, const string sep,
                        const string comm, const bool normalize_after=false);
-  explicit WavSelector(const string sep, const string comm);
+  explicit WavSelector(const vector<string> filenames,
+                       const bool normalize_after=false);
   // deleted copy- and assignment constructors
   WavSelector(const WavSelector& copyFrom)=delete;
   WavSelector& operator= (const WavSelector& copyFrom)=delete;

@@ -15,9 +15,15 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////////////
 /// constructor&destructor
 ////////////////////////////////////////////////////////////////////////////////
+WavSelector::WavSelector(){
+  
+}
 
 WavSelector::WavSelector(const string pathIn, const string sep,
                          const string comm, const bool normalize_after){
+  if (pathIn.empty()){
+    throw invalid_argument("WavSelector: empty path to constructor not allowed");
+  }
   separator = sep;
   commentMarker = comm;
   unifDist = new uniform_real_distribution<double>(0.0, 1.0);
@@ -39,8 +45,16 @@ WavSelector::WavSelector(const string pathIn, const string sep,
   }
 }
 
-WavSelector::WavSelector(const string sep, const string comm)
-  : WavSelector("", sep, comm, false){}
+WavSelector::WavSelector(const vector<string> filenames,
+                         const bool normalize_after){
+  separator = "|";
+  commentMarker = "#";
+  unifDist = new uniform_real_distribution<double>(0.0, 1.0);
+  for(string s : filenames){
+    add(s, 1);
+  }
+  if(normalize_after){normalize();}
+}
 
 WavSelector::~WavSelector(){
   delete unifDist;

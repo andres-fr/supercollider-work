@@ -2,19 +2,20 @@
 #define INPUTPARSER_H
 
 // stl includes
-#include <vector>
+
 // namespace
 using namespace std;
 
 class InputParser{
  private:
-  string action;
   string originalPath;
-  vector<string> materialPaths;
-  unsigned int sampledownRatio;
   unsigned int iterations;
-  string optListName;
-  string pickListName;
+  string pickListPath;
+  string materialsPath;
+  string optListPath;
+  string action;
+  unsigned int sampledownRatio;
+  int printFrequency;
  public:
   // constructor (parser-setter)
   InputParser(int &argc, char **argv);
@@ -22,13 +23,14 @@ class InputParser{
   InputParser(const InputParser& copyFrom)=delete;
   InputParser& operator= (const InputParser& copyFrom)=delete;
   // getters
-  string getAction() const;
   string getOriginalPath() const;
-  vector<string> getMaterialPaths() const;
-  unsigned int getSampledownRatio() const;
   unsigned int getIterations() const;
-  string getOptListName() const;
-  string getPickListName() const;
+  string getPickListPath() const;
+  string getMaterialsPath() const;
+  string getOptListPath() const;
+  string getAction() const;
+  unsigned int getSampledownRatio() const;
+  unsigned int getPrintFrequency() const;
 };
 
 
