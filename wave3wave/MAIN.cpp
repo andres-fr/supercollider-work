@@ -6,6 +6,11 @@
 // using a picklist
 // g++ -O3 -Wall -Wextra -pedantic -std=c++14 ./*.cpp -o MAIN -Wl,-rpath,opencv-3.1.0  -lopencv_core -lopencv_imgproc -lopencv_ml -lsndfile && valgrind --leak-check=full -v ./MAIN -s child-short.wav -i 500 -r 20 -p picklist.txt -f 100
 
+// exporting blobs of file
+// g++ -O3 -Wall -Wextra -pedantic -std=c++14 ./*.cpp -o MAIN -Wl,-rpath,opencv-3.1.0  -lopencv_core -lopencv_imgproc -lopencv_ml -lsndfile && valgrind --leak-check=full -v ./MAIN -a extract_blobs -s violin.wav -m violin_blobs
+
+// last tests for blob extractor
+// g++ -O3 -Wall -Wextra -pedantic -std=c++14 ./*.cpp -o MAIN  -lopencv_core -lopencv_imgproc -lopencv_ml -lopencv_highgui -lopencv_imgcodecs -lopencv_features2d -lsndfile && valgrind --leak-check=full -v ./MAIN -a extract_blobs -s violin.wav -m violin_blobs
 
 // std libs
 #include <iostream>
@@ -18,7 +23,11 @@
 #include <dirent.h>
 // 3rd party libs
 #include "sndfile.hh"
+//#include <opencv2/imgproc/imgproc.hpp>
+// #include <opencv2/highgui/highgui.hpp>
+//#include <opencv2/features2d/features2d.hpp>
 #include <opencv2/opencv.hpp>
+//#include <opencv2/
 // own dependencies
 #include "inputparser.h"
 #include "floatsignal.h"
@@ -28,12 +37,38 @@
 using namespace std;
 
 
+
+
+
+
+// -lopencv_calib3d
+// -lopencv_contrib
+// -lopencv_core            **
+// -lopencv_features2d      **
+// -lopencv_flann
+// -lopencv_highgui         **
+// -lopencv_imgproc         **
+// -lopencv_legacy
+// -lopencv_ml              **
+// -lopencv_nonfree
+// -lopencv_objdetect
+// -lopencv_photo
+// -lopencv_stitching
+// -lopencv_superres
+// -lopencv_ts
+// -lopencv_video
+// -lopencv_videostab
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /// TODO
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // implement some heuristic to apply on the wavselector distribution
 
+// blob detector: https://www.learnopencv.com/blob-detection-using-opencv-python-c/
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -124,7 +159,97 @@ int main(int argc, char **argv){
 
   InputParser input(argc, argv);
 
-  // THE DEFAULT ACTION
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  // EXPORTING BLOBS OF FILE
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  if (input.getAction() == "extract_blobs"){
+    string path = input.getOriginalPath();
+    string blobsPath = input.getMaterialsPath();
+    // check that all needed parameters are present
+    if (path.empty() || blobsPath.empty()){
+      cout << "aborting: action '" << input.getAction() << "' requires -s <PATH> to original .wav "
+           << "file and -m <FOLDER_PATH> to save the .wav blobs!" << endl;
+      return -1;
+    }
+    cout << "loading wav file in " << path << endl;
+    FloatSignal original(path);
+    cout << "detecting blobs..." << endl;
+    
+    cv::Mat origCV(original.getSize(), 1, CV_32F, original.getContent());
+    origCV = cv::abs(origCV);
+    int kernel_size = 11;
+    cv::Mat kernel = cv::Mat::ones(kernel_size, 11, CV_32F) / (float)(kernel_size*11);
+    cv::Mat result;    
+    cv::filter2D(origCV, result, 1 , kernel, cv::Point(-1, -1), 0, cv::BORDER_DEFAULT );
+
+
+    cv::imshow("keypoints", result );
+    cv::waitKey(0);
+
+    cout << "exporting blobs to " << blobsPath << endl;
+    //
+    return 0;
+  }
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  // TEST 2D BLOB DETECTOR
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  if (input.getAction() == "test_blob2d"){
+    string path = input.getOriginalPath();
+    string blobsPath = input.getMaterialsPath();
+    // check that all needed parameters are present
+    if (path.empty() || blobsPath.empty()){
+      cout << "aborting: action '" << input.getAction() << "' requires -s <PATH> to original .wav "
+           << "file and -m <FOLDER_PATH> to save the .wav blobs!" << endl;
+      return -1;
+    }
+    cout << "loading wav file in " << path << endl;
+    FloatSignal original(path);
+    cout << "detecting blobs..." << endl;
+    cv::Mat im = cv::imread("blobs.jpg", CV_LOAD_IMAGE_GRAYSCALE); // CV_LOAD_IMAGE_COLOR
+    if(!im.data){
+      return -1;
+    }
+    int kernel_size = 11;
+    cv::Mat kernel = cv::Mat::ones(kernel_size, kernel_size, CV_32F)/ (float)(kernel_size*kernel_size);
+    cv::Mat newPic;
+      
+    for (int i=0; i<1; ++i){
+
+      cv::filter2D(im, newPic, -1 , kernel, cv::Point(-1, -1), 0, cv::BORDER_DEFAULT );
+      
+      cv::SimpleBlobDetector::Params params;
+      // params.minThreshold = 10;
+      // params.maxThreshold = 200;
+      // params.thresholdStep = 1;
+      // params.minDistBetweenBlobs = 1;
+      params.filterByArea = true;
+      params.minArea = 50;
+      params.maxArea = 1000000;
+      params.filterByCircularity = true;
+      params.minCircularity = 0.1;
+      params.filterByConvexity = true;
+      params.minConvexity = 0.4;
+      params.filterByInertia = true;
+      params.minInertiaRatio = 0.01;
+      cv::Ptr<cv::SimpleBlobDetector> detector = cv::SimpleBlobDetector::create(params);
+      vector<cv::KeyPoint> keypoints;
+      detector->detect(newPic, keypoints);
+      cv::Mat im_with_keypoints;
+      drawKeypoints(im, keypoints, im_with_keypoints, cv::Scalar(0,0,255), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS );
+      cv::imshow("keypoints", im_with_keypoints );
+      cv::waitKey(0);
+    }
+    
+    cout << "exporting blobs to " << blobsPath << endl;
+    //
+    return 0;
+  }
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  // GENERATING W2W AUDIO AND SEQUENCE: THE DEFAULT ACTION
+  //////////////////////////////////////////////////////////////////////////////////////////////////
   if (input.getAction() == "optimize"){
     // check that all needed parameters are present
     if (input.getOriginalPath().empty() || !input.getIterations()){

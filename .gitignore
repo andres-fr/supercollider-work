@@ -7,3 +7,6 @@
 /wave2wave/SETUP*
 #unignore everything in showoff
 !/wave2wave/showoff/*
+
+/wave3wave/*.wav
+/wave3wave/**/*.wav

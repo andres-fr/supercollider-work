@@ -1,0 +1,28 @@
+The wav2wav_v1 program has the following command line options:
+
+-a action     // {preprocess, generate_list, generate_wav}
+-s originalName  // the whole path to a mono, 44100 wav file
+-m mat1 mat2 ... // a sucession of whole paths to mono, 44100 wav files
+-r sampledown ratio // the "time resolution": any integer >=1 (the bigger, the faster)
+-i iterations   // the number of elements the reconstruction will have: any integer >=1
+-p project name // this will be the folder (IN THE COMPILED WORKSPACE) where the analysis and output goes to
+-d the D-list   // outputed by the generate_list action, and needed by generate_wav to make the wav output
+
+** important: for this setup, the "WORKSPACE_DIR" is hardcoded to /home/afr/IMPULS/WORKSPACE/
+
+USAGE EXAMPLE:
+
+1) generate the analysis files, just with one material in this case. time resolution = 60, project name test_child
+
+./wav2wav_v1 -a preprocess -s /home/afr/IMPULS/WORKSPACE/AUDIO/child-short.wav -m /home/afr/IMPULS/WORKSPACE/AUDIO/anvil[0].wav -r 60 -p test_child
+
+
+2) calculate a reconstruction with 600 elements and save as a list
+
+./wav2wav_v1 -a generate_list -p test_child -i 600
+
+
+3) generate the audio file
+./wav2wav_v1 -a generate_wav -p test_child -d reconstruction_600iterations_60ratio.txt
+
+
