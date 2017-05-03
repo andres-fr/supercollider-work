@@ -2,6 +2,9 @@
 #include <iostream>
 #include <stdexcept>
 #include <algorithm>
+// other includes
+#include <opencv2/opencv.hpp>
+#include <opencv2/plot.hpp>
 // own dependencies
 
 // own header
@@ -74,6 +77,34 @@ void FloatSignal::toWav(const string pathOut, const bool norm){
   }
 }
 
+
+void FloatSignal::plot(const string title, const bool wait,
+                       const int width, const int height){
+  const float* fArr = getContent();
+  const int size = getSize();
+  // copy the float array to a double array (required by cv plot) and put it into a Mat
+  double* dArr = new double[size]();
+  copy(fArr, fArr+size, dArr);
+  cv::Mat data(size, 1, CV_64F, dArr);
+  data *= -1; // invert because y axis
+  // instantiate and configure plot object based on the data Mat
+  cv::Ptr<cv::plot::Plot2d> plot = cv::plot::createPlot2d(data);
+  plot->setPlotBackgroundColor(cv::Scalar(10, 10, 10));
+  plot->setPlotGridColor(cv::Scalar(10, 10, 10));
+  plot->setPlotTextColor(cv::Scalar(10, 10, 10));
+  plot->setPlotAxisColor(cv::Scalar(10, 10, 90));
+  plot->setPlotLineColor(cv::Scalar(120, 120, 120));
+  plot->setPlotSize(width, height);
+  plot->setMinY(-1.1);
+  plot->setMaxY(1.1);
+  // render into result, plot, wait for any key and clean exit
+  cv::Mat plot_result;
+  plot->render(plot_result);
+  cv::namedWindow(title, 1);
+  cv::imshow(title, plot_result);
+  if(wait){cv::waitKey();}
+  delete[] dArr;
+}
 
 // private
 void FloatSignal::normalize(){

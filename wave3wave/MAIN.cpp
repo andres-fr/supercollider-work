@@ -25,12 +25,8 @@
 #include <dirent.h>
 // 3rd party libs
 #include "sndfile.hh"
-//#include <opencv2/imgproc/imgproc.hpp>
-// #include <opencv2/highgui/highgui.hpp>
-//#include <opencv2/features2d/features2d.hpp>
 #include <opencv2/opencv.hpp>
 #include <opencv2/plot.hpp>
-//#include <opencv2/
 // own dependencies
 #include "inputparser.h"
 #include "floatsignal.h"
@@ -90,8 +86,8 @@ float* cv_crosscorrelate(float* orig, int origLen, float* mat, int matLen){
   return cc;
 }
 
-void cv_plot_floatarray(const float* fArr, const int size,
-                        int width=1000, int height=300, string title="plot"){
+void cv_plot_floatarray(const float* fArr, const int size, const string title,
+                        const bool wait=false, const int width=1000, const int height=300){
   // copy the float array to a double array (required by cv plot) and put it into a Mat
   double* dArr = new double[size]();
   copy(fArr, fArr+size, dArr);
@@ -110,8 +106,9 @@ void cv_plot_floatarray(const float* fArr, const int size,
   // render into result, plot, wait for any key and clean exit
   cv::Mat plot_result;
   plot->render(plot_result);
+  cv::namedWindow(title, 1);
   cv::imshow(title, plot_result);
-  cv::waitKey();
+  if(wait){cv::waitKey();}
   delete[] dArr;
 }
 
@@ -177,105 +174,21 @@ int main(int argc, char **argv){
       return -1;
     }
     cout << "loading wav file in " << path << endl;
+    // load and plot original
     FloatSignal original(path);
-    cout << "detecting blobs..." << endl;
-    
-    //cv::Mat origCV(original.getSize(), 1, CV_64F, original.getContent());
-    // cv::Ptr<cv::plot::Plot2d> plot = cv::plot::createPlot2d(origCV);
-    // origCV = cv::abs(origCV);
-    // int kernel_size = 11;
-    // cv::Mat kernel = cv::Mat::ones(kernel_size, 11, CV_32F) / (float)(kernel_size*11);
-    // cv::Mat result;   
-    
-    // cv::filter2D(origCV, result, 1 , kernel, cv::Point(-1, -1), 0, cv::BORDER_DEFAULT );
-
-    cv_plot_floatarray(original.getContent(), original.getSize());
-
-    // //float dummy_query_data[20] = {0,0, 1, 1, 2, 3, 4, 5, 6, 6, 5, 4, 0, 0 };
-    // //double dst[sizeof(dummy_query_data)/sizeof(float)];
-    // int xx= original.getSize();
-    // double* dst = new double[xx]();
-    // copy(original.getContent(), original.getContent()+xx, dst);
-    // cv::Mat data( xx, 1, CV_64F, dst);
-    // data *= -1;
-
-    //  cv::Mat plot_result;
-
-    // cv::Ptr<cv::plot::Plot2d> plot = cv::plot::createPlot2d( data );
-    // plot->setPlotBackgroundColor( cv::Scalar( 80, 80, 80 ) );
-    // plot->setPlotLineColor( cv::Scalar( 20, 20, 20 ) );
-    // plot->render( plot_result );
-
-    // cv::imshow( "plot", plot_result );
-    // cv::waitKey();
-
-    // delete[] dst;
-
-
-
-    
-    // cv::imshow("keypoints", result );
-    // cv::waitKey(0);
-
-    cout << "exporting blobs to " << blobsPath << endl;
-    //
+    cv::Mat origCV(original.getSize(), 1, CV_32F, original.getContent());
+    original.plot("original signal");
+    // perform a convolution on the absolute value of orig
+    origCV = cv::abs(origCV);
+    int kernel_size = 5000;
+    cv::Mat kernel = cv::Mat::ones(kernel_size, 1, CV_32F) / (float)kernel_size;
+    float* cc = cv_crosscorrelate((float*)origCV.data, origCV.rows, (float*)kernel.data, kernel_size);
+    cv_plot_floatarray(cc, origCV.rows-kernel_size+1, "abs. signal, convolution with flat 5000p kernel");
+    cv::waitKey();
+ 
     return 0;
   }
 
-  // //////////////////////////////////////////////////////////////////////////////////////////////////
-  // // TEST 2D BLOB DETECTOR
-  // //////////////////////////////////////////////////////////////////////////////////////////////////
-  // if (input.getAction() == "test_blob2d"){
-  //   string path = input.getOriginalPath();
-  //   string blobsPath = input.getMaterialsPath();
-  //   // check that all needed parameters are present
-  //   if (path.empty() || blobsPath.empty()){
-  //     cout << "aborting: action '" << input.getAction() << "' requires -s <PATH> to original .wav "
-  //          << "file and -m <FOLDER_PATH> to save the .wav blobs!" << endl;
-  //     return -1;
-  //   }
-  //   cout << "loading wav file in " << path << endl;
-  //   FloatSignal original(path);
-  //   cout << "detecting blobs..." << endl;
-  //   cv::Mat im = cv::imread("blobs.jpg", CV_LOAD_IMAGE_GRAYSCALE); // CV_LOAD_IMAGE_COLOR
-  //   if(!im.data){
-  //     return -1;
-  //   }
-  //   int kernel_size = 11;
-  //   cv::Mat kernel = cv::Mat::ones(kernel_size, kernel_size, CV_32F)/ (float)(kernel_size*kernel_size);
-  //   cv::Mat newPic;
-      
-  //   for (int i=0; i<1; ++i){
-
-  //     cv::filter2D(im, newPic, -1 , kernel, cv::Point(-1, -1), 0, cv::BORDER_DEFAULT );
-      
-  //     cv::SimpleBlobDetector::Params params;
-  //     // params.minThreshold = 10;
-  //     // params.maxThreshold = 200;
-  //     // params.thresholdStep = 1;
-  //     // params.minDistBetweenBlobs = 1;
-  //     params.filterByArea = true;
-  //     params.minArea = 50;
-  //     params.maxArea = 1000000;
-  //     params.filterByCircularity = true;
-  //     params.minCircularity = 0.1;
-  //     params.filterByConvexity = true;
-  //     params.minConvexity = 0.4;
-  //     params.filterByInertia = true;
-  //     params.minInertiaRatio = 0.01;
-  //     cv::Ptr<cv::SimpleBlobDetector> detector = cv::SimpleBlobDetector::create(params);
-  //     vector<cv::KeyPoint> keypoints;
-  //     detector->detect(newPic, keypoints);
-  //     cv::Mat im_with_keypoints;
-  //     drawKeypoints(im, keypoints, im_with_keypoints, cv::Scalar(0,0,255), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS );
-  //     cv::imshow("keypoints", im_with_keypoints );
-  //     cv::waitKey(0);
-  //   }
-    
-  //   cout << "exporting blobs to " << blobsPath << endl;
-  //   //
-  //   return 0;
-  // }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////
   // GENERATING W2W AUDIO AND SEQUENCE: THE DEFAULT ACTION
@@ -406,3 +319,77 @@ int main(int argc, char **argv){
   cout << "aborting: action not understood! " << input.getAction() << endl;
   return -1; 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // //////////////////////////////////////////////////////////////////////////////////////////////////
+  // // TEST 2D BLOB DETECTOR
+  // //////////////////////////////////////////////////////////////////////////////////////////////////
+  // if (input.getAction() == "test_blob2d"){
+  //   string path = input.getOriginalPath();
+  //   string blobsPath = input.getMaterialsPath();
+  //   // check that all needed parameters are present
+  //   if (path.empty() || blobsPath.empty()){
+  //     cout << "aborting: action '" << input.getAction() << "' requires -s <PATH> to original .wav "
+  //          << "file and -m <FOLDER_PATH> to save the .wav blobs!" << endl;
+  //     return -1;
+  //   }
+  //   cout << "loading wav file in " << path << endl;
+  //   FloatSignal original(path);
+  //   cout << "detecting blobs..." << endl;
+  //   cv::Mat im = cv::imread("blobs.jpg", CV_LOAD_IMAGE_GRAYSCALE); // CV_LOAD_IMAGE_COLOR
+  //   if(!im.data){
+  //     return -1;
+  //   }
+  //   int kernel_size = 11;
+  //   cv::Mat kernel = cv::Mat::ones(kernel_size, kernel_size, CV_32F)/ (float)(kernel_size*kernel_size);
+  //   cv::Mat newPic;
+      
+  //   for (int i=0; i<1; ++i){
+
+  //     cv::filter2D(im, newPic, -1 , kernel, cv::Point(-1, -1), 0, cv::BORDER_DEFAULT );
+      
+  //     cv::SimpleBlobDetector::Params params;
+  //     // params.minThreshold = 10;
+  //     // params.maxThreshold = 200;
+  //     // params.thresholdStep = 1;
+  //     // params.minDistBetweenBlobs = 1;
+  //     params.filterByArea = true;
+  //     params.minArea = 50;
+  //     params.maxArea = 1000000;
+  //     params.filterByCircularity = true;
+  //     params.minCircularity = 0.1;
+  //     params.filterByConvexity = true;
+  //     params.minConvexity = 0.4;
+  //     params.filterByInertia = true;
+  //     params.minInertiaRatio = 0.01;
+  //     cv::Ptr<cv::SimpleBlobDetector> detector = cv::SimpleBlobDetector::create(params);
+  //     vector<cv::KeyPoint> keypoints;
+  //     detector->detect(newPic, keypoints);
+  //     cv::Mat im_with_keypoints;
+  //     drawKeypoints(im, keypoints, im_with_keypoints, cv::Scalar(0,0,255), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS );
+  //     cv::imshow("keypoints", im_with_keypoints );
+  //     cv::waitKey(0);
+  //   }
+    
+  //   cout << "exporting blobs to " << blobsPath << endl;
+  //   //
+  //   return 0;
+  // }

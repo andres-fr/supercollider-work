@@ -31,6 +31,8 @@ class FloatSignal {
   // further functionality
   float* getDownsampledCopy(const int ratio); // side effects!
   void toWav(const string pathOut, const bool norm);
+  void plot(const string title, const bool wait=false,
+            const int width=1000, const int height=300);
 };
 
 #endif
