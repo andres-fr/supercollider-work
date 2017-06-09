@@ -1,0 +1,10 @@
+26460  0.7    piano-66.wav
+4410   0.2    piano-61.wav
+35280  0.9    piano-68.wav
+17640  0.5    piano-64.wav
+8820   0.3    piano-62.wav
+30870  0.8    piano-67.wav
+0      0.1    piano-60.wav
+39690  1      piano-69.wav
+22050  0.6    piano-65.wav
+13230  0.4    piano-63.wav

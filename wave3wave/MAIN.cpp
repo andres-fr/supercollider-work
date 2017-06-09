@@ -112,6 +112,11 @@ void cv_plot_floatarray(const float* fArr, const int size, const string title,
   delete[] dArr;
 }
 
+void cv_plotmat(const cv::Mat mat, const string title,
+                const bool wait=false, const int width=1000, const int height=300){
+  cv_plot_floatarray((float*)mat.data, mat.rows, title, wait, width, height);
+}
+
 
 double energy(float* arr, int size){return inner_product(arr, arr+size, arr, 0.0);}
 
@@ -180,11 +185,17 @@ int main(int argc, char **argv){
     original.plot("original signal");
     // perform a convolution on the absolute value of orig
     origCV = cv::abs(origCV);
-    int kernel_size = 5000;
-    cv::Mat kernel = cv::Mat::ones(kernel_size, 1, CV_32F) / (float)kernel_size;
+
+    int kernel_size = 3*44101;
+    cv::Mat kernel = cv::getGaussianKernel(kernel_size, 10, CV_32F);
+    //cv_plotmat(kernel, "gaussian", false, 1000, 1000);
+
+    // cv::Mat kernel = cv::Mat::ones(kernel_size, 1, CV_32F) / (float)kernel_size;
     float* cc = cv_crosscorrelate((float*)origCV.data, origCV.rows, (float*)kernel.data, kernel_size);
     cv_plot_floatarray(cc, origCV.rows-kernel_size+1, "abs. signal, convolution with flat 5000p kernel");
-    cv::waitKey();
+    while(true){
+      if ((char)27 == (char)cv::waitKey()) break;
+    }
  
     return 0;
   }
@@ -230,7 +241,7 @@ int main(int argc, char **argv){
         else{origContent[delIdx] -= matContent[i]*s.k;}
       }
     }
-    // now the original can be downsampled for further optimization    
+    // now the original can be downsampled for further optimization
     int origDownSize = original.getSize()/DS_RATIO;
     float* origDownContent = original.getDownsampledCopy(DS_RATIO);
 
@@ -295,7 +306,7 @@ int main(int argc, char **argv){
     // delete remaining garbage
     delete[] origDownContent;
     delete pickList;
-    // calculate reconstruction with simple trick: ORIG-(ORIG-RECONSTRUCTION) = RECONSTRUCTION 
+    // calculate reconstruction with simple trick: ORIG-(ORIG-RECONSTRUCTION) = RECONSTRUCTION
     FloatSignal reconstruction(origPath);
     float* reconsContent= reconstruction.getContent();
     int reconsSize = reconstruction.getSize();
